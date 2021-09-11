@@ -1,6 +1,7 @@
 from manimlib import *
 from collections import deque
 
+# try run manimgl tree.py BuildTree
 
 ARRAY = [0, 1, 2, 3, 4, 0, 1, 2, 3, 4, 0, 1, 2, 3, 4, 0, 1, 2, 3, 4, 0, 1, 2, 3, 4, 0, 1, 2, None, 4]
 
