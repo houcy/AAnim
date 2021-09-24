@@ -9,4 +9,4 @@ pip install manim
 pip install manimgl
 ```
 
-After installing, `cd practice dir` and try `manimgl make_image.py SquareToCircle`, if you see a window pop up which renders a blue circle, you are good to go.
+After installing, `cd practice` and try `manimgl make_image.py SquareToCircle`, if you see a window pop up which renders a blue circle, you are good to go.
