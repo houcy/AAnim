@@ -3,8 +3,8 @@ from collections import deque
 
 # try run $ manimgl tree.py BuildTree
 
-SHORT = [9, 8, 7, 6, 5, 4, 3, 2, 1]
-SHORT2 = [1, 4, 3, 2, 2, 3, 4]
+MIN = [9, 8, 7, 6, 5, 4, 3, 2, 1]
+MAX = [1, 2, 3, 4, 5, 6, 7, 8, 9]
 LONG = [1, 4, 3, 2, 2, 3, 4, 0, 1, 4, 3, 2, 3, 4, 0, 1, 2, 3, 4, 0, 1, 1, 2, 3, 4, 0, 1, 4, 3, 2, 2, 3, 4, 0, 1, 4, 3, 2, 3, 4, 0, 1, 2, 3, 4, 0, 1, 1, 2, 3, 4, 0]
 
 
@@ -19,12 +19,16 @@ class TreeNode:
         self.position_y = 0
         self.object = None
 
+
 class BuildTree(Scene):
     ###################################################
     # Methods that convert a list to tree and mobjects #
     ###################################################
-    # Turn a list of numbers to a tree, return the root node
+
     def deserialize(self, array):
+        """
+        Turn a list of numbers to a tree, return the root node
+        """
         if not array:
             return None
         root = TreeNode(array[0])
@@ -47,8 +51,11 @@ class BuildTree(Scene):
             i += 1
         return root
 
-    # Calculate the correct offset (so that the node in the bottom level doesn’t overlap)
+
     def get_offset(self, array):
+        """
+        Calculate the correct offset (so that the node in the bottom level doesn’t overlap)
+        """
         # Hardcode the offset for different range = (how many nodes in total, corresponding offset value)
         hardcode_standard = [(3, 0.5), (7, 1), (15, 2), (32, 3), (63, 4)]
         if len(array) > 63:
@@ -58,14 +65,16 @@ class BuildTree(Scene):
             if len(array) <= cutoff:
                 return offset
 
-    # Convert a TreeNode to an MObject in order to show on the canvas
+
     def create_node_object(self, node):
-        radius = 0.3 # should adjust
+        """
+        Convert a TreeNode to an MObject so that it shows on the canvas
+        """
+        radius = 0.3
         font_size = 0.5 
         circle = Circle(radius=radius).set_stroke(color=WHITE, width=1)
         text = Text(str(node.value), font="Open Sans", weight="THIN").scale(font_size)
-        # Place the text at the center of the circle
-        text.add_updater(lambda m: m.move_to(circle.get_center()))
+        text.add_updater(lambda m: m.move_to(circle.get_center())) # Place the text at the center of the circle
         # If the node is on the left side of the root
         if node.position_x < 0:
             return VGroup(circle, text).shift(LEFT * abs(node.position_x) + DOWN * node.position_y)
@@ -73,9 +82,11 @@ class BuildTree(Scene):
         else:
             return VGroup(circle, text).shift(RIGHT * abs(node.position_x) + DOWN * node.position_y)
 
-    
-    # Calculate the position of each treenode and save in the treenode object
+
     def populate_position(self, node, offset):
+        """
+        Calculate the position of each treenode and save in the treenode object
+        """
         if node.parent is None:
             if node.left:
                 node.left.offset = -offset
@@ -97,22 +108,29 @@ class BuildTree(Scene):
         # Convert node to an MObject so that it can be showed on canvas
         node.object = self.create_node_object(node)
 
-    # Convert tree nodes to a list of (circle+text) MObject
+
     def get_all_node_objects(self, node, node_objects):
+        """
+        Convert tree nodes to a list of (circle+text) MObject
+        """
         node_objects.append(node.object)
         if node.left:
             self.get_all_node_objects(node.left, node_objects)
         if node.right:
             self.get_all_node_objects(node.right, node_objects)
 
-    # Convert the lines to a list of line MObject
+
     def get_all_line_objects(self, node, line_objects):
+        """
+        Convert the lines to a list of line MObject
+        """
         if node.left:
             line_objects.append(Line(node.object, node.left.object).set_stroke(color=WHITE, width=1))
             self.get_all_line_objects(node.left, line_objects)
         if node.right:
             line_objects.append(Line(node.object, node.right.object).set_stroke(color=WHITE, width=1))
             self.get_all_line_objects(node.right, line_objects)
+
 
     def list_to_tree_mobjects(self, array):
         """
@@ -135,6 +153,7 @@ class BuildTree(Scene):
         self.get_all_line_objects(root, line_objects)
         return (root, node_objects, line_objects)
 
+
     def draw_tree(self, node_objects, line_objects):
         """
         Show (circle+text) MObject and line MObject
@@ -145,13 +164,30 @@ class BuildTree(Scene):
     # BUILD HEAP #
     ###################################################
 
-    def swap(self, node1, node2):
+    def color(self, node):
+        """
+        Color a node to highlight
+        """
+        node.object.set_stroke(YELLOW, opacity=1.0, width=2)
+
+
+    def decolor(self, node):
+        """
+        Deolor a node to de-highlight
+        """
+        node.object.set_stroke(WHITE, opacity=1.0, width=1)
+
+
+    def swap(self, curr_node, node_to_swap):
         """
         Draw the swap animation and update the tree structure
         """
-        node1.value, node2.value = node2.value, node1.value
-        node1.object, node2.object = node2.object, node1.object
-        self.play(Swap(node1.object, node2.object))
+        self.color(curr_node)
+        curr_node.value, node_to_swap.value = node_to_swap.value, curr_node.value
+        curr_node.object, node_to_swap.object = node_to_swap.object, curr_node.object
+        self.play(Swap(curr_node.object, node_to_swap.object))
+        self.decolor(node_to_swap)
+    
 
     def heapify(self, curr_node, is_min_heap):
         """
@@ -163,25 +199,26 @@ class BuildTree(Scene):
                 smallest = curr_node.left
             if curr_node.right and smallest.value > curr_node.right.value:
                 smallest = curr_node.right 
-            if smallest.value != curr_node.value:
+            if smallest.value != curr_node.value: # Need swap
                 self.swap(curr_node, smallest) # Draw the swap animation
-                self.heapify(smallest, is_min_heap=True)
+                self.heapify(smallest, is_min_heap)
         else:
             largest = curr_node
             if curr_node.left and largest.value < curr_node.left.value:
                 largest = curr_node.left
             if curr_node.right and largest.value < curr_node.right.value:
                 largest = curr_node.right 
-            if largest.value != curr_node.value:
+            if largest.value != curr_node.value: # Need swap
                 self.swap(curr_node, largest) # Draw the swap animation
-                self.heapify(largest, is_min_heap=True)
+                self.heapify(largest, is_min_heap)
+
 
     def build_heap(self, root, is_min_heap=True):
         """
         Build a heap started at root
         """
         stack = [root]
-        all = [root]
+        all = [root] # Unpack the tree to a list of nodes
         while stack:
             node = stack.pop()
             if node.left:
@@ -190,23 +227,22 @@ class BuildTree(Scene):
             if node.right:
                 stack.append(node.right)
                 all.append(node.right)
-        
         while all:
             curr_node = all.pop()
             if not curr_node.left and not curr_node.right:
                 continue
-            self.heapify(curr_node, is_min_heap=True)
+            self.heapify(curr_node, is_min_heap)
 
 
-    # Main
     def construct(self):
         """
-        To build a tree:
-        1. Call list_to_tree_mobjects() which takes a list and returns a list of tree nodes and a list of lines
-        2. Add all nodes and all lines in self.add()
+        This is the main function called by manim
         """
-        root, node_objects, line_objects = self.list_to_tree_mobjects(SHORT)
+        # To build a tree
+        root, node_objects, line_objects = self.list_to_tree_mobjects(MAX)
         self.draw_tree(node_objects, line_objects)
-        self.build_heap(root, is_min_heap=True)
+
+        # To build a heap by the tree 
+        self.build_heap(root, is_min_heap=False)
 
 
