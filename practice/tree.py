@@ -72,8 +72,8 @@ class BuildTree(Scene):
         """
         radius = 0.3
         font_size = 0.5 
-        circle = Circle(radius=radius).set_stroke(color=WHITE, width=1)
-        text = Text(str(node.value), font="Open Sans", weight="THIN").scale(font_size)
+        circle = Circle(radius=radius).set_stroke(color=WHITE, width=1).set_fill(WHITE, opacity=1.0)
+        text = Text(str(node.value), font="Open Sans", weight="THIN", color=BLACK).scale(font_size)
         text.add_updater(lambda m: m.move_to(circle.get_center())) # Place the text at the center of the circle
         # If the node is on the left side of the root
         if node.position_x < 0:
@@ -125,10 +125,10 @@ class BuildTree(Scene):
         Convert the lines to a list of line MObject
         """
         if node.left:
-            line_objects.append(Line(node.object, node.left.object).set_stroke(color=WHITE, width=1))
+            line_objects.append(Line(node.object.get_center(), node.left.object.get_center()).set_stroke(color=WHITE, width=1))
             self.get_all_line_objects(node.left, line_objects)
         if node.right:
-            line_objects.append(Line(node.object, node.right.object).set_stroke(color=WHITE, width=1))
+            line_objects.append(Line(node.object.get_center(), node.right.object.get_center()).set_stroke(color=WHITE, width=1))
             self.get_all_line_objects(node.right, line_objects)
 
 
@@ -168,14 +168,14 @@ class BuildTree(Scene):
         """
         Color a node to highlight
         """
-        node.object.set_stroke(YELLOW, opacity=1.0, width=2)
+        node.object.set_stroke(RED, opacity=1.0, width=2)
 
 
     def decolor(self, node):
         """
         Deolor a node to de-highlight
         """
-        node.object.set_stroke(WHITE, opacity=1.0, width=1)
+        node.object.set_stroke(BLACK, opacity=1.0, width=1)
 
 
     def swap(self, curr_node, node_to_swap):
