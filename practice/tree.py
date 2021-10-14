@@ -46,6 +46,14 @@ class TreeNode:
             i += 1
         return root
 
+    def size(self):
+        size = 1
+        if self.left:
+            size += self.left.size()
+        if self.right:
+            size += self.right.size()
+        return size
+
 
 class HeapNode(TreeNode):
     """
@@ -63,17 +71,18 @@ class BuildTree(Scene):
     # Methods that convert a list to tree and mobjects #
     ###################################################
 
-    def get_offset(self, array):
+    def get_offset(self, root):
         """
         Calculate the correct offset (so that the node in the bottom level doesn’t overlap)
         """
         # Hardcode the offset for different range = (how many nodes in total, corresponding offset value)
+        size = root.size()
         hardcode_standard = [(3, 0.5), (7, 1), (15, 2), (32, 3), (63, 4)]
-        if len(array) > 63:
-            print("The max length we support is 63. Now the lengh is:", len(array))
+        if size > 63:
+            print("The max length we support is 63. Now the lengh is:", size)
             return False
         for cutoff, offset in hardcode_standard:
-            if len(array) <= cutoff:
+            if size <= cutoff:
                 return offset
 
 
@@ -143,19 +152,16 @@ class BuildTree(Scene):
             self.get_all_line_objects(node.right, line_objects)
 
 
-    def _list_to_tree_mobjects(self, node_cls, array):
+    def tree_to_tree_mobjects(self, root):
         """
-        Return a root node, a list of node object(Mobject), a list of lines(Mobject).
-        Not user-facing. This function is called by user-facing functions list_to_tree_mobjects() 
-        or list_to_heap_mobjects().
+        Convert an abstract tree object to its mobject representation.
+        Return a list of node object(Mobject), a list of lines(Mobject). 
         """
         # Check the length of the list (should be <=63) and output the offset based on the length
         # offset is the half of the distance between root.left and root.right
-        offset = self.get_offset(array)
+        offset = self.get_offset(root)
         if not offset:
             return
-        # Convert list to a tree
-        root = node_cls.from_array(array)
         # Fill in the position of each node, pass the offset to draw nodes
         self.populate_position(root, offset)
         # Convert the tree to a list of (circle+text) MObject
@@ -164,13 +170,8 @@ class BuildTree(Scene):
         # Convert the lines to a list of line MObject
         line_objects = []
         self.get_all_line_objects(root, line_objects)
-        return (root, node_objects, line_objects)
+        return node_objects, line_objects
 
-    def list_to_tree_mobjects(self, array):
-        return self._list_to_tree_mobjects(TreeNode, array)
-
-    def list_to_heap_mobjects(self, array):
-        return self._list_to_tree_mobjects(HeapNode, array)
 
     def draw_tree(self, node_objects, line_objects):
         """
@@ -259,7 +260,8 @@ class BuildTree(Scene):
         This is the main function called by manim
         """
         # To build a heap tree
-        root, node_objects, line_objects = self.list_to_heap_mobjects(MAX)
+        root = HeapNode.from_array(MAX)
+        node_objects, line_objects = self.tree_to_tree_mobjects(root)
         self.draw_tree(node_objects, line_objects)
 
         # To build a heap by the tree 
