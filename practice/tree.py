@@ -87,7 +87,7 @@ class TreeNode:
             if size <= cutoff:
                 return offset
 
-    def _create_node_object(self):
+    def _create_node_object(self, is_tree_node=True):
         """
         Convert a TreeNode to an MObject so that it shows on the canvas
         """
@@ -96,12 +96,17 @@ class TreeNode:
         circle = Circle(radius=radius).set_stroke(color=WHITE, width=1).set_fill(WHITE, opacity=1.0)
         text = Text(str(self.value), font="Open Sans", weight="THIN", color=BLACK).scale(font_size)
         text.add_updater(lambda m: m.move_to(circle.get_center())) # Place the text at the center of the circle
-        # If the node is on the left side of the root
-        if self.position_x < 0:
-            return VGroup(circle, text).shift(LEFT * abs(self.position_x) + DOWN * self.position_y)
-        # If the node is on the right side of the root
+        # If the node is for tree representation instead of array representation (e.g., an array representing heap)
+        if is_tree_node:
+            # If the node is on the left side of the root
+            if self.position_x < 0:
+                return VGroup(circle, text).shift(LEFT * abs(self.position_x) + DOWN * self.position_y)
+            # If the node is on the right side of the root
+            else:
+                return VGroup(circle, text).shift(RIGHT * abs(self.position_x) + DOWN * self.position_y)
         else:
-            return VGroup(circle, text).shift(RIGHT * abs(self.position_x) + DOWN * self.position_y)
+            return VGroup(circle, text).shift(RIGHT * abs(self.array_position_x) + UP * self.array_position_y)
+
 
     def _populate_position_and_objects(self, offset):
         """
@@ -182,20 +187,38 @@ class HeapNode(TreeNode):
         self.array_position_y = 1
         self.array_object = None
 
+    def _populate_array_objects(self, start):
+        """
+        Calculate the position of the treenode the its children and save in the treenode object
+        and create the node object for each node
+        """
+        all = self.unpack()
+        distance = 1
+        pos = start
+        for node in all:
+            node.array_position_x = pos
+            pos += distance
+            node.array_object = node._create_node_object(is_tree_node=False)
 
-    # def _populate_array_objects(self):
-    #     """
-    #     Calculate the position of the treenode the its children and save in the treenode object
-    #     and create the node object for each node
-    #     """
-    #     all = self.unpack()
-        
-    
-    # def draw_array(self):
-    #     """
-    #     Create an a copy of all node objects and save in an array
-    #     """
-    #     self._populate_array_objects()
+    def _get_all_array_node_objects(self, node_objects):
+        """
+        Convert tree nodes to a list of (circle+text) MObject
+        """
+        node_objects.append(self.array_object)
+        print("self.array_object", self.array_object)
+        if self.left:
+            self.left._get_all_array_node_objects(node_objects)
+        if self.right:
+            self.right._get_all_array_node_objects(node_objects)
+
+    def tree_to_array_mobjects(self):
+        self._populate_array_objects(0)
+        array_objects = []
+        self._get_all_array_node_objects(array_objects)
+        print("array_objects", array_objects)
+        return array_objects
+            
+
 
 class BuildHeap(Scene):
     ###################################################
@@ -207,6 +230,16 @@ class BuildHeap(Scene):
         Show (circle+text) MObject and line MObject
         """
         self.add(*line_objects, *node_objects)
+
+    ###################################################
+    # DRAW ARRAY #
+    ###################################################
+
+    def draw_array(self, array_objects):
+        """
+        Show (circle+text) MObject and line MObject
+        """
+        self.add(*array_objects)
 
     ###################################################
     # BUILD HEAP #
@@ -278,13 +311,14 @@ class BuildHeap(Scene):
         """
         This is the main function called by manim
         """
-        # To build a tree (initial heap that hasn't been heapified)
+        # To create a tree and draw (initial heap that hasn't been heapified)
         root = HeapNode.from_array(MAX)
         node_objects, line_objects = root.tree_to_mobjects()
-        root.draw_array()
-
-        # To draw the tree (initial heap that hasn't been heapified)
         self.draw_tree(node_objects, line_objects)
+
+        # To create an array representation of the tree and draw
+        array_objects = root.tree_to_array_mobjects()
+        self.draw_array(array_objects)
 
         # To animate build heap (apply heapify)
         self.build_heap(root, is_min_heap=False)
