@@ -19,38 +19,49 @@ class TreeNode:
         self.position_y = 0
         self.object = None
 
-
-class BuildTree(Scene):
-    ###################################################
-    # Methods that convert a list to tree and mobjects #
-    ###################################################
-
-    def deserialize(self, array):
+    @classmethod
+    def from_array(cls, array):
         """
         Turn a list of numbers to a tree, return the root node
         """
         if not array:
             return None
-        root = TreeNode(array[0])
+        root = cls(array[0])
         queue = deque()
         queue.append(root)
         i = 1
         while queue and i < len(array):
             node = queue.popleft()
             if array[i] != None:
-                left = TreeNode(array[i])
+                left = cls(array[i])
                 left.parent = node
                 node.left = left
                 queue.append(left)
             i += 1
             if i < len(array) and array[i] != None:
-                right = TreeNode(array[i])
+                right = cls(array[i])
                 right.parent = node
                 node.right = right
                 queue.append(right)
             i += 1
         return root
 
+
+class HeapNode(TreeNode):
+    """
+    Inherit from TreeNode and add more attributes about array representation
+    """
+    def __init__(self, value):
+        self.array_position_x = 0
+        self.array_position_y = 0
+        self.array_object = None
+        TreeNode.__init__(self, value)
+
+
+class BuildTree(Scene):
+    ###################################################
+    # Methods that convert a list to tree and mobjects #
+    ###################################################
 
     def get_offset(self, array):
         """
@@ -132,9 +143,11 @@ class BuildTree(Scene):
             self.get_all_line_objects(node.right, line_objects)
 
 
-    def list_to_tree_mobjects(self, array):
+    def _list_to_tree_mobjects(self, node_cls, array):
         """
-        Return a root node, a list of node object(Mobject), a list of lines(Mobject)
+        Return a root node, a list of node object(Mobject), a list of lines(Mobject).
+        Not user-facing. This function is called by user-facing functions list_to_tree_mobjects() 
+        or list_to_heap_mobjects().
         """
         # Check the length of the list (should be <=63) and output the offset based on the length
         # offset is the half of the distance between root.left and root.right
@@ -142,7 +155,7 @@ class BuildTree(Scene):
         if not offset:
             return
         # Convert list to a tree
-        root = self.deserialize(array)
+        root = node_cls.from_array(array)
         # Fill in the position of each node, pass the offset to draw nodes
         self.populate_position(root, offset)
         # Convert the tree to a list of (circle+text) MObject
@@ -153,12 +166,17 @@ class BuildTree(Scene):
         self.get_all_line_objects(root, line_objects)
         return (root, node_objects, line_objects)
 
+    def list_to_tree_mobjects(self, array):
+        return self._list_to_tree_mobjects(TreeNode, array)
+
+    def list_to_heap_mobjects(self, array):
+        return self._list_to_tree_mobjects(HeapNode, array)
 
     def draw_tree(self, node_objects, line_objects):
         """
         Show (circle+text) MObject and line MObject
         """
-        self.add(*node_objects, *line_objects)
+        self.add(*line_objects, *node_objects)
 
     ###################################################
     # BUILD HEAP #
@@ -218,7 +236,8 @@ class BuildTree(Scene):
         Build a heap started at root
         """
         stack = [root]
-        all = [root] # Unpack the tree to a list of nodes
+        all = [root]
+        # Unpack the tree to a list of nodes in level order
         while stack:
             node = stack.pop()
             if node.left:
@@ -227,6 +246,7 @@ class BuildTree(Scene):
             if node.right:
                 stack.append(node.right)
                 all.append(node.right)
+        # Iterate all nodes from bottom to top and heapify each node
         while all:
             curr_node = all.pop()
             if not curr_node.left and not curr_node.right:
@@ -238,8 +258,8 @@ class BuildTree(Scene):
         """
         This is the main function called by manim
         """
-        # To build a tree
-        root, node_objects, line_objects = self.list_to_tree_mobjects(MAX)
+        # To build a heap tree
+        root, node_objects, line_objects = self.list_to_heap_mobjects(MAX)
         self.draw_tree(node_objects, line_objects)
 
         # To build a heap by the tree 
