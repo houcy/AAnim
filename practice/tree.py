@@ -61,15 +61,15 @@ class TreeNode:
         """
         Unpack the tree to a list of nodes in level order
         """
-        stack = [self]
+        queue = deque([self])
         all = [self]
-        while stack:
-            node = stack.pop()
+        while queue:
+            node = queue.popleft()
             if node.left:
-                stack.append(node.left)
+                queue.append(node.left)
                 all.append(node.left)
             if node.right:
-                stack.append(node.right)
+                queue.append(node.right)
                 all.append(node.right)
         return all
         
@@ -183,19 +183,19 @@ class HeapNode(TreeNode):
         self.array_object = None
 
 
-    # def _populate_array_position_and_objects(self, start):
+    # def _populate_array_objects(self):
     #     """
     #     Calculate the position of the treenode the its children and save in the treenode object
     #     and create the node object for each node
     #     """
+    #     all = self.unpack()
         
     
     # def draw_array(self):
     #     """
     #     Create an a copy of all node objects and save in an array
     #     """
-    #     self._create_array_object()
-
+    #     self._populate_array_objects()
 
 class BuildHeap(Scene):
     ###################################################
@@ -281,6 +281,7 @@ class BuildHeap(Scene):
         # To build a tree (initial heap that hasn't been heapified)
         root = HeapNode.from_array(MAX)
         node_objects, line_objects = root.tree_to_mobjects()
+        root.draw_array()
 
         # To draw the tree (initial heap that hasn't been heapified)
         self.draw_tree(node_objects, line_objects)
