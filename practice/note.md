@@ -28,6 +28,7 @@ Apperance
 - set_stroke(): circle.set_stroke(color=GREEN, width=20)
 - set_fill(): square.set_fill(YELLOW, opacity=1.0)
 - set_color(): for non VMobject
+- set_opacity(1)
 
 Order
 
