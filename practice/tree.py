@@ -1,7 +1,10 @@
 from manim import *
+from manim.utils.color import Colors
 from collections import deque
 
-# try run $ manim -ql -p tree.py BuildHeap
+# run for low quality $ manim -ql -p tree.py BuildHeap
+# try for medium quality $ manim -qm -p tree.py BuildHeap
+# try for high quality $ manim -qh -p tree.py BuildHeap
 
 MIN = [9, 8, 7, 6, 5, 4, 3, 2, 1]
 MAX = [1, 2, 3, 4, 5, 6, 7, 8, 9]
@@ -10,11 +13,12 @@ LONG = [1, 4, 3, 2, 2, 3, 4, 0, 1, 4, 3, 2, 3, 4, 0, 1, 2, 3, 4, 0, 1, 1, 2, 3, 
 # Styling configs
 LINE_COLOR = WHITE
 BACKGROUND_COLOR = BLACK
-HIGHLIGHT_COLOR = YELLOW
-
+HIGHLIGHT_COLOR = Colors.yellow_d.value
+HIGHLIGHT_TEXT = BLACK
 WIDTH = 2
 FONT_SIZE = 0.6
 RADIUS = 0.3
+
 
 class TreeNode:
     def __init__(self, value):
@@ -102,12 +106,13 @@ class TreeNode:
         circle = Circle(radius=RADIUS).set_stroke(color=LINE_COLOR, width=WIDTH).set_fill(BACKGROUND_COLOR, opacity=1.0)
         text = Tex(str(self.value), color=LINE_COLOR).scale(FONT_SIZE)
         text.add_updater(lambda m: m.move_to(circle.get_center())) # Place the text at the center of the circle
+        key_mobject_list = [("circle", circle), ("text", text)]
         # If the node is on the left side of the root
         if self.position_x < 0:
-            return VGroup(circle, text).shift(LEFT * abs(self.position_x) + DOWN * self.position_y)
+            return VDict(key_mobject_list).shift(LEFT * abs(self.position_x) + DOWN * self.position_y)
         # If the node is on the right side of the root
         else:
-            return VGroup(circle, text).shift(RIGHT * abs(self.position_x) + DOWN * self.position_y)
+            return VDict(key_mobject_list).shift(RIGHT * abs(self.position_x) + DOWN * self.position_y)
 
 
     def _populate_position_and_objects(self, offset):
@@ -219,17 +224,17 @@ class BuildHeap(Scene):
         """
         Color a node to highlight
         """
-        color = HIGHLIGHT_COLOR
-        node.object.set_stroke(color)
-        node.text_mobject.set_color(color)
+        node.object["circle"].set_color(HIGHLIGHT_COLOR)
+        node.object["text"].set_color(HIGHLIGHT_TEXT)
+        node.text_mobject.set_color(HIGHLIGHT_COLOR)
 
     def decolor(self, node):
         """
         Deolor a node to de-highlight
         """
-        color = LINE_COLOR
-        node.object.set_stroke(color)
-        node.text_mobject.set_color(color)
+        node.object["circle"].set_color(BACKGROUND_COLOR).set_stroke(LINE_COLOR)
+        node.object["text"].set_color(LINE_COLOR)
+        node.text_mobject.set_color(LINE_COLOR)
 
     def swap(self, curr_node, node_to_swap):
         """

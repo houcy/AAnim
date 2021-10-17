@@ -1,2 +1,5 @@
 __pycache__
 .DS_Store
+media/
+practice/test.py
+manim.cfg
