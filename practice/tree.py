@@ -1,12 +1,20 @@
 from manim import *
 from collections import deque
 
-# try run $ manim tree.py BuildHeap
+# try run $ manim -ql -p tree.py BuildHeap
 
 MIN = [9, 8, 7, 6, 5, 4, 3, 2, 1]
 MAX = [1, 2, 3, 4, 5, 6, 7, 8, 9]
 LONG = [1, 4, 3, 2, 2, 3, 4, 0, 1, 4, 3, 2, 3, 4, 0, 1, 2, 3, 4, 0, 1, 1, 2, 3, 4, 0, 1, 4, 3, 2, 2, 3, 4, 0, 1, 4, 3, 2, 3, 4, 0, 1, 2, 3, 4, 0, 1, 1, 2, 3, 4, 0]
 
+# Styling configs
+LINE_COLOR = WHITE
+BACKGROUND_COLOR = BLACK
+HIGHLIGHT_COLOR = YELLOW
+
+WIDTH = 2
+FONT_SIZE = 0.6
+RADIUS = 0.3
 
 class TreeNode:
     def __init__(self, value):
@@ -91,10 +99,8 @@ class TreeNode:
         """
         Convert a TreeNode to an MObject so that it shows on the canvas
         """
-        radius = 0.3
-        font_size = 0.5 
-        circle = Circle(radius=radius).set_stroke(color=WHITE).set_fill(BLACK, opacity=1.0)
-        text = Text(str(self.value), font="Open Sans", color=WHITE).scale(font_size)
+        circle = Circle(radius=RADIUS).set_stroke(color=LINE_COLOR, width=WIDTH).set_fill(BACKGROUND_COLOR, opacity=1.0)
+        text = Tex(str(self.value), color=LINE_COLOR).scale(FONT_SIZE)
         text.add_updater(lambda m: m.move_to(circle.get_center())) # Place the text at the center of the circle
         # If the node is on the left side of the root
         if self.position_x < 0:
@@ -150,10 +156,10 @@ class TreeNode:
         """
         line_objects = []
         if self.left:
-            line_objects.append(Line(self.object.get_center(), self.left.object.get_center()).set_stroke(color=WHITE))
+            line_objects.append(Line(self.object.get_center(), self.left.object.get_center()).set_stroke(color=LINE_COLOR, width=WIDTH))
             line_objects += self.left._get_all_line_objects()
         if self.right:
-            line_objects.append(Line(self.object.get_center(), self.right.object.get_center()).set_stroke(color=WHITE))
+            line_objects.append(Line(self.object.get_center(), self.right.object.get_center()).set_stroke(color=LINE_COLOR, width=WIDTH))
             line_objects += self.right._get_all_line_objects()
         return line_objects
 
@@ -185,8 +191,7 @@ class HeapNode(TreeNode):
         self.text_mobject = None
     
     def _create_text_mobject(self):
-        font_size = 0.5
-        return Text(str(self.value), font="Open Sans", color=WHITE).scale(font_size)
+        return Tex(str(self.value), color=LINE_COLOR).scale(FONT_SIZE)
 
     def create_text_mobjects(self):
         """
@@ -207,25 +212,23 @@ class BuildHeap(Scene):
         table = MobjectTable(
             [array_node_mobjects],
             v_buff=0.5, h_buff=0.7,
-            include_outer_lines=True)
+            include_outer_lines=True).set_stroke(width=WIDTH)
         return table
     
     def color(self, node):
         """
         Color a node to highlight
         """
-        color = YELLOW
-        opacity = 1.0
-        node.object.set_stroke(color, opacity=opacity)
+        color = HIGHLIGHT_COLOR
+        node.object.set_stroke(color)
         node.text_mobject.set_color(color)
 
     def decolor(self, node):
         """
         Deolor a node to de-highlight
         """
-        color = WHITE
-        opacity = 1.0
-        node.object.set_stroke(color, opacity=opacity)
+        color = LINE_COLOR
+        node.object.set_stroke(color)
         node.text_mobject.set_color(color)
 
     def swap(self, curr_node, node_to_swap):
@@ -280,7 +283,7 @@ class BuildHeap(Scene):
         """
         This is the main function called by manim
         """
-        self.camera.background_color = BLACK
+        self.camera.background_color = BACKGROUND_COLOR
         # To create a tree data structure
         root = HeapNode.from_array(MIN)
 
@@ -295,6 +298,7 @@ class BuildHeap(Scene):
 
         # To animate build heap (apply heapify)
         self.build_heap(root, is_min_heap=True)
+
 
 
 
