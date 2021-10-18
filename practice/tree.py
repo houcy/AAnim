@@ -13,7 +13,7 @@ LONG = [1, 4, 3, 2, 2, 3, 4, 0, 1, 4, 3, 2, 3, 4, 0, 1, 2, 3, 4, 0, 1, 1, 2, 3, 
 # Styling configs
 LINE_COLOR = WHITE
 BACKGROUND_COLOR = BLACK
-HIGHLIGHT_COLOR = Colors.yellow_d.value
+HIGHLIGHT_COLOR = Colors.yellow_c.value
 HIGHLIGHT_TEXT = BLACK
 WIDTH = 2
 FONT_SIZE = 0.6
@@ -141,7 +141,6 @@ class TreeNode:
         # Convert node to an MObject so that it can be showed on canvas
         self.object = self._create_node_object()
             
-
     def _get_all_node_objects(self):
         """
         Convert tree nodes to a list of (circle+text) mobject.
@@ -184,7 +183,7 @@ class TreeNode:
         node_mobjects = self._get_all_node_objects()
         # Convert the lines to a list of line MObject
         line_mobjects = self._get_all_line_objects()
-        return VGroup(*line_mobjects, *node_mobjects)
+        return [*line_mobjects, *node_mobjects]
 
 
 class HeapNode(TreeNode):
@@ -224,7 +223,8 @@ class BuildHeap(Scene):
         """
         Color a node to highlight
         """
-        node.object["circle"].set_color(HIGHLIGHT_COLOR)
+        # self.play(node.object["circle"].animate.set_color(HIGHLIGHT_COLOR), node.object["text"].animate.set_color(HIGHLIGHT_TEXT))
+        node.object["circle"].set_color(HIGHLIGHT_COLOR)        
         node.object["text"].set_color(HIGHLIGHT_TEXT)
         node.text_mobject.set_color(HIGHLIGHT_COLOR)
 
@@ -286,22 +286,29 @@ class BuildHeap(Scene):
 
     def construct(self):
         """
-        This is the main function called by manim
+        Main function called by manim
         """
         self.camera.background_color = BACKGROUND_COLOR
-        # To create a tree data structure
+        # Create a tree data structure
         root = HeapNode.from_array(MIN)
 
-        # Draw the array
+        # Create the array mobject
         table_mobject = self.create_table_mobject(root)
-        self.play(table_mobject.create())
 
-        # Draw the tree
-        tree_mobject = root.create_node_mobjects()
-        table_mobject.next_to(tree_mobject, direction = UP, buff=1)  # Align the tree and the array
-        self.play(ShowIncreasingSubsets(tree_mobject))
+        # Create the tree mobject
+        tree_mobject_list = root.create_node_mobjects()
+
+        # Draw array and tree
+        tree_vgroup = VGroup(*tree_mobject_list)
+        table_mobject.next_to(tree_vgroup, direction = DOWN, buff=1)  # Align the tree and the array
+        vgroup = VGroup(table_mobject, tree_vgroup)
+        vgroup.center() # Position the vgroup of tree and array at the center
+        animation = [FadeIn(x) for x in tree_mobject_list]
+        self.play(table_mobject.create(), run_time=3)
+        self.play(AnimationGroup(*animation, lag_ratio=0.5), run_time=3)
 
         # To animate build heap (apply heapify)
+        self.wait(2)
         self.build_heap(root, is_min_heap=True)
 
 
