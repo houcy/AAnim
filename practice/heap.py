@@ -16,6 +16,7 @@ LINE_COLOR = WHITE
 BACKGROUND_COLOR = BLACK
 HIGHLIGHT_COLOR = Colors.yellow_c.value
 HIGHLIGHT_TEXT = BLACK
+DELETE_COLOR = RED
 WIDTH = 2
 FONT_SIZE = 0.6
 RADIUS = 0.3
@@ -33,6 +34,7 @@ class HeapNode:
         self.position_y = 0
         self.mobject = None
         self.text_mobject = None
+        self.line_mobject = None
     
     def _create_mobject(self):
         """
@@ -102,9 +104,13 @@ class HeapArray():
         for node in self.array:
             node_mobjects.append(node.mobject)
             if node.left < self.length:
-                line_mobjects.append(Line(node.mobject.get_center(), self.array[node.left].mobject.get_center()).set_stroke(color=LINE_COLOR, width=WIDTH))
+                line = Line(node.mobject.get_center(), self.array[node.left].mobject.get_center()).set_stroke(color=LINE_COLOR, width=WIDTH)
+                line_mobjects.append(line)
+                self.array[node.left].line_mobject = line
             if node.right < self.length:
-                line_mobjects.append(Line(node.mobject.get_center(), self.array[node.right].mobject.get_center()).set_stroke(color=LINE_COLOR, width=WIDTH))
+                line = Line(node.mobject.get_center(), self.array[node.right].mobject.get_center()).set_stroke(color=LINE_COLOR, width=WIDTH)
+                line_mobjects.append(line)
+                self.array[node.right].line_mobject = line
         tree = VGroup(*line_mobjects, *node_mobjects)
         animation = [FadeIn(x) for x in line_mobjects+node_mobjects]
         return tree, animation
@@ -126,11 +132,14 @@ class HeapArray():
 
 
 class BuildHeap(Scene):
-    def color(self, node):
+    def color(self, node, is_delete):
         """
         Color a node to highlight
         """
-        node.mobject["circle"].set_color(HIGHLIGHT_COLOR)        
+        if is_delete:
+            node.mobject["circle"].set_color(DELETE_COLOR)        
+        else:
+            node.mobject["circle"].set_color(HIGHLIGHT_COLOR)        
         node.mobject["text"].set_color(HIGHLIGHT_TEXT)
         node.text_mobject.set_color(HIGHLIGHT_COLOR)
 
@@ -142,16 +151,17 @@ class BuildHeap(Scene):
         node.mobject["text"].set_color(LINE_COLOR)
         node.text_mobject.set_color(LINE_COLOR)
 
-    def swap(self, node, node_to_swap):
+    def swap(self, node, node_to_swap, is_delete=False):
         """
         Draw the swap animation and update the array structure
         """
-        self.color(node)
+        self.color(node, is_delete)
         node.value, node_to_swap.value = node_to_swap.value, node.value
         node.mobject, node_to_swap.mobject = node_to_swap.mobject, node.mobject
         node.text_mobject, node_to_swap.text_mobject = node_to_swap.text_mobject, node.text_mobject
         self.play(Swap(node.mobject, node_to_swap.mobject), Swap(node.text_mobject, node_to_swap.text_mobject))
-        self.decolor(node_to_swap)
+        if not is_delete:
+            self.decolor(node_to_swap)
     
     def _heapify(self, heap, node, is_min_heap):
         """
@@ -187,11 +197,13 @@ class BuildHeap(Scene):
         if heap.length == 0:
             print("Heap is empty")
             return
-        to_delete = heap.array[0]
+        first = heap.array[0]
         last = heap.array[-1]
-        self.play(FadeOut(to_delete.mobject))
-        self.play(Swap(to_delete.mobject, last.mobject))
-
+        self.swap(first, last, True)
+        self.play(FadeOut(last.mobject), FadeOut(last.line_mobject))
+        heap.array.pop()
+        heap.length -= 1
+        self._heapify(heap, first, True)
 
     def construct(self):
         """
@@ -213,6 +225,9 @@ class BuildHeap(Scene):
         self.build_heap(heap, is_min_heap=True)
 
         # Delete
+        self.wait(2)
+        self.delete(heap)
+        self.delete(heap)
         self.delete(heap)
 
 
