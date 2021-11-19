@@ -3,10 +3,11 @@ from manim.utils.color import Colors
 from collections import deque
 import math
 
-# run for low quality $ manim -ql -p tree.py BuildHeap
-# try for medium quality $ manim -qm -p tree.py BuildHeap
-# try for high quality $ manim -qh -p tree.py BuildHeap
+# run for low quality $ manim -ql -p heap.py BuildHeap
+# try for medium quality $ manim -qm -p heap.py BuildHeap
+# try for high quality $ manim -qh -p heap.py BuildHeap
 
+SHORT = [9, 8, 7]
 MIN = [9, 8, 7, 6, 5, 4, 3, 2, 1]
 MAX = [1, 2, 3, 4, 5, 6, 7, 8, 9]
 LONG = [1, 4, 3, 2, 2, 3, 4, 0, 1, 4, 3, 2, 3, 4, 0, 1, 2, 3, 4, 0, 1, 1, 2, 3, 4, 0, 1, 4, 3, 2, 2, 3, 4, 0, 1, 4, 3, 2, 3, 4, 0, 1, 2, 3, 4, 0, 1, 1, 2, 3, 4, 0]
@@ -19,8 +20,11 @@ HIGHLIGHT_TEXT = BLACK
 DELETE_COLOR = RED
 WIDTH = 2
 FONT_SIZE = 0.6
+TITLE_SIZE = 1.0
+TITLE_POSITION = UP*2.5+LEFT*4
 RADIUS = 0.3
 
+# Zindex: line 0, circle 1, description text 2
 
 class HeapNode:
     def __init__(self, index, value):
@@ -57,7 +61,6 @@ class HeapNode:
 
 class HeapArray():
     def __init__(self, array):
-        self.length = len(array)
         self.array = []
         for i, value in enumerate(array):
             node = HeapNode(i, value)
@@ -70,11 +73,11 @@ class HeapArray():
         """
         # Hardcode the offset for different range = (how many nodes in total, corresponding offset value)
         hardcode_standard = [(3, 0.5, -1), (7, 1, -1.5), (15, 2, -2), (32, 3, -2.5), (63, 4, 4, -3)]
-        if self.length > 63:
-            print("The max length we support is 63. Now the lengh is:", self.length)
+        if len(self.array) > 63:
+            print("The max length we support is 63. Now the lengh is:", len(self.array))
             return False
         for cutoff, offset, start_y in hardcode_standard:
-            if self.length <= cutoff:
+            if len(self.array) <= cutoff:
                 return offset, start_y
 
     def _populate_position_and_mobjects(self):
@@ -84,18 +87,18 @@ class HeapArray():
         for i, node in enumerate(self.array):
             if i == 0:
                 node.position_y = start_y
-                if node.left < self.length:
+                if node.left < len(self.array):
                     self.array[node.left].offset = -offset
-                if node.right < self.length:
+                if node.right < len(self.array):
                     self.array[node.right].offset = offset
             else:
                 parent_x = self.array[node.parent].position_x
                 parent_y = self.array[node.parent].position_y
                 node.position_x = parent_x + node.offset
                 node.position_y = parent_y + 1
-                if node.left < self.length:
+                if node.left < len(self.array):
                     self.array[node.left].offset = -abs(node.offset) / 2
-                if node.right < self.length:
+                if node.right < len(self.array):
                     self.array[node.right].offset = abs(node.offset) / 2
             node._create_mobject()
         
@@ -103,11 +106,11 @@ class HeapArray():
         mobjects = []
         for node in self.array:
             mobjects.append(node.mobject)
-            if node.left < self.length:
+            if node.left < len(self.array):
                 line = Line(node.mobject.get_center(), self.array[node.left].mobject.get_center()).set_stroke(color=LINE_COLOR, width=WIDTH).set_z_index(0)
                 mobjects.append(line)
                 self.array[node.left].line_mobject = line
-            if node.right < self.length:
+            if node.right < len(self.array):
                 line = Line(node.mobject.get_center(), self.array[node.right].mobject.get_center()).set_stroke(color=LINE_COLOR, width=WIDTH).set_z_index(0)
                 mobjects.append(line)
                 self.array[node.right].line_mobject = line
@@ -135,16 +138,15 @@ class HeapArray():
         Delete the last node
         """
         self.array.pop()
-        self.length -= 1
 
     def insert(self, value):
         """
         Insert a node in the end, create a mobject and update the array
         """
-        node = HeapNode(self.length, value)
+        node = HeapNode(len(self.array), value)
         parent_x = self.array[node.parent].position_x
         parent_y = self.array[node.parent].position_y
-        if self.array[node.parent].left >= self.length:
+        if self.array[node.parent].left >= len(self.array):
             node.offset = -abs(self.array[node.parent].offset) / 2
         else:
             node.offset = abs(self.array[node.parent].offset) / 2
@@ -153,7 +155,6 @@ class HeapArray():
         node._create_mobject()
         node.line_mobject = Line(node.mobject.get_center(), self.array[node.parent].mobject.get_center()).set_stroke(color=LINE_COLOR, width=WIDTH).set_z_index(0)
         self.array.append(node)
-        self.length += 1
         return node
 
 
@@ -182,10 +183,11 @@ class BuildHeap(Scene):
         Draw the swap animation and update the array structure
         """
         self.color(node, is_delete)
+        self.wait(1)
         node.value, node_to_swap.value = node_to_swap.value, node.value
         node.mobject, node_to_swap.mobject = node_to_swap.mobject, node.mobject
         node.text_mobject, node_to_swap.text_mobject = node_to_swap.text_mobject, node.text_mobject
-        self.play(Swap(node.mobject, node_to_swap.mobject), Swap(node.text_mobject, node_to_swap.text_mobject))
+        self.play(Swap(node.mobject, node_to_swap.mobject), Swap(node.text_mobject, node_to_swap.text_mobject), run_time=1.5)
         if not is_delete:
             self.decolor(node_to_swap)
     
@@ -195,24 +197,26 @@ class BuildHeap(Scene):
         """
         if is_min_heap:
             smallest = node
-            if node.left < heap.length and smallest.value > heap.array[node.left].value:
+            if node.left < len(heap.array) and smallest.value > heap.array[node.left].value:
                 smallest = heap.array[node.left]
-            if node.right < heap.length and smallest.value > heap.array[node.right].value:
+            if node.right < len(heap.array) and smallest.value > heap.array[node.right].value:
                 smallest = heap.array[node.right]
             if smallest.value != node.value: # Need swap
                 self.swap(node, smallest) # Draw the swap animation
                 self._heapify(heap, smallest, is_min_heap)
         else:
             largest = node
-            if node.left < heap.length and largest.value < heap[node.left].value:
+            if node.left < len(heap.array) and largest.value < heap[node.left].value:
                 largest = heap.array[node.left]
-            if node.right < heap.length and largest.value < heap[node.right].value:
+            if node.right < len(heap.array) and largest.value < heap[node.right].value:
                 largest = heap.array[node.right]
             if largest != node: # Need swap
                 self.swap(node, largest) # Draw the swap animation
                 self._heapify(heap, largest, is_min_heap)
 
     def _filterup(self, heap, node, is_min_heap):
+        if node.parent < 0:
+            return
         parent = heap.array[node.parent]
         if is_min_heap:
             if node.value < parent.value:
@@ -227,30 +231,42 @@ class BuildHeap(Scene):
         """
         Build a heap by heapify each node from bottom to up
         """
-        for i in range(heap.length-1, -1, -1):
+        text = Tex('Building the heap', color=LINE_COLOR).scale(TITLE_SIZE).set_z_index(2).move_to(TITLE_POSITION)
+        self.play(FadeIn(text))
+        self.wait(1)
+        for i in range(len(heap.array)-1, -1, -1):
             self._heapify(heap, heap.array[i], is_min_heap)
+        self.play(FadeOut(text))
 
     def delete(self, heap):
-        if heap.length == 0:
+        if len(heap.array) == 0:
             print("Heap is empty")
             return
+        text = Tex('Deletion', color=LINE_COLOR).scale(TITLE_SIZE).set_z_index(2).move_to(TITLE_POSITION)
+        self.play(FadeIn(text))
+        self.wait(1)
         first = heap.array[0]
         last = heap.array[-1]
         self.swap(first, last, True)
         self.play(FadeOut(last.mobject), FadeOut(last.line_mobject))
-        heap.array.delete()
+        heap.delete()
         self._heapify(heap, first, True)
+        self.play(FadeOut(text))
 
     def insert(self, heap, value):
-        if heap.length == 0:
+        if len(heap.array) == 0:
             print("Heap is empty")
             return
+        text = Tex('Insertion', color=LINE_COLOR).scale(TITLE_SIZE).set_z_index(2).move_to(TITLE_POSITION)
+        self.play(FadeIn(text))
+        self.wait(1)
         node = heap.insert(value)
         self.play(FadeIn(node.line_mobject), FadeIn(node.mobject))
         table = heap.table()
         table.move_to(DOWN*2)
         self.play(table.create(), run_time=3)
         self._filterup(heap, node, True)
+        self.play(FadeOut(text))
 
 
     def construct(self):
@@ -268,18 +284,14 @@ class BuildHeap(Scene):
         self.play(table.create(), run_time=3)
         self.play(AnimationGroup(*animation, lag_ratio=0.5), run_time=3)
 
-        # Build heap
-        self.wait(2)
+        # Building the heap
         self.build_heap(heap, is_min_heap=True)
 
-        # # Delete
-        # self.wait(2)
+        # # Deletion
         # self.delete(heap)
         # self.delete(heap)
-
-        # Insert
-        self.wait(2)
-        self.insert(heap, 1)
+        # # Insertion
+        # self.insert(heap, 1)
 
 
 
