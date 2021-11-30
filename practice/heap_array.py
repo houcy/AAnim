@@ -69,15 +69,15 @@ class HeapArray():
         text_mobjects = [node.text_mobject for node in self.array]
         return Table(text_mobjects, is_mobject=True)
     
-    def delete(self):
+    def remove(self):
         """
-        Delete the last node
+        Remove the last node
         """
         self.array.pop()
 
-    def insert(self, value):
+    def add(self, value):
         """
-        Insert a node in the end, create a mobject and update the array
+        Add a node in the end, create a mobject and update the array
         """
         node = HeapNode(len(self.array), value)
         parent_x = self.array[node.parent].position_x

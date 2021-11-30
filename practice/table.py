@@ -75,8 +75,6 @@ class Table():
         if self.is_mobject:
             mobject, mobject_to_swap = index, index_to_swap
         else:
-            print(index_to_swap)
-            print(self.second_line[index_to_swap])
             if index < 15:
                 mobject = self.first_line[index]["text"]
             else:
@@ -85,7 +83,6 @@ class Table():
                 mobject_to_swap = self.first_line[index_to_swap]["text"]
             else:
                 mobject_to_swap = self.second_line[index_to_swap]["text"]
-        print(mobject, mobject_to_swap)
         return Swap(mobject, mobject_to_swap)
 
     def remove(self):
