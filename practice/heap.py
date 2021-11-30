@@ -43,10 +43,17 @@ class BuildHeap(Scene):
         """
         self._color(node, is_delete)
         self.wait(1)
+        text = None
+        if is_delete:
+            text = Tex('move {} to the end'.format(node.value), color=LINE_COLOR).scale(FONT_SIZE).set_z_index(2).shift(5*LEFT+1*UP)
+        else:
+            text = Tex('heapify({})'.format(node.value), color=LINE_COLOR).scale(FONT_SIZE).set_z_index(2).shift(5*LEFT+1*UP)
         node.value, node_to_swap.value = node_to_swap.value, node.value
         node.mobject, node_to_swap.mobject = node_to_swap.mobject, node.mobject
         node.text_mobject, node_to_swap.text_mobject = node_to_swap.text_mobject, node.text_mobject
+        self.play(FadeIn(text))
         self.play(Swap(node.mobject, node_to_swap.mobject), heap.table.swap(node.text_mobject, node_to_swap.text_mobject), run_time=1.5)
+        self.play(FadeOut(text))
         if not is_delete:
             self._decolor(node_to_swap)
     
