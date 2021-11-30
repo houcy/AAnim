@@ -1,0 +1,15 @@
+from manim import *
+from manim.utils.color import Colors
+
+# Styling configs
+LINE_COLOR = WHITE
+BACKGROUND_COLOR = BLACK
+HIGHLIGHT_COLOR = Colors.yellow_c.value
+HIGHLIGHT_TEXT = BLACK
+DELETE_COLOR = RED
+WIDTH = 2
+FONT_SIZE = 0.6
+TITLE_SIZE = 1.0
+TITLE_POSITION = UP*2.5+LEFT*4
+RADIUS = 0.3
+TABLE_SIDE_LENGTH = 0.7
