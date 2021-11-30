@@ -15,7 +15,8 @@ Example: Circle, Arrow, Rectangle
 
 ### How to change location
 
-- shift(): change the location from ORIGIN. Can be shifted to LEFT, RIGHT, UP, DOWN, etc. Like circle.shift(LEFT).
+- shift(): change the location from ORIGIN. Can be shifted to LEFT, RIGHT, UP, DOWN, etc. Like circle.shift(LEFT). For example, x.shift(x.get_center()\*LEFT).
+
 - move_to(): circle.move_to(LEFT \* 2) place the circle two units left from the origin.
 - next_to(): square.next_to(circle, LEFT) place the square to the left of the circle.
 - align_to(): triangle.align_to(circle, LEFT) align the left border of the triangle to the left border of the circle.
