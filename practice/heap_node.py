@@ -22,7 +22,7 @@ class HeapNode:
         """
         circle = Circle(radius=RADIUS).set_stroke(color=LINE_COLOR, width=WIDTH).set_fill(BACKGROUND_COLOR, opacity=1.0)
         text = Tex(str(self.value), color=LINE_COLOR).scale(FONT_SIZE)
-        text.add_updater(lambda m: m.move_to(circle.get_center())) # Place the text at the center of the circle
+        # text.add_updater(lambda m: m.move_to(circle.get_center())) # Place the text at the center of the circle
         key_mobject_list = [("circle", circle), ("text", text)]
         # If the node is on the left side of the root
         if self.position_x < 0:
