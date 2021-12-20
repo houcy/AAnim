@@ -4,18 +4,25 @@ from heap_node import HeapNode
 from table import Table
 from code_block import CodeBlock
 
-CODE_FOR_BUILD = """BuildHeap(A) {
+CODE_FOR_BUILD = """BUILD-HEAP(A) {
     heapsize = length(A)
     for i = floor(heapsize/2) downto 1
-        Heapify(A, i)
+        HeapifyDown(A, i)
 }
 """
 
-CODE_FOR_EXTRACT = """Extract(A) {
-    heapsize <- length(A)
+CODE_FOR_EXTRACT = """EXTRACT-FIRST(A) {
+    heapsize = length(A)
     Exchange A[1] with A[heapsize]
     Remove A[heapsize]
-    Heapify(A, 1)
+    HeapifyDown(A, 1)
+}
+"""
+
+CODE_FOR_INSERT = """INSERT(A, value) {
+    heapsize = length(A) + 1
+    A[heapsize] = value
+    HeapifyUp(A, heapsize)
 }
 """
 
@@ -30,6 +37,8 @@ class HeapArray():
         self.tree, self.animation = self._tree()
         self.table.first_line.next_to(self.tree, direction = DOWN, buff=1)  # Align the tree and the table
         self.code_for_build = CodeBlock(CODE_FOR_BUILD)
+        self.code_for_extract = CodeBlock(CODE_FOR_EXTRACT)
+        self.code_for_insert = CodeBlock(CODE_FOR_INSERT)
         self.animation = AnimationGroup(*self.animation, *self.table.animation, lag_ratio=0.5)
     
     def _get_offset(self):
@@ -106,6 +115,7 @@ class HeapArray():
         node.position_x = parent_x + node.offset
         node.position_y = parent_y + 1
         node._create_mobject()
+        node.mobject = node.mobject.shift(3 * RIGHT)
         node.line_mobject = Line(node.mobject.get_center(), self.array[node.parent].mobject.get_center()).set_stroke(color=LINE_COLOR, width=WIDTH).set_z_index(0)
         self.array.append(node)
         return node

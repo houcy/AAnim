@@ -2,7 +2,7 @@ from manim import *
 
 class CodeBlock():
     def __init__(self, code):
-        self.code = Code(code=code, margin=0, line_spacing=0.7, background_stroke_width=0, tab_width=2, language="Python", font="Monospace", font_size=16)
+        self.code = Code(code=code, margin=0, line_spacing=0.7, background_stroke_width=0, tab_width=2, language="Python", font="Monospace", font_size=16).shift(3.5*LEFT)
         self.top = self.code.get_top()[1]
         self.left = self.code.get_left()[0]
         self.bottom = self.code.get_bottom()[1]

@@ -9,6 +9,7 @@ from code_block import CodeBlock
 
 SHORT = [9, 8, 7]
 MIN = [19, 18, 17, 16, 15, 14, 13, 12, 11]
+HEAPIFIED = [11, 12, 13, 14, 15, 16, 17, 18, 19]
 MID = [15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1]
 MAX = [1, 2, 3, 4, 5, 6, 7, 8, 9]
 LONG = [1, 4, 3, 2, 2, 3, 4, 0, 1, 4, 3, 2, 3, 4, 0, 1, 2, 3, 4, 0, 1, 1, 2, 3, 4, 0, 1, 4, 3, 2, 2, 3, 4, 0, 1, 4, 3, 2, 3, 4, 0, 1, 2, 3, 4, 0, 1, 1, 2, 3, 4, 0]
@@ -104,14 +105,16 @@ class BuildHeap(Scene):
         """
         text = Tex('Building the heap', color=LINE_COLOR).scale(TITLE_SIZE).set_z_index(2).move_to(TITLE_POSITION)
         self.play(FadeIn(text))
-        self.play(FadeIn(heap.code_for_build.code.shift(3.5*LEFT)))
+        self.play(FadeIn(heap.code_for_build.code))
         self.wait(1)
         for i in range((len(heap.array)-1) // 2 - 1, -1, -1):
             node = heap.array[i]
+            # Color
             self.play(heap.code_for_build.highlight(3))
             self.wait(0.5)
             self._color(node, False)
             self.wait(0.5)
+            # Heapify
             self.play(heap.code_for_build.highlight(4))
             self._heapify(heap, node, is_min_heap)
             self._decolor_all(heap.array)
@@ -125,14 +128,27 @@ class BuildHeap(Scene):
             return
         text = Tex('Deletion', color=LINE_COLOR).scale(TITLE_SIZE).set_z_index(2).move_to(TITLE_POSITION)
         self.play(FadeIn(text))
-        self.wait(1)
+        self.play(FadeIn(heap.code_for_extract.code))
+        self.wait(0.5)
+        # Swap
+        self.play(heap.code_for_extract.highlight(3))
         first = heap.array[0]
         last = heap.array[-1]
+        self._color(first, False)
+        self._color(last, False)
         self.swap(heap, first, last, True)
+        # Remove last
+        self.play(heap.code_for_extract.highlight(4))
         self.play(FadeOut(last.mobject), FadeOut(last.line_mobject), heap.table.remove())
         heap.remove()
+        # Heapify
+        self.play(heap.code_for_extract.highlight(5))
         self._heapify(heap, first, True)
+        self._decolor_all(heap.array)
+        # Clean up
         self.play(FadeOut(text))
+        self.play(FadeOut(heap.code_for_extract.code))
+        self.play(FadeOut(heap.code_for_extract.highlight_rect))
 
     def insert(self, heap, value):
         if len(heap.array) == 0:
@@ -140,11 +156,21 @@ class BuildHeap(Scene):
             return
         text = Tex('Insertion', color=LINE_COLOR).scale(TITLE_SIZE).set_z_index(2).move_to(TITLE_POSITION)
         self.play(FadeIn(text))
-        self.wait(1)
+        self.play(FadeIn(heap.code_for_insert.code))
+        self.wait(0.5)
+        # Insert
+        self.play(heap.code_for_insert.highlight(3))
         node = heap.add(value)
         self.play(FadeIn(node.line_mobject), FadeIn(node.mobject), heap.table.add(node.text_mobject))
+        # Heapify
+        self._color(node, False)
+        self.play(heap.code_for_insert.highlight(4))
         self._filterup(heap, node, True)
+        self._decolor_all(heap.array)
+        # Clean up
         self.play(FadeOut(text))
+        self.play(FadeOut(heap.code_for_insert.code))
+        self.play(FadeOut(heap.code_for_insert.highlight_rect))
 
 
     def construct(self):
@@ -153,17 +179,17 @@ class BuildHeap(Scene):
         """
         self.camera.background_color = BACKGROUND_COLOR
         # Draw an array and a tree
-        heap = HeapArray(MIN)        
+        heap = HeapArray(HEAPIFIED)        
         self.play(heap.animation, run_time=3)
 
-        # Building the heap
-        self.build_heap(heap, is_min_heap=True)
+        # # Building the heap
+        # self.build_heap(heap, is_min_heap=True)
 
-        # # Deletion
-        # self.extract(heap)
+        # Deletion
+        self.extract(heap)
 
-        # # Insertion
-        # self.insert(heap, 1)
+        # Insertion
+        self.insert(heap, 1)
 
 
 
