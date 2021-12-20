@@ -2,6 +2,22 @@ from manim import *
 from style import *
 from heap_node import HeapNode
 from table import Table
+from code_block import CodeBlock
+
+CODE_FOR_BUILD = """BuildHeap(A) {
+    heapsize = length(A)
+    for i = floor(heapsize/2) downto 1
+        Heapify(A, i)
+}
+"""
+
+CODE_FOR_EXTRACT = """Extract(A) {
+    heapsize <- length(A)
+    Exchange A[1] with A[heapsize]
+    Remove A[heapsize]
+    Heapify(A, 1)
+}
+"""
 
 class HeapArray():
     def __init__(self, array):
@@ -13,6 +29,7 @@ class HeapArray():
         self._populate_position_and_mobjects()  
         self.tree, self.animation = self._tree()
         self.table.first_line.next_to(self.tree, direction = DOWN, buff=1)  # Align the tree and the table
+        self.code_for_build = CodeBlock(CODE_FOR_BUILD)
         self.animation = AnimationGroup(*self.animation, *self.table.animation, lag_ratio=0.5)
     
     def _get_offset(self):
@@ -62,7 +79,7 @@ class HeapArray():
                 line = Line(node.mobject.get_center(), self.array[node.right].mobject.get_center()).set_stroke(color=LINE_COLOR, width=WIDTH).set_z_index(0)
                 mobjects.append(line)
                 self.array[node.right].line_mobject = line
-        return VGroup(*mobjects), [FadeIn(x) for x in mobjects]
+        return VGroup(*mobjects), [FadeIn(x.shift(3 * RIGHT)) for x in mobjects]
         
 
     def _table(self):
