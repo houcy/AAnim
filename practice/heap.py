@@ -1,11 +1,10 @@
 from manim import *
 from style import *
 from heap_array import HeapArray
-from code_block import CodeBlock
 
-# run for low quality $ manim -ql -p heap.py BuildHeap
-# try for medium quality $ manim -qm -p heap.py BuildHeap
-# try for high quality $ manim -qh -p heap.py BuildHeap
+# create low quality video $ manim -ql -p heap.py BinaryHeap
+# create medium quality video $ manim -qm -p heap.py BinaryHeap
+# create high quality video $ manim -qh -p heap.py BinaryHeap
 
 SHORT = [9, 8, 7]
 MIN = [19, 18, 17, 16, 15, 14, 13, 12, 11]
@@ -17,7 +16,7 @@ LONG = [1, 4, 3, 2, 2, 3, 4, 0, 1, 4, 3, 2, 3, 4, 0, 1, 2, 3, 4, 0, 1, 1, 2, 3, 
 # Zindex: line 0, circle 1, description text 2
 
 
-class BuildHeap(Scene):
+class BinaryHeap(Scene):    
     def _color(self, node, is_delete):
         """
         Color a node to highlight
@@ -52,14 +51,10 @@ class BuildHeap(Scene):
         """
         Draw the swap animation and update the array structure
         """
-        # self._color(node, is_delete)
-        text = None
         node.value, node_to_swap.value = node_to_swap.value, node.value
         node.mobject, node_to_swap.mobject = node_to_swap.mobject, node.mobject
-        node.text_mobject, node_to_swap.text_mobject = node_to_swap.text_mobject, node.text_mobject
-        self.play(FadeIn(text))
         self.play(Swap(node.mobject, node_to_swap.mobject), heap.table.swap(node.text_mobject, node_to_swap.text_mobject), run_time=1.5)
-        self.play(FadeOut(text))
+        node.text_mobject, node_to_swap.text_mobject = node_to_swap.text_mobject, node.text_mobject
         # if not is_delete:
         #     self._decolor(node_to_swap)
     
@@ -103,32 +98,27 @@ class BuildHeap(Scene):
         """
         Build a heap by heapify each node from bottom to up
         """
-        text = Tex('Building the heap', color=LINE_COLOR).scale(TITLE_SIZE).set_z_index(2).move_to(TITLE_POSITION)
-        self.play(FadeIn(text))
-        self.play(FadeIn(heap.code_for_build.code))
+        self.play(FadeIn(heap.code_for_build.code, heap.code_for_build.create_title('Building the heap')))
         self.wait(1)
         for i in range((len(heap.array)-1) // 2 - 1, -1, -1):
             node = heap.array[i]
             # Color
-            self.play(heap.code_for_build.highlight(3))
+            self.play(heap.code_for_build.highlight(2))
             self.wait(0.5)
             self._color(node, False)
             self.wait(0.5)
             # Heapify
-            self.play(heap.code_for_build.highlight(4))
+            self.play(heap.code_for_build.highlight(3))
             self._heapify(heap, node, is_min_heap)
             self._decolor_all(heap.array)
-        self.play(FadeOut(text))
-        self.play(FadeOut(heap.code_for_build.code))
-        self.play(FadeOut(heap.code_for_build.highlight_rect))
+        self.play(FadeOut(heap.code_for_build.code, heap.code_for_build.highlight_rect, heap.code_for_build.title))
+
 
     def extract(self, heap):
         if len(heap.array) == 0:
             print("Heap is empty")
             return
-        text = Tex('Deletion', color=LINE_COLOR).scale(TITLE_SIZE).set_z_index(2).move_to(TITLE_POSITION)
-        self.play(FadeIn(text))
-        self.play(FadeIn(heap.code_for_extract.code))
+        self.play(FadeIn(heap.code_for_extract.code, heap.code_for_build.create_title('Deletion')))
         self.wait(0.5)
         # Swap
         self.play(heap.code_for_extract.highlight(3))
@@ -139,24 +129,23 @@ class BuildHeap(Scene):
         self.swap(heap, first, last, True)
         # Remove last
         self.play(heap.code_for_extract.highlight(4))
+        self.wait(1)
         self.play(FadeOut(last.mobject), FadeOut(last.line_mobject), heap.table.remove())
         heap.remove()
         # Heapify
         self.play(heap.code_for_extract.highlight(5))
+        self.wait(1)
         self._heapify(heap, first, True)
         self._decolor_all(heap.array)
         # Clean up
-        self.play(FadeOut(text))
-        self.play(FadeOut(heap.code_for_extract.code))
-        self.play(FadeOut(heap.code_for_extract.highlight_rect))
+        self.play(FadeOut(heap.code_for_extract.code, heap.code_for_extract.highlight_rect, heap.code_for_build.title))
+
 
     def insert(self, heap, value):
         if len(heap.array) == 0:
             print("Heap is empty")
             return
-        text = Tex('Insertion', color=LINE_COLOR).scale(TITLE_SIZE).set_z_index(2).move_to(TITLE_POSITION)
-        self.play(FadeIn(text))
-        self.play(FadeIn(heap.code_for_insert.code))
+        self.play(FadeIn(heap.code_for_insert.code, heap.code_for_build.create_title('Insertion')))
         self.wait(0.5)
         # Insert
         self.play(heap.code_for_insert.highlight(3))
@@ -165,12 +154,11 @@ class BuildHeap(Scene):
         # Heapify
         self._color(node, False)
         self.play(heap.code_for_insert.highlight(4))
+        self.wait(1)
         self._filterup(heap, node, True)
         self._decolor_all(heap.array)
         # Clean up
-        self.play(FadeOut(text))
-        self.play(FadeOut(heap.code_for_insert.code))
-        self.play(FadeOut(heap.code_for_insert.highlight_rect))
+        self.play(FadeOut(heap.code_for_insert.code, heap.code_for_insert.highlight_rect, heap.code_for_build.title))
 
 
     def construct(self):
@@ -179,17 +167,18 @@ class BuildHeap(Scene):
         """
         self.camera.background_color = BACKGROUND_COLOR
         # Draw an array and a tree
-        heap = HeapArray(HEAPIFIED)        
+        heap = HeapArray(MIN)        
         self.play(heap.animation, run_time=3)
 
-        # # Building the heap
-        # self.build_heap(heap, is_min_heap=True)
+        # Building the heap
+        self.build_heap(heap, is_min_heap=True)
 
         # Deletion
         self.extract(heap)
 
         # Insertion
         self.insert(heap, 1)
+
 
 
 

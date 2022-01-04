@@ -4,9 +4,8 @@ from heap_node import HeapNode
 from table import Table
 from code_block import CodeBlock
 
-CODE_FOR_BUILD = """BUILD-HEAP(A) {
-    heapsize = length(A)
-    for i = floor(heapsize/2) downto 1
+CODE_FOR_BUILD = """BUILD-HEAP(A[1,...,n]) {
+    for i = floor(n/2) downto 1
         HeapifyDown(A, i)
 }
 """
@@ -88,7 +87,7 @@ class HeapArray():
                 line = Line(node.mobject.get_center(), self.array[node.right].mobject.get_center()).set_stroke(color=LINE_COLOR, width=WIDTH).set_z_index(0)
                 mobjects.append(line)
                 self.array[node.right].line_mobject = line
-        return VGroup(*mobjects), [FadeIn(x.shift(3 * RIGHT)) for x in mobjects]
+        return VGroup(*mobjects), [FadeIn(x.shift(SHIFT_RIGHT_UNIT * RIGHT)) for x in mobjects]
         
 
     def _table(self):
