@@ -15,13 +15,17 @@ class Table():
         self.buff = buff
         self.table = []
         self.is_mobject = is_mobject
+        self.text2index = {} # A map from the Tex mobject to its index in VDict
         if self.length >= 32:
             print("Array is too long")
             return
         if is_mobject:
+            index = 0
             for mob in array:
                 square = VDict([("box", Square(side_length=TABLE_SIDE_LENGTH)), ("text", mob)])
                 self.table.append(square)
+                self.text2index[mob] = index
+                index+=1
         else:
             for value in array:
                 mobject = self._create_text_mobject(value)
@@ -46,10 +50,11 @@ class Table():
             mobject = value
         else:
             mobject = self._create_text_mobject(value)
-        square = VGroup(Square(side_length=TABLE_SIDE_LENGTH), mobject)
+        square = VDict([("box", Square(side_length=TABLE_SIDE_LENGTH)), ("text", mobject)])
         if self.length < 15:
             square.next_to(self.first_line, RIGHT, buff=0)
             self.first_line = self.first_line.add([(self.length, square)])
+            self.text2index[mobject] = self.length
             animation.append(FadeIn(square))
             position_y = self.first_line.get_y()
             animation.append(self.first_line.animate.move_to([0, position_y, 0]))
@@ -70,19 +75,32 @@ class Table():
         self.length += 1
         return self.animation
 
-    def swap(self, index, index_to_swap):
+    def swap(self, text, text_to_swap):
+        print("text", text)
+        print("text_to_swap", text_to_swap)
+        print("SWAP self.first_line", self.first_line)
         mobject, mobject_to_swap = None, None
         if self.is_mobject:
-            mobject, mobject_to_swap = index, index_to_swap
+            mobject, mobject_to_swap = text, text_to_swap
+            index = self.text2index[text]
+            index_to_swap = self.text2index[text_to_swap]
+            print("index, index_to_swap", index, index_to_swap)
+            print("self.first_line[index]", self.first_line[index])
+            print("self.first_line[index_to_swap]", self.first_line[index_to_swap])
+            self.first_line[index]["text"] = text_to_swap
+            self.first_line[index_to_swap]["text"] = text
+            self.text2index[text] = index_to_swap
+            self.text2index[text_to_swap] = index
         else:
-            if index < 15:
-                mobject = self.first_line[index]["text"]
+            if text < 15:
+                mobject = self.first_line[text]["text"]
             else:
-                mobject = self.second_line[index]["text"]
-            if index_to_swap < 15:
-                mobject_to_swap = self.first_line[index_to_swap]["text"]
+                mobject = self.second_line[text]["text"]
+            if text_to_swap < 15:
+                mobject_to_swap = self.first_line[text_to_swap]["text"]
             else:
-                mobject_to_swap = self.second_line[index_to_swap]["text"]
+                mobject_to_swap = self.second_line[text_to_swap]["text"]
+        print("SWAP(after) self.first_line", self.first_line)
         return Swap(mobject, mobject_to_swap)
 
     def remove(self):
@@ -90,17 +108,22 @@ class Table():
             print("Array is empty")
             return
         animation = []
-        if self.length <=15:
-            animation.append(FadeOut(self.first_line[self.length-1]))
+        if self.length <= 15:
+            print("REMOVE self.first_line", self.first_line)
+            last_square = self.first_line[self.length-1]
+            del self.text2index[last_square["text"]]
+            animation.append(FadeOut(last_square))
             self.first_line.remove(self.length-1)
             position_y = self.first_line.get_y()
-            animation.append(self.first_line.animate.move_to([0, position_y, 0]))
+            print("position_y", position_y)
+            print("REMOVE(after) self.first_line", self.first_line)
+            animation.append(self.first_line.animate.move_to([SHIFT_RIGHT_UNIT, position_y, 0]))
         else:
             animation.append(FadeOut(self.second_line[self.length-1]))
             self.second_line.remove(self.length-1)
             if self.length > 16:
                 position_y = self.second_line.get_y()
-                animation.append(self.second_line.animate.move_to([0, position_y, 0]))
+                animation.append(self.second_line.animate.move_to([SHIFT_RIGHT_UNIT, position_y, 0]))
         self.animation = AnimationGroup(*animation, lag_ratio=0.5)
         self.length -= 1
         return self.animation
