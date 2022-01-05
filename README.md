@@ -17,4 +17,4 @@ After installing, `cd practice` and try `manimgl make_image.py SquareToCircle`, 
 ## Working demo
 
 You will need to `cd practice` first.
-Heap operations: `manim -ql -p heap.py BuildHeap`
+Heap operations: `manim -ql -p heap.py BinaryHeap`

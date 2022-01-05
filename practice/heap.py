@@ -6,17 +6,14 @@ from heap_array import HeapArray
 # create medium quality video $ manim -qm -p heap.py BinaryHeap
 # create high quality video $ manim -qh -p heap.py BinaryHeap
 
-SHORT = [9, 8, 7]
-MIN = [19, 18, 17, 16, 15, 14, 13, 12, 11]
-HEAPIFIED = [11, 12, 13, 14, 15, 16, 17, 18, 19]
-MID = [15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1]
-MAX = [1, 2, 3, 4, 5, 6, 7, 8, 9]
-LONG = [1, 4, 3, 2, 2, 3, 4, 0, 1, 4, 3, 2, 3, 4, 0, 1, 2, 3, 4, 0, 1, 1, 2, 3, 4, 0, 1, 4, 3, 2, 2, 3, 4, 0, 1, 4, 3, 2, 3, 4, 0, 1, 2, 3, 4, 0, 1, 1, 2, 3, 4, 0]
-
 # Zindex: line 0, circle 1, description text 2
 
 
-class BinaryHeap(Scene):    
+class BinaryHeap(Scene):
+    def __init__(self, array):
+        self.heap = HeapArray(array) 
+        super().__init__()
+
     def _color(self, node, is_delete):
         """
         Color a node to highlight
@@ -161,23 +158,32 @@ class BinaryHeap(Scene):
         self.play(FadeOut(heap.code_for_insert.code, heap.code_for_insert.highlight_rect, heap.code_for_build.title))
 
 
-    def construct(self):
+    def construct(self, command):
         """
         Main function called by manim
+        command is a list of string
         """
+        print("command", command)
         self.camera.background_color = BACKGROUND_COLOR
-        # Draw an array and a tree
-        heap = HeapArray(MIN)        
-        self.play(heap.animation, run_time=3)
-
+        
+        # Draw an array and a tree 
+        if command[0].isdigit():   
+            print("self.heap.animation", self.heap.animation)  
+            self.play(self.heap.animation, run_time=3)
         # Building the heap
-        self.build_heap(heap, is_min_heap=True)
-
+        elif command[0] == 'build':
+            if command[1] == 'min':
+                self.build_heap(self.heap, is_min_heap=True)
+            elif command[1] == 'max':
+                self.build_heap(self.heap, is_min_heap=False)
+            else:
+                print('Error: input should be min or max')
         # Deletion
-        self.extract(heap)
-
+        elif command[0] == 'extract':
+            self.extract(self.heap)
         # Insertion
-        self.insert(heap, 1)
+        elif command[0] == 'insert':
+            self.insert(self.heap, int(command[1]))
 
 
 
