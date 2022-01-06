@@ -17,4 +17,10 @@ After installing, `cd practice` and try `manimgl make_image.py SquareToCircle`, 
 ## Working demo
 
 You will need to `cd practice` first.
-Heap operations: `manim -ql -p heap.py BinaryHeap`
+Heap operations: `python animate.py commands.txt`
+You can customize your commands in commands.txt. However it only takes one of the four commands:
+
+1. Create a heap by giving a list of numbers less than 15 elements, seperated by space. For example: `19 18 17 16 15 14 13 12 11`
+2. Build a heap: build [min/max]. For example: `build min`
+3. Extract the Min/Max: extract.
+4. Insert a value and heapify: insert [integer]. For example: `insert 1`

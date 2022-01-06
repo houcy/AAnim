@@ -3,7 +3,7 @@ from style import *
 
 class CodeBlock():
     def __init__(self, code):
-        self.code = Code(code=code, margin=0, background_stroke_width=0, tab_width=2, language="Python", font="Monospace", font_size=16).shift(SHIFT_LEFT_UNIT * LEFT)
+        self.code = Code(code=code, line_spacing=1, background="rectangle", margin=0, background_stroke_width=0, tab_width=2, language="Python", font="Monospace", font_size=16).shift(SHIFT_LEFT_UNIT * LEFT)
         self.top = self.code.get_top()[1]
         self.left = self.code.get_left()[0]
         self.bottom = self.code.get_bottom()[1]

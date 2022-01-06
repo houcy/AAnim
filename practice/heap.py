@@ -163,7 +163,7 @@ class BinaryHeap(Scene):
         Main function called by manim
         command is a list of string
         """
-        print("command", command)
+        # print("command", command)
         self.camera.background_color = BACKGROUND_COLOR
         
         # Draw an array and a tree 
