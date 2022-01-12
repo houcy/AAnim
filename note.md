@@ -2,7 +2,7 @@
 
 ## Mobject
 
-Example: Circle, Arrow, Rectangle
+Example: Circle(), Arrow(), Rectangle(), SurroundingRectangle(text)
 
 ### How to display
 
@@ -42,13 +42,25 @@ Creating an instance of an animation action
 - FadeIn(circle)
 - Rotate(square, 1)
 - FadeOut(square)
+- Write(text)
+- DrawBoarderThenFill(square)
+- Create(circle)
 
 Calling animate() methods of a mobject
 
 - circle.animate.set_fill(WHITE)
+- circle.animate.to_edge(UR, buff=0.5)
 
 Change duration
 
 - self.play(circle.animate.set_fill(WHITE), run_time=3)
 
-## Scene
+## Getter
+
+Manim provides functions to get the position of an mobject.
+
+- arrow = Line(start=rect.get_bottom(), end=circ.get_top())
+
+You can also use `always_redraw(lambda : mobject)` to update the position of the mobject if it depends on another moving mobject.
+
+- arraw2 = always_redraw(lambda: arrow)
