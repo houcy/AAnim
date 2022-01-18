@@ -41,6 +41,10 @@ class CodeBlock():
         self.line_height = self.height / (self.total_lines + self.total_lines*CODE_LINE_SPACING - CODE_LINE_SPACING)
         self.highlight_rect = None
         self.title = None
+        self._set_background_color()
+
+    def _set_background_color(self):
+        self.code.background_mobject.set_fill(BACKGROUND_COLOR)
 
     def create_title(self, title):
         self.title = Tex(title, color=LINE_COLOR).scale(TITLE_SIZE).set_z_index(2).next_to(self.code, UP, buff=0.5)
@@ -50,17 +54,9 @@ class CodeBlock():
         if line_number > self.total_lines or line_number <= 0:
             print("Error: line number out of the range")
             return
-        # if not self.highlight_rect:
-        #     y_position = self.top - (line_number-0.5) * self.line_height
-        #     self.highlight_rect = Rectangle(width=self.width+CODE_BLOCK_WIDTH_PADDING, height=self.line_height+CODE_BLOCK_HEIGHT_PADDING).set_stroke(color=YELLOW, width=2).shift(SHIFT_LEFT_UNIT * LEFT + UP * y_position)
-        #     return FadeIn(self.highlight_rect)
-        # else:
-        #     y_position = self.top - (self.line_height + self.line_height * CODE_LINE_SPACING) * (line_number - 1) - 0.5 * self.line_height
-        #     return self.highlight_rect.animate.move_to(SHIFT_LEFT_UNIT * LEFT + UP * y_position)
-
         y_position = self.top - (self.line_height + self.line_height * CODE_LINE_SPACING) * (line_number - 1) - 0.5 * self.line_height
         if not self.highlight_rect:
-            self.highlight_rect = Rectangle(width=self.width+CODE_BLOCK_WIDTH_PADDING, height=self.line_height+CODE_BLOCK_HEIGHT_PADDING).set_stroke(color=YELLOW, width=2).shift(SHIFT_LEFT_UNIT * LEFT + UP * y_position)
+            self.highlight_rect = Rectangle(width=self.width+CODE_BLOCK_WIDTH_PADDING, height=self.line_height+CODE_BLOCK_HEIGHT_PADDING).set_stroke(color=HIGHLIGHT_COLOR, width=2).shift(SHIFT_LEFT_UNIT * LEFT + UP * y_position)
             return FadeIn(self.highlight_rect)
         else:
             return self.highlight_rect.animate.move_to(SHIFT_LEFT_UNIT * LEFT + UP * y_position)
