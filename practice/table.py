@@ -124,7 +124,7 @@ class Table():
 
 # class Example(Scene):
 #     def construct(self):
-#         self.camera.background_color = BACKGROUND_COLOR
+#         self.camera.background_color = BACKGROUND
 #         table = Table([i for i in range(18)])
 #         self.play(*table.animation)
 #         self.play(table.remove())

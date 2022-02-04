@@ -44,7 +44,7 @@ class CodeBlock():
         self._set_background_color()
 
     def _set_background_color(self):
-        self.code.background_mobject.set_fill(BACKGROUND_COLOR)
+        self.code.background_mobject.set_fill(BACKGROUND)
 
     def create_title(self, title):
         self.title = Tex(title, color=LINE_COLOR).scale(TITLE_SIZE).set_z_index(2).next_to(self.code, UP, buff=0.5)

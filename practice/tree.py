@@ -12,7 +12,7 @@ LONG = [1, 4, 3, 2, 2, 3, 4, 0, 1, 4, 3, 2, 3, 4, 0, 1, 2, 3, 4, 0, 1, 1, 2, 3, 
 
 # Styling configs
 LINE_COLOR = WHITE
-BACKGROUND_COLOR = BLACK
+BACKGROUND = BLACK
 HIGHLIGHT_COLOR = Colors.yellow_c.value
 HIGHLIGHT_TEXT = BLACK
 WIDTH = 2
@@ -103,7 +103,7 @@ class TreeNode:
         """
         Convert a TreeNode to an MObject so that it shows on the canvas
         """
-        circle = Circle(radius=RADIUS).set_stroke(color=LINE_COLOR, width=WIDTH).set_fill(BACKGROUND_COLOR, opacity=1.0)
+        circle = Circle(radius=RADIUS).set_stroke(color=LINE_COLOR, width=WIDTH).set_fill(BACKGROUND, opacity=1.0)
         text = Tex(str(self.value), color=LINE_COLOR).scale(FONT_SIZE)
         text.add_updater(lambda m: m.move_to(circle.get_center())) # Place the text at the center of the circle
         key_mobject_list = [("circle", circle), ("text", text)]
@@ -228,7 +228,7 @@ class BuildHeap(Scene):
         """
         Deolor a node to de-highlight
         """
-        node.object["circle"].set_color(BACKGROUND_COLOR).set_stroke(LINE_COLOR)
+        node.object["circle"].set_color(BACKGROUND).set_stroke(LINE_COLOR)
         node.object["text"].set_color(LINE_COLOR)
         node.text_mobject.set_color(LINE_COLOR)
 
@@ -283,7 +283,7 @@ class BuildHeap(Scene):
         """
         Main function called by manim
         """
-        self.camera.background_color = BACKGROUND_COLOR
+        self.camera.background_color = BACKGROUND
         # Create a tree data structure
         root = HeapNode.from_array(MIN)
 

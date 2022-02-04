@@ -31,7 +31,7 @@ class BinaryHeap(Scene):
         """
         Deolor a node to de-highlight
         """
-        node.mobject["circle"].set_color(BACKGROUND_COLOR).set_stroke(LINE_COLOR)
+        node.mobject["circle"].set_color(BACKGROUND).set_stroke(LINE_COLOR)
         node.mobject["text"].set_color(LINE_COLOR)
         node.text_mobject.set_color(LINE_COLOR)
 
@@ -40,7 +40,7 @@ class BinaryHeap(Scene):
         Deolor all nodes to de-highlight
         """
         for node in heap_array:
-            node.mobject["circle"].set_color(BACKGROUND_COLOR).set_stroke(LINE_COLOR)
+            node.mobject["circle"].set_color(BACKGROUND).set_stroke(LINE_COLOR)
             node.mobject["text"].set_color(LINE_COLOR)
             node.text_mobject.set_color(LINE_COLOR)
 
@@ -164,7 +164,7 @@ class BinaryHeap(Scene):
         command is a list of string
         """
         # print("command", command)
-        self.camera.background_color = BACKGROUND_COLOR
+        self.camera.background_color = BACKGROUND
         
         # Draw an array and a tree 
         if command[0].isdigit():   
