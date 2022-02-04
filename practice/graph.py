@@ -5,19 +5,20 @@ from graph_node import GraphNode
 
 
 class Graph:
-    def __init__(self, map, position, is_directed=False):
+    def __init__(self, adjacency_list, position, is_directed=False):
         self.graph_mobject = VGroup()
         self.value2node = {}
-        for start in map:
+        for start in adjacency_list:
             if start not in self.value2node:
                 position_x, position_y = position[start]
                 self._create_node(start, position_x, position_y)
                 
-            for end in map[start]:
+            for end in adjacency_list[start]:
                 if end not in self.value2node:
                     position_x, position_y = position[end]
                     self._create_node(end, position_x, position_y)
                 self._create_edge(start, end, is_directed)
+        self.graph_mobject = self.graph_mobject.move_to(ORIGIN)
                 
     def _create_node(self, value, position_x, position_y):
         node = GraphNode(value, position_x, position_y)
