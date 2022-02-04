@@ -3,3 +3,5 @@ __pycache__
 media/
 practice/test.py
 manim.cfg
+practice/output.png
+practice/output.json
