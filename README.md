@@ -35,14 +35,11 @@ Graph operations that we currently support is to build a graph, dfs. Use the fol
 
 You can also customize the blueprint of the graph in graph_blueprint.gv. Please follow the following format strictly. Check out [Graphviz](https://graphviz.org) to know more about this format.
 
-graph G { # You can't modify the first line
-
-A -- B # You can use A -- B to represent an undirected edge AB, or A -> B to represent a directed edge AB. Aditional spaces doesn't matter.
-
-B -- C
-
+```
+graph G {      # You can't modify the first line
+A -- B         # Use A -- B to represent an undirected edge, or A -> B to represent a directed edge.
+   B -- C      # Indentation doesn't matter
 C -- A
-
 C -- D
-
-} # You can't modify the last line
+}              # You can't modify the last line
+```
