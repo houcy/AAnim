@@ -10,9 +10,10 @@ POSITION = {'A': (-1, 1), 'B': (1, 1), 'C': (-1, -1), 'D': (1, -1)}
 POSITION2 = {'A': (0.675, 2.1569), 'B': (2.4143499999999998, 0.45), 'D': (4.135, 2.181125), 'C': (2.38995, 3.8865000000000003)}
 
 class GraphAlgorithm(Scene):
-    def __init__(self, adjacency_list, position):
+    def __init__(self, adjacency_list, position, is_directed):
         self.adjacency_list = adjacency_list
         self.position = position
+        self.is_directed = is_directed
         super().__init__()
 
     def _dfs_helper(self, node, discovered):
@@ -37,7 +38,7 @@ class GraphAlgorithm(Scene):
     def construct(self):
         self.camera.background_color = BACKGROUND
         # graph = Graph(MAP, POSITION2, True)
-        graph = Graph(self.adjacency_list, self.position, True)
+        graph = Graph(self.adjacency_list, self.position, self.is_directed)
         self.add(graph.graph_mobject)
         self.dfs(graph)
     

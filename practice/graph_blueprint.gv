@@ -2,9 +2,6 @@ graph G {
 	A -- B
 	B -- C
 	C -- A
-    C -- D
-    C -- E
-    C -- F
     D -- F
     E -- F
 }

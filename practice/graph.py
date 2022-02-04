@@ -3,7 +3,6 @@ from style import *
 from graph_node import GraphNode
 
 
-
 class Graph:
     def __init__(self, adjacency_list, position, is_directed=False):
         self.graph_mobject = VGroup()

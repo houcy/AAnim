@@ -8,9 +8,10 @@ def get_adjacency_list(file_name):
     is_directed = False
     adjacency_list = defaultdict(list)
     with open(file_name) as f:
-        contents = f.readlines()
-        if ">" in contents:
+        if ">" in f.read():
             is_directed = True
+    with open(file_name) as f:
+        contents = f.readlines()
         for line in contents[1:-1]:
             line = line.strip("\n")
             line = line.strip("\t")
@@ -29,7 +30,7 @@ def get_adjacency_list(file_name):
             if not is_directed:
                 if start not in adjacency_list[end]:
                     adjacency_list[end].append(start)
-    return adjacency_list
+    return adjacency_list, is_directed
 
 def transform_position_to_manim(position):
     max_x, max_y= 0, 0
@@ -56,13 +57,13 @@ def get_position():
     
             
 # Get the adjacency_list
-adjacency_list = get_adjacency_list(sys.argv[1])
+adjacency_list, is_directed = get_adjacency_list(sys.argv[1])
 
 # Get the position
 position = get_position()
 
 # Call manim
-scene = GraphAlgorithm(adjacency_list, position)
+scene = GraphAlgorithm(adjacency_list, position, is_directed)
 scene.construct()
 
 # Use FFMPEG to combine partial videos      
