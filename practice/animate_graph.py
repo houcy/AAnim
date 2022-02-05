@@ -38,7 +38,7 @@ def transform_position_to_manim(position):
         x, y = position[e]
         max_x = max(max_x, x)
         max_y = max(max_y, y)
-    ratio = max(max_x/6, max_y/3)
+    ratio = max(max_x/4, max_y/3)
     new_position = {}
     for e in position:
         x, y = position[e]

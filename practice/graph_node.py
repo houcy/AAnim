@@ -25,13 +25,20 @@ class GraphNode:
         return Tex(str(value), color=LINE_COLOR).scale(FONT_SIZE)
 
     def mark_discovered(self):
-        return AnimationGroup(self.mobject["c"].animate.set_fill(PINK3).set_stroke(PINK3), self.mobject["t"].animate.set_color(BACKGROUND))
+        return AnimationGroup(self.mobject["c"].animate.set_fill(PINK1).set_stroke(PINK1), self.mobject["t"].animate.set_color(BACKGROUND))
     
     def mark_finished(self):
-        return AnimationGroup(self.mobject["c"].animate.set_fill(PINK1).set_stroke(PINK1), self.mobject["t"].animate.set_color(BACKGROUND))
+        return AnimationGroup(self.mobject["c"].animate.set_fill(BLUE1).set_stroke(BLUE1), self.mobject["t"].animate.set_color(BACKGROUND))
+    
+    def mark_line_discovered(self, neighbor):
+        return self.neighbor2line[neighbor].animate.set_fill(PINK1).set_stroke(PINK1)
 
-# class Test(Scene):
-#     def construct(self):
-#         self.camera.background_color = BACKGROUND
-#         node = HeapNode(2, 1, 1)
-#         self.add(node.mobject)
+    def mark_line_finished(self, neighbor):
+        return self.neighbor2line[neighbor].animate.set_fill(BLUE1).set_stroke(BLUE1)
+
+
+class Test(Scene):
+    def construct(self):
+        self.camera.background_color = BACKGROUND
+        node = GraphNode(2, 1, 1)
+        self.add(node.mobject)

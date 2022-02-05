@@ -17,6 +17,21 @@ TEST_CODE = """EXTRACT-FIRST(A) {
 }
 """
 
+CODE_FOR_DFS = """DFS(G) {
+    for each vertex u
+        if u.color = BLACK
+            DFS-VISIT(G, u)
+}
+
+DFS-VISIT(G, u) {
+    u.color = WHITE
+    for each v in G.Adj[u]
+        if v.color = BLACK
+            DFS-VISIT(G, v)
+    u.color = PINK
+}
+"""
+
 CODE_FOR_BUILD = """BUILD-HEAP(A[1,...,n]) {
     for i = floor(n/2) downto 1
         HeapifyDown(A, i)
@@ -59,12 +74,12 @@ class CodeBlock():
             self.highlight_rect = Rectangle(width=self.width+CODE_BLOCK_WIDTH_PADDING, height=self.line_height+CODE_BLOCK_HEIGHT_PADDING).set_stroke(color=HIGHLIGHT_COLOR, width=2).shift(SHIFT_LEFT_UNIT * LEFT + UP * y_position)
             return FadeIn(self.highlight_rect)
         else:
-            return self.highlight_rect.animate.move_to(SHIFT_LEFT_UNIT * LEFT + UP * y_position)
+            return AnimationGroup(self.highlight_rect.animate.move_to(SHIFT_LEFT_UNIT * LEFT + UP * y_position), Wait(2))
 
 
-class CodeScene(Scene):
+class Test(Scene):
     def construct(self):
-        code2 = CodeBlock(CODE_FOR_BUILD)
+        code2 = CodeBlock(CODE_FOR_DFS)
         self.play(FadeIn(code2.code))
         for i in range(1, 4):
             self.play(code2.highlight(i))
