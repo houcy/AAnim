@@ -49,6 +49,9 @@ class GraphAlgorithm(Scene):
         self.play(node.mark_finished())
 
     def dfs(self, graph, code_block, source=None, dest=None):
+        """
+        DFS on the graph
+        """
         discovered = set()
         self.play(code_block.highlight(1))
         if not source:    # Traverse all

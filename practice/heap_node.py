@@ -1,5 +1,6 @@
 from manim import *
 from style import *
+from manim_fonts import *
 import math
 
 class HeapNode:
@@ -21,7 +22,7 @@ class HeapNode:
         Convert a node to an MObject so that it shows on the canvas
         """
         circle = Circle(radius=RADIUS).set_stroke(color=LINE_COLOR, width=WIDTH).set_fill(BACKGROUND, opacity=1.0)
-        text = Tex(str(self.value), color=LINE_COLOR).scale(FONT_SIZE)
+        text = Text(str(self.value), color=LINE_COLOR, font=FONT, weight="BOLD", font_size=VALUE_SIZE)
         key_mobject_list = [("circle", circle), ("text", text)]
         # If the node is on the left side of the root
         if self.position_x < 0:
@@ -31,4 +32,4 @@ class HeapNode:
             self.mobject = VDict(key_mobject_list).shift(RIGHT * abs(self.position_x) + DOWN * self.position_y).set_z_index(1)
 
     def _create_text_mobject(self, value):
-        return Tex(str(value), color=LINE_COLOR).scale(FONT_SIZE)
+        return Text(str(value), color=LINE_COLOR, font=FONT, weight="BOLD", font_size=VALUE_SIZE)

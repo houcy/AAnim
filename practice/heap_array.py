@@ -120,4 +120,4 @@ class HeapArray():
         return node
     
     def _create_text_mobject(self, value):
-        return Tex(str(value), color=LINE_COLOR).scale(FONT_SIZE)
+        return Text(str(value), color=LINE_COLOR, font=FONT, weight="BOLD", font_size=VALUE_SIZE)
