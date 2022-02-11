@@ -46,8 +46,11 @@ def transform_position_to_manim(position):
     return new_position
 
 def get_position():
-    os.system("sfdp -Tpng g.gv -o output.png")
-    os.system("sfdp -Tjson0 g.gv -o output.json")
+    print("command1", sys.argv[2] + " -Tpng " + sys.argv[1] + " -o output.png")
+    print("command2", sys.argv[2] + " -Tjson0 " + sys.argv[1] + " -o output.json")
+
+    os.system(sys.argv[2] + " -Tpng " + sys.argv[1] + " -o output.png")
+    os.system(sys.argv[2] + " -Tjson " + sys.argv[1] + " -o output.json")
     output = json.load(open('output.json'))
     position = {}
     for e in output["objects"]:
@@ -58,16 +61,19 @@ def get_position():
             
 # Get the adjacency_list
 adjacency_list, is_directed = get_adjacency_list(sys.argv[1])
+print("adjacency_list", adjacency_list)
 
 # Get the position
 position = get_position()
+print("position", position)
 
-# Call manim
-scene = GraphAlgorithm(adjacency_list, position, is_directed)
-scene.construct()
+# Comment out to get position only
+# # Call manim
+# scene = GraphAlgorithm(adjacency_list, position, is_directed)
+# scene.construct()
 
-# Use FFMPEG to combine partial videos      
-scene.renderer.scene_finished(scene)  
+# # Use FFMPEG to combine partial videos      
+# scene.renderer.scene_finished(scene)  
 
 
 

@@ -1,7 +1,7 @@
 graph G {
 	A -- B
-	B -- C
-	C -- A
-    D -- F
-    E -- F
+	A -- C
+	B -- D
+	B -- E
+	D -- F
 }

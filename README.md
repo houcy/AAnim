@@ -31,9 +31,9 @@ You can also customize your command in command_heap.txt. Please follow the follo
 
 ### Animate Graph
 
-Graph operations that we currently support is to build a graph, dfs. Use the following default command to try: `python animate_graph.py graph_blueprint.gv`
+Graph operations that we currently support is to build a graph, dfs. We use the layout engine from [Graphviz](https://graphviz.org) to get a proper layout of any graph. You need to download it first. Then use the following default command to try: `python animate_graph.py graph_blueprint.gv dot`.
 
-You can also customize the blueprint of the graph in graph_blueprint.gv. Please follow the following format strictly. Check out [Graphviz](https://graphviz.org) to know more about this format.
+You can also customize the blueprint of the graph in graph_blueprint.gv. `dot` is customizable too. You can specify a layout engine among `dot`, `neato`, `twopi`, `circo`, `fdp`, `osage`, `sfdp`. Please follow the following order strictly.
 
 ```
 graph G {      # You can't modify the first line
