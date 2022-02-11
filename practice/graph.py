@@ -31,7 +31,7 @@ class Graph:
         if not is_directed:
             line = Line(start_node.mobject.get_center(), end_node.mobject.get_center()).set_stroke(color=LINE_COLOR, width=WIDTH).set_z_index(0)
         else:
-            line = Arrow(start_node.mobject.get_center(), end_node.mobject.get_center(), max_tip_length_to_length_ratio=0.1).set_stroke(color=LINE_COLOR, width=WIDTH).set_z_index(0)
+            line = Arrow(start_node.mobject.get_center(), end_node.mobject.get_center(), buff=0.4, max_tip_length_to_length_ratio=0.1).set_stroke(color=LINE_COLOR, width=WIDTH).set_z_index(0)
         start_node.neighbor2line[end_node] = line
         self.graph_mobject += line
 

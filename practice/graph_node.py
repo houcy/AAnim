@@ -25,25 +25,31 @@ class GraphNode:
     def _create_text_mobject(self, value):
         return Tex(str(value), color=LINE_COLOR).scale(FONT_SIZE)
 
-    def mark_discovered(self):
+    def mark_pink1(self):
         """
         Mark this node as PINK
         """
         return AnimationGroup(self.mobject["c"].animate.set_fill(PINK1).set_stroke(PINK1), self.mobject["t"].animate.set_color(BACKGROUND))
+
+    def mark_pink3(self):
+        """
+        Mark this node as PINK
+        """
+        return AnimationGroup(self.mobject["c"].animate.set_fill(PINK3).set_stroke(PINK3), self.mobject["t"].animate.set_color(BACKGROUND))
     
-    def mark_finished(self):
+    def mark_blue1(self):
         """
         Mark this node as BLUE
         """
         return AnimationGroup(self.mobject["c"].animate.set_fill(BLUE1).set_stroke(BLUE1), self.mobject["t"].animate.set_color(BACKGROUND))
     
-    def mark_line_discovered(self, neighbor):
+    def mark_line_pink1(self, neighbor):
         """
         Mark a line pointing to 'neighbor' as PINK
         """
         return self.neighbor2line[neighbor].animate.set_fill(PINK1).set_stroke(PINK1)
 
-    def mark_line_finished(self, neighbor):
+    def mark_line_blue1(self, neighbor):
         """
         Mark a line pointing to 'neighbor' as BLUE
         """
