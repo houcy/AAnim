@@ -24,7 +24,7 @@ CODE_FONT = "Source Code Pro"
 class CodeBlock():
     def __init__(self, code):
         with RegisterFont(CODE_FONT) as fonts:
-            self.code = Code(code=code, line_spacing=CODE_LINE_SPACING, font=CODE_FONT, background="rectangle", margin=0, background_stroke_width=0, tab_width=2, language="Python", font_size=16).shift(SHIFT_LEFT_UNIT * LEFT)
+            self.code = Code(code=code, stroke_width=1, line_spacing=CODE_LINE_SPACING, font=CODE_FONT, background="rectangle", margin=0, background_stroke_width=0, tab_width=2, language="Python", font_size=16).shift(SHIFT_LEFT_UNIT * LEFT)
             self.top = self.code.get_top()[1]
             self.left = self.code.get_left()[0]
             self.bottom = self.code.get_bottom()[1]
@@ -53,7 +53,7 @@ class CodeBlock():
             return
         y_position = self.top - (self.line_height + self.line_height * CODE_LINE_SPACING) * (line_number - 1) - 0.5 * self.line_height
         if not self.highlight_rect:
-            self.highlight_rect = Rectangle(width=self.width+CODE_BLOCK_WIDTH_PADDING, height=self.line_height+CODE_BLOCK_HEIGHT_PADDING).set_stroke(color=HIGHLIGHT_COLOR, width=2).shift(SHIFT_LEFT_UNIT * LEFT + UP * y_position)
+            self.highlight_rect = Rectangle(width=self.width+CODE_BLOCK_WIDTH_PADDING, height=self.line_height+CODE_BLOCK_HEIGHT_PADDING).set_stroke(color=GRAY, width=2).shift(SHIFT_LEFT_UNIT * LEFT + UP * y_position)
             return FadeIn(self.highlight_rect)
         else:
             return AnimationGroup(self.highlight_rect.animate.move_to(SHIFT_LEFT_UNIT * LEFT + UP * y_position), Wait(2))

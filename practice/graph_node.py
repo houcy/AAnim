@@ -27,13 +27,13 @@ class GraphNode:
 
     def mark_pink1(self):
         """
-        Mark this node as PINK
+        Mark this node as PINK1 (dark pink)
         """
         return AnimationGroup(self.mobject["c"].animate.set_fill(PINK1).set_stroke(PINK1), self.mobject["t"].animate.set_color(BACKGROUND))
 
     def mark_pink3(self):
         """
-        Mark this node as PINK
+        Mark this node as PINK (light pink)
         """
         return AnimationGroup(self.mobject["c"].animate.set_fill(PINK3).set_stroke(PINK3), self.mobject["t"].animate.set_color(BACKGROUND))
     
