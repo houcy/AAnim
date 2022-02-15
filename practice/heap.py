@@ -97,7 +97,7 @@ class BinaryHeap(Scene):
         """
         self.play(FadeIn(heap.code_for_build.code, heap.code_for_build.create_title('Building the heap')))
         self.wait(1)
-        for i in range((len(heap.array)-1) // 2 - 1, -1, -1):
+        for i in range((len(heap.array)-1) // 2, -1, -1):
             node = heap.array[i]
             # Color
             self.play(heap.code_for_build.highlight(2))
