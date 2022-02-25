@@ -1,7 +1,16 @@
 graph G {
 	A -- B
-	A -- C
-	B -- D
-	B -- E
+	A -- H
+	B -- C
+	B -- H
+	C -- D
+	C -- I
+	C -- F
+	I -- G
+	G -- F
 	D -- F
+	D -- E
+	E -- F
+	H -- G
+	H -- I
 }

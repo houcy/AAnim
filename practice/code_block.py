@@ -54,6 +54,7 @@ class CodeBlock():
         y_position = self.top - (self.line_height + self.line_height * CODE_LINE_SPACING) * (line_number - 1) - 0.5 * self.line_height
         if not self.highlight_rect:
             self.highlight_rect = Rectangle(width=self.width+CODE_BLOCK_WIDTH_PADDING, height=self.line_height+CODE_BLOCK_HEIGHT_PADDING).set_stroke(color=GRAY, width=2).shift(SHIFT_LEFT_UNIT * LEFT + UP * y_position)
+            self.code = VGroup(self.code, self.highlight_rect)
             return FadeIn(self.highlight_rect)
         else:
             return AnimationGroup(self.highlight_rect.animate.move_to(SHIFT_LEFT_UNIT * LEFT + UP * y_position), Wait(2))

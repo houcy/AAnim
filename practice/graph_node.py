@@ -25,33 +25,39 @@ class GraphNode:
     def _create_text_mobject(self, value):
         return Tex(str(value), color=LINE_COLOR).scale(FONT_SIZE)
 
+    def highlight_stroke(self, color=GREEN):
+        """
+        Change the stroke color of the node to be highlight color
+        """
+        return self.mobject.animate.set_stroke(color=color)
+
     def mark_pink1(self):
         """
-        Mark this node as PINK1 (dark pink)
+        Fill this node as PINK1 (dark pink)
         """
         return AnimationGroup(self.mobject["c"].animate.set_fill(PINK1).set_stroke(PINK1), self.mobject["t"].animate.set_color(BACKGROUND))
 
     def mark_pink3(self):
         """
-        Mark this node as PINK (light pink)
+        Fill this node as PINK (light pink)
         """
         return AnimationGroup(self.mobject["c"].animate.set_fill(PINK3).set_stroke(PINK3), self.mobject["t"].animate.set_color(BACKGROUND))
     
     def mark_blue1(self):
         """
-        Mark this node as BLUE
+        Fill this node as BLUE
         """
         return AnimationGroup(self.mobject["c"].animate.set_fill(BLUE1).set_stroke(BLUE1), self.mobject["t"].animate.set_color(BACKGROUND))
     
     def mark_line_pink1(self, neighbor):
         """
-        Mark a line pointing to 'neighbor' as PINK
+        Fill a line pointing to 'neighbor' as PINK
         """
         return self.neighbor2line[neighbor].animate.set_fill(PINK1).set_stroke(PINK1)
 
     def mark_line_blue1(self, neighbor):
         """
-        Mark a line pointing to 'neighbor' as BLUE
+        Fill a line pointing to 'neighbor' as BLUE
         """
         return self.neighbor2line[neighbor].animate.set_fill(BLUE1).set_stroke(BLUE1)
 

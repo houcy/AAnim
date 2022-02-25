@@ -1,6 +1,7 @@
 import os
 import json
 import sys
+from style import *
 from collections import defaultdict
 from graph_algorithm import GraphAlgorithm
 
@@ -38,7 +39,7 @@ def transform_position_to_manim(position):
         x, y = position[e]
         max_x = max(max_x, x)
         max_y = max(max_y, y)
-    ratio = max(max_x/4, max_y/3)   # Change denominators here to adjust the size of the graph
+    ratio = max(max_x/FINAL_WIDTH, max_y/FINAL_HEIGHT)   # Change denominators here to adjust the size of the graph
     new_position = {}
     for e in position:
         x, y = position[e]
