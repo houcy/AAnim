@@ -7,30 +7,38 @@ from graph_algorithm import GraphAlgorithm
 
 def get_adjacency_list(file_name):
     is_directed = False
-    adjacency_list = defaultdict(list)
+    adjacency_list = defaultdict(dict)
     with open(file_name) as f:
         if ">" in f.read():
             is_directed = True
     with open(file_name) as f:
         contents = f.readlines()
         for line in contents[1:-1]:
-            line = line.strip("\n")
-            line = line.strip("\t")
-            line = line.strip(" ")
+            line = line.strip("\n").strip().replace(" ", "")
             start, end = "", ""
             i = 0
             while line[i].isalnum():
                 start += line[i]
                 i+=1
-            i = len(line) - 1
+            i+=2
             while line[i].isalnum():
                 end += line[i]
-                i-=1
-            if end not in adjacency_list[start]:
-                adjacency_list[start].append(end)
+                i+=1
+            weight = ""
+            if "xlabel" in line:
+                i+=8
+            while line[i].isalnum():
+                weight += line[i]
+                i+=1
+            if weight:
+                adjacency_list[start][end] = int(weight)
+            else:
+                adjacency_list[start][end] = None
             if not is_directed:
-                if start not in adjacency_list[end]:
-                    adjacency_list[end].append(start)
+                if weight:
+                    adjacency_list[end][start] = int(weight)
+                else:
+                    adjacency_list[end][start] = None
     return adjacency_list, is_directed
 
 def transform_position_to_manim(position):
@@ -50,6 +58,8 @@ def get_position():
     print("command1", sys.argv[2] + " -Tpng " + sys.argv[1] + " -o output.png")
     print("command2", sys.argv[2] + " -Tjson0 " + sys.argv[1] + " -o output.json")
 
+    # argv[2] is one of `dot`, `neato`, `twopi`, `circo`, `fdp`, `osage`, `sfdp`
+    # command: dot -Tpng graph_blueprint.gv -o output.png
     os.system(sys.argv[2] + " -Tpng " + sys.argv[1] + " -o output.png")
     os.system(sys.argv[2] + " -Tjson " + sys.argv[1] + " -o output.json")
     output = json.load(open('output.json'))
