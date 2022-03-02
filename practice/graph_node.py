@@ -6,7 +6,8 @@ from style import *
 class GraphNode:
     def __init__(self, value, position_x, position_y):
         self.value = value
-        self.neighbor2line = {}
+        self.neighbor2edge = {}
+        self.edges = []
         self.position_x = position_x
         self.position_y = position_y
         self.mobject = None
@@ -53,13 +54,13 @@ class GraphNode:
         """
         Fill a line pointing to 'neighbor' as PINK
         """
-        return self.neighbor2line[neighbor].animate.set_fill(PINK1).set_stroke(PINK1)
+        return self.neighbor2edge[neighbor].mobject.animate.set_fill(PINK1).set_stroke(PINK1)
 
     def mark_line_blue1(self, neighbor):
         """
         Fill a line pointing to 'neighbor' as BLUE
         """
-        return self.neighbor2line[neighbor].animate.set_fill(BLUE1).set_stroke(BLUE1)
+        return self.neighbor2edge[neighbor].mobject.animate.set_fill(BLUE1).set_stroke(BLUE1)
 
 
 class Test(Scene):
