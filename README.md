@@ -35,6 +35,8 @@ Graph operations that we currently support is to build a graph, dfs. We use the 
 
 The format of the command is: `python animate_graph.py [name of .gv file] [layout engine]`. You can specify a layout engine among `dot`, `neato`, `twopi`, `circo`, `fdp`, `osage`, `sfdp`, which are supported by Graphviz. You can also customize the blueprint of the graph in `graph_blueprint.gv` by following the instruction below.
 
+For an un-weighted graph:
+
 ```
 graph G {      # You can't modify the first line
 A -- B         # Use A -- B to represent an undirected edge, or A -> B to represent a directed edge.
@@ -42,4 +44,15 @@ A -- B         # Use A -- B to represent an undirected edge, or A -> B to repres
 C -- A
 C -- D
 }              # You can't modify the last line
+```
+
+For a weighted graph:
+
+```
+graph G {
+A -- B [xlabel=4]    # Add [xlabel=your_weight] at the end, the weight should be an integer
+   B -- C [xlabel=5]
+C -- A [xlabel=2]
+C -- D [xlabel=3]
+}
 ```
