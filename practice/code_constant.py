@@ -48,12 +48,13 @@ CODE2_FOR_BFS = """BFS(G, s) {
 
 CODE_FOR_PRIM_BASIC = """MST-PRIM(G) {
     T = ∅;
-    add an arbitraty v in G.V to U;
+    add an arbitrary v vertex to U;
     while (U ≠ V)
-        let (u, v) be the lowest cost edge
-        such that u ∈ U and v ∈ V - U
-        T = T ∪ {(u, v)}
-        U = U ∪ {v}
+        for each vertex v in U
+            find (u, v) be the min edge
+            such that u ∈ V - U
+            T = T ∪ {(u, v)}
+            U = U ∪ {v}
 }
 """
 
@@ -62,8 +63,8 @@ CODE_FOR_PRIM_QUEUE = """MST-PRIM(G, w, s) {
         v.key = ∞
     s.key = 0
     Q = G.V
-    T = ∅
-    while Q != ∅
+    T = Φ
+    while Q != Φ
         v = EXTRACT-MIN(Q)
         add edge(v) to T
         for each neighbor u of v
