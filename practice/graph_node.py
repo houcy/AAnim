@@ -19,7 +19,7 @@ class GraphNode:
         Convert a node to an MObject so that it shows on the canvas
         """
         circle = Circle(radius=RADIUS).set_stroke(color=LINE_COLOR, width=WIDTH).set_fill(BACKGROUND, opacity=1.0)
-        text = Text(str(self.value), color=LINE_COLOR, font=FONT, weight="BOLD", font_size=VALUE_SIZE)
+        text = Text(str(self.value), color=LINE_COLOR, font=FONT, weight=BOLD, font_size=VALUE_SIZE)
         key_mobject_list = [("c", circle), ("t", text)]
         self.mobject = VDict(key_mobject_list).shift(RIGHT * self.position_x + UP * self.position_y).set_z_index(1)
 

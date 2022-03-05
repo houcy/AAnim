@@ -25,7 +25,7 @@ class GraphEdge:
 
         # If it's a weighted edge
         if self.weight:
-            text = Text(str(weight), color=PINK1, font=FONT, weight="HEAVY", font_size=EDGE_WEIGHT_SIZE).move_to(line.get_center()).set_z_index(1).set_stroke(color=BACKGROUND, width=2)
+            text = Text(str(weight), color=EDGE_COLOR, font=FONT, weight=ULTRAHEAVY, font_size=EDGE_WEIGHT_SIZE).move_to(line.get_center()).set_z_index(1).set_stroke(color=EDGE_STROKE_COLOR, width=2)
             self.mobject["text"] = text
 
     def get_the_other_end(self, node):
@@ -37,5 +37,8 @@ class GraphEdge:
             print("Failed to output the other end of the edge, the input node is incorrect")
             return None
 
-    def mark_color(self, color):
+    def highlight(self, color):
         return AnimationGroup(self.mobject["line"].animate.set_fill(color).set_stroke(color, width=WIDTH+5), Wait())
+
+    def dehighlight(self, color=GRAY):
+        return AnimationGroup(self.mobject["line"].animate.set_fill(color).set_stroke(color, width=WIDTH), Wait())

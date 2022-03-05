@@ -15,7 +15,13 @@ MAP_DIRECTED_WEIGHT = {'A': {'B': 7, 'C': 7}, 'B': {'D': 7, 'E': 7}, 'D': {'F': 
 MAP_UNDIRECTED_WEIGHT = {'A': {'B': 7, 'C': 7}, 'B': {'A': 7, 'D': 7, 'E': 7}, 'C': {'A': 7}, 'D': {'B': 7, 'F': 7}, 'E': {'B': 7}, 'F': {'D': 7}}
 POSITION1 = {'A': (1.2692307692307692, 3.0), 'B': (0.8076923076923077, 2.076923076923077), 'C': (1.7307692307692308, 2.076923076923077), 'D': (0.34615384615384615, 1.1538461538461537), 'E': (1.2692307692307692, 1.1538461538461537), 'F': (0.34615384615384615, 0.23076923076923078)}
 
-class Graph:
+POSITION_CYCLE = {'A': (-1, -1), 'B': (1, 1)}
+POSITION_CYCLE2 = {'A': (-0.5, -0.5), 'B': (0.5, 0.5)}
+POSITION_CYCLE3 = {'A': (-2, -2), 'B': (2, 2)}
+
+MAP_CYCLE = {'A': {'B': 3}, 'B': {'A': 2}}
+
+class Graph1:
     def __init__(self, adjacency_list, position, is_directed=False, is_topological_graph=False):
         self.graph_mobject = VGroup()
         self.value2node = {}
@@ -68,19 +74,25 @@ class Graph:
 class Test(Scene):
     def construct(self):
         self.camera.background_color = BACKGROUND
-        graph = Graph(MAP_UNDIRECTED, POSITION1, is_directed=False)
-        self.add(graph.graph_mobject)
-        self.play(FadeOut(graph.graph_mobject))
-        graph = Graph(MAP_DIRECTED, POSITION1, is_directed=True)
-        self.add(graph.graph_mobject)
-        self.play(FadeOut(graph.graph_mobject))
-        graph = Graph(MAP_UNDIRECTED_WEIGHT, POSITION1, is_directed=False)
-        self.add(graph.graph_mobject)
-        self.play(FadeOut(graph.graph_mobject))
-        graph = Graph(MAP_DIRECTED_WEIGHT, POSITION1, is_directed=True)
-        self.add(graph.graph_mobject)
-        self.play(FadeOut(graph.graph_mobject))
+        # graph = Graph(MAP_UNDIRECTED, POSITION1, is_directed=False)
+        # self.add(graph.graph_mobject)
+        # self.play(FadeOut(graph.graph_mobject))
+        # graph = Graph(MAP_DIRECTED, POSITION1, is_directed=True)
+        # self.add(graph.graph_mobject)
+        # self.play(FadeOut(graph.graph_mobject))
+        # graph = Graph(MAP_UNDIRECTED_WEIGHT, POSITION1, is_directed=False)
+        # self.add(graph.graph_mobject)
+        # self.play(FadeOut(graph.graph_mobject))
+        # graph = Graph(MAP_DIRECTED_WEIGHT, POSITION1, is_directed=True)
+        # self.add(graph.graph_mobject)
+        # self.play(FadeOut(graph.graph_mobject))
         graph = Graph(MAP_CYCLE, POSITION_CYCLE, is_directed=True)
+        self.add(graph.graph_mobject)
+        self.play(FadeOut(graph.graph_mobject))
+        graph = Graph(MAP_CYCLE, POSITION_CYCLE2, is_directed=True)
+        self.add(graph.graph_mobject)
+        self.play(FadeOut(graph.graph_mobject))
+        graph = Graph(MAP_CYCLE, POSITION_CYCLE3, is_directed=True)
         self.add(graph.graph_mobject)
         self.play(FadeOut(graph.graph_mobject))
     

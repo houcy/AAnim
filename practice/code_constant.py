@@ -50,11 +50,10 @@ CODE_FOR_PRIM_BASIC = """MST-PRIM(G) {
     T = ∅;
     add an arbitrary v vertex to U;
     while (U ≠ V)
-        for each vertex v in U
-            find (u, v) be the min edge
-            such that u ∈ V - U
-            T = T ∪ {(u, v)}
-            U = U ∪ {v}
+        find (u, v) be the min edge
+        such that u ∈ V - U
+        T = T ∪ {(u, v)}
+        U = U ∪ {v}
 }
 """
 

@@ -11,5 +11,8 @@ class GraphEdgesGroup:
     def add(self, mobject):
         self.mobject += mobject["line"]
 
-    def mark_color(self, color):
+    def highlight(self, color):
         return AnimationGroup(self.mobject.animate.set_fill(color).set_stroke(color, width=WIDTH+5), Wait())
+
+    def dehighlight(self, color=GRAY):
+        return AnimationGroup(self.mobject.animate.set_fill(color).set_stroke(color, width=WIDTH), Wait())

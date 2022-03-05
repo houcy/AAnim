@@ -1,10 +1,11 @@
 from manim import *
 from style import *
 from code_constant import *
-from graph import Graph
+from graph import Graph1
 from code_block import CodeBlock
 from legend import Legend
 from graph_edges_group import GraphEdgesGroup
+from util import *
 import copy
 
 MAP_DIRECTED = {'A': {'B': None, 'C': None}, 'B': {'D': None, 'E': None}, 'D': {'F': None}, 'E': {'F': None}}
@@ -194,47 +195,24 @@ class Show(Scene):
     # MST: Prim
     ##################################
 
-    CODE_FOR_PRIM_QUEUE = """MST-PRIM(G, w, s) {
-        for each vertex v
-            v.key = ∞
-        s.key = 0
-        Q = G.V
-        T = Φ
-        while Q != Φ
-            v = EXTRACT-MIN(Q)
-            add edge(v) to T
-            for each neighbor u of v
-                if u ∈ Q and w(u, v) < u.key
-                    edge(u) = uv
-                    u.key = w(u, v)
-    }
-    """
-
-    CODE_FOR_PRIM_BASIC = """MST-PRIM(G) {
-        T = ∅;
-        add an arbitrary v vertex to U;
-        while (U ≠ V)
-            for each vertex v in U
-                find (u, v) be the min edge
-                such that u ∈ V - U
-                T = T ∪ {(u, v)}
-                U = U ∪ {v}
-    }
-    """
 
     def mst_prim_basic(self, graph):
-        l = Legend({GREEN: "available line", PINK1: "MST-so-far"})
-        l.mobjects.next_to(graph.graph_mobject, UP, buff=0.5)
+        l = Legend({GREEN: "Edge candidate", PINK1: "MST so far"})
+        l.mobjects.move_to(UP * 2 + RIGHT * 1)
         self.play(l.animation)
         code_block = CodeBlock(CODE_FOR_PRIM_BASIC)
         self.add(code_block.code)
+        code_block.highlight(1)
         selected_edges = set()
         selected = set()
         first_node_key = list(graph.adjacency_list.keys())[0]
         first_node = graph.value2node[first_node_key]
+        self.play(code_block.highlight(2))
+        self.play(code_block.highlight(3))
         selected.add(first_node)
         self.play(first_node.mark_pink1())
         while len(selected) != len(graph.adjacency_list):
+            self.play(code_block.highlight(4))
             minimum = float("inf")
             minimum_node = None
             minimum_edge = None
@@ -252,16 +230,21 @@ class Show(Scene):
                 # self.play(v.highlight_stroke(color=GRAY))
             selected_edges.add(minimum_edge)
             # show all available edges
-            self.play(neighbor_edges.mark_color(GREEN))
-            self.play(neighbor_edges.mark_color(GRAY))
+            # self.play(code_block.highlight(5, 2))
+            self.play(neighbor_edges.highlight(GRAY_OUT))
+            self.play(neighbor_edges.dehighlight())
             # show the shortest edge - the next edge to add
-            self.play(minimum_edge.mark_color(PINK1))
+            # self.play(code_block.highlight(7, 2))
             selected.add(minimum_node)
-            self.play(minimum_node.mark_pink1())
+            self.play(minimum_edge.highlight(PINK1), minimum_node.mark_pink1())
+        self.play(code_block.highlight(9))
 
 
     def construct(self):
         self.camera.background_color = BACKGROUND
+        # w = watermark()
+        # self.add(w)
+
         # Comment out DFS code
         # graph = Graph(MAP_DIRECTED, POSITION2, is_directed=True)
         # self.add(graph.graph_mobject.shift(3.2 * RIGHT))
@@ -271,7 +254,7 @@ class Show(Scene):
         # graph = Graph(self.adjacency_list, self.position, self.is_directed)
         
         # Prim
-        graph = Graph(MAP_MST, POSITION_MST)
+        graph = Graph1(MAP_MST, POSITION_MST)
         self.add(graph.graph_mobject.shift(3.2 * RIGHT))
         self.mst_prim_basic(graph)
 

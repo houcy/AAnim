@@ -14,7 +14,7 @@ class Legend:
             inside += circle
             inside += text
         inside = inside.arrange_in_grid(cols=2, buff=LEGEND_BUFF)
-        box = SurroundingRectangle(inside, color=LINE_COLOR, stroke_width=LEGEND_STROKE_WIDTH, buff=0.2)
+        box = SurroundingRectangle(inside, corner_radius=0, color=LINE_COLOR, stroke_width=LEGEND_STROKE_WIDTH, buff=0.2)
         self.animation = AnimationGroup(FadeIn(inside), Create(box))
         self.mobjects = VGroup(inside, box)
 
