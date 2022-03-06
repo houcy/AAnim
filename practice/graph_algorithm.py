@@ -195,7 +195,6 @@ class Show(Scene):
     # MST: Prim
     ##################################
 
-
     def mst_prim_basic(self, graph, speed=1, code_block=None):
         l = Legend({PINK1: "MST so far"})
         l.mobjects.move_to(1.6*UP+1.7*RIGHT)
@@ -253,14 +252,19 @@ class Show(Scene):
         self.play(code_block.highlight(13), run_time=speed)
         
 
-    def mst_prim_heap(self, graph, speed=1, code_block=None):
+    def mst_prim_queue(self, graph, speed=1, code_block=None):
         l = Legend({PINK1: "V (MST so far)"})
         # l.mobjects.next_to(graph.graph_mobject, DOWN, buff=0.3)
         l.mobjects.move_to(2*UP+1*RIGHT)
         self.play(l.animation)
+        # self.wait()
         if not code_block:
             code_block = CodeBlock(CODE_FOR_PRIM_QUEUE)
             self.play(Create(code_block.code))
+        key_initialize = []
+        for node in graph.value2node.values():
+            key_initialize.append(node.change_key("∞"))
+        self.play(*key_initialize)
         
 
     def construct(self):
@@ -275,23 +279,33 @@ class Show(Scene):
         # self.add(graph.graph_mobject.shift(3.2 * RIGHT))
         # self.dfs(graph, True)
         
-        # Prim
-        title_mobject = show_title_for_demo("PRIM'S ALGO FOR MST")
-        self.add(title_mobject)
-        code_block = CodeBlock(CODE_FOR_PRIM_BASIC)
-        self.play(Create(code_block.code))
-        graph = Graph1(MAP_MST, POSITION_MST)
-        self.play(FadeIn(graph.graph_mobject.scale(0.9).shift(3.7*RIGHT)))
-        self.mst_prim_basic(graph, code_block=code_block)
-        self.wait(5)
+        # Prim-basic
+        # title_mobject = show_title_for_demo("PRIM'S ALGO FOR MST")
+        # self.add(title_mobject)
+        # code_block = CodeBlock(CODE_FOR_PRIM_BASIC)
+        # self.play(Create(code_block.code))
+        # graph = Graph1(MAP_MST, POSITION_MST)
+        # self.play(FadeIn(graph.graph_mobject.scale(0.9).shift(3.7*RIGHT)))
+        # self.mst_prim_basic(graph, code_block=code_block)
+        # self.wait(5)
 
-        # create thumbnail
+        # Prim-basic create thumbnail
         # l = Legend({PINK1: "MST so far"})
         # l.mobjects.move_to(1.6*UP+1.7*RIGHT)
         # code_block = CodeBlock(CODE_FOR_PRIM_BASIC)
         # graph = Graph1(MAP_MST, POSITION_MST)
         # graph.graph_mobject.scale(0.9).shift(3.7*RIGHT)
         # self.add(l.mobjects, code_block.code, graph.graph_mobject)
+
+        # Prim-queue
+        # title_mobject = show_title_for_demo("PRIM'S ALGO FOR MST")
+        # self.add(title_mobject)
+        code_block = CodeBlock(CODE_FOR_PRIM_QUEUE)
+        self.play(Create(code_block.code))
+        graph = Graph1(MAP_MST, POSITION_MST)
+        self.play(FadeIn(graph.graph_mobject.scale(0.9).shift(3.7*RIGHT)))
+        self.mst_prim_queue(graph, code_block=code_block)
+        # self.wait(5)
 
         # Comment out BFS code  
         # graph = Graph(MAP_UNDIRECTED, POSITION2, is_directed=False)
