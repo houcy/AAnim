@@ -196,29 +196,32 @@ class Show(Scene):
     ##################################
 
 
-    def mst_prim_basic(self, graph):
-        l = Legend({GREEN: "Edge candidate", PINK1: "MST so far"})
-        l.mobjects.move_to(UP * 2 + RIGHT * 1)
+    def mst_prim_basic(self, graph, speed=1, code_block=None):
+        l = Legend({PINK1: "MST so far"})
+        l.mobjects.move_to(1.6*UP+1.7*RIGHT)
         self.play(l.animation)
-        code_block = CodeBlock(CODE_FOR_PRIM_BASIC)
-        self.add(code_block.code)
-        code_block.highlight(1)
+        self.wait()
+        # l.mobjects.next_to(graph.graph_mobject, DOWN, buff=0.3)
+        if not code_block:
+            code_block = CodeBlock(CODE_FOR_PRIM_BASIC)
+            self.play(Create(code_block.code))
+        self.play(code_block.highlight(1))
         selected_edges = set()
         selected = set()
         first_node_key = list(graph.adjacency_list.keys())[0]
         first_node = graph.value2node[first_node_key]
-        self.play(code_block.highlight(2))
-        self.play(code_block.highlight(3))
+        self.play(code_block.highlight(2, 3), run_time=speed)
+        self.play(code_block.highlight(5), run_time=speed)
         selected.add(first_node)
-        self.play(first_node.mark_pink1())
+        self.play(first_node.color(), run_time=speed)
         while len(selected) != len(graph.adjacency_list):
-            self.play(code_block.highlight(4))
+            self.play(code_block.highlight(6), run_time=speed)
+            self.wait(0.8)
             minimum = float("inf")
             minimum_node = None
             minimum_edge = None
             neighbor_edges = GraphEdgesGroup()
             for v in selected:
-                # self.play(v.highlight_stroke())
                 for e in v.edges:
                     u = e.get_the_other_end(v)
                     if u not in selected:
@@ -227,36 +230,68 @@ class Show(Scene):
                             minimum = graph.adjacency_list[u.value][v.value]
                             minimum_node = u
                             minimum_edge = e
-                # self.play(v.highlight_stroke(color=GRAY))
             selected_edges.add(minimum_edge)
             # show all available edges
-            # self.play(code_block.highlight(5, 2))
-            self.play(neighbor_edges.highlight(GRAY_OUT))
-            self.play(neighbor_edges.dehighlight())
+            self.play(code_block.highlight(7, 2), run_time=speed)
+            self.play(neighbor_edges.highlight(BACKGROUND), run_time=1.3*speed)
+            self.wait(speed)
+            self.play(neighbor_edges.dehighlight(), run_time=1.3*speed)
+            self.play(minimum_edge.highlight(PINK1), run_time=0.5*speed)
+            self.play(minimum_edge.dehighlight(), run_time=0.5*speed)
+            self.play(minimum_edge.highlight(PINK1), run_time=0.5*speed)
+            self.wait()
             # show the shortest edge - the next edge to add
-            # self.play(code_block.highlight(7, 2))
+            self.play(code_block.highlight(9, 3), run_time=speed)
             selected.add(minimum_node)
-            self.play(minimum_edge.highlight(PINK1), minimum_node.mark_pink1())
-        self.play(code_block.highlight(9))
+            self.play(minimum_node.color(), run_time=speed)
+        self.play(code_block.highlight(12), run_time=speed)
+        edge_to_remove = set()
+        for edge in graph.edges:
+            if edge not in selected_edges:
+                edge_to_remove.add(edge)
+                self.play(edge.fade_out(), run_time=0.4*speed)
+        self.play(code_block.highlight(13), run_time=speed)
+        
 
+    def mst_prim_heap(self, graph, speed=1, code_block=None):
+        l = Legend({PINK1: "V (MST so far)"})
+        # l.mobjects.next_to(graph.graph_mobject, DOWN, buff=0.3)
+        l.mobjects.move_to(2*UP+1*RIGHT)
+        self.play(l.animation)
+        if not code_block:
+            code_block = CodeBlock(CODE_FOR_PRIM_QUEUE)
+            self.play(Create(code_block.code))
+        
 
     def construct(self):
         self.camera.background_color = BACKGROUND
-        # w = watermark()
-        # self.add(w)
+        w = watermark()
+        self.add(w)
+        # Comment out for easy testing
+        # graph = Graph(self.adjacency_list, self.position, self.is_directed)
 
         # Comment out DFS code
         # graph = Graph(MAP_DIRECTED, POSITION2, is_directed=True)
         # self.add(graph.graph_mobject.shift(3.2 * RIGHT))
         # self.dfs(graph, True)
-
-        # Comment out for easy testing
-        # graph = Graph(self.adjacency_list, self.position, self.is_directed)
         
         # Prim
+        title_mobject = show_title_for_demo("PRIM'S ALGO FOR MST")
+        self.add(title_mobject)
+        code_block = CodeBlock(CODE_FOR_PRIM_BASIC)
+        self.play(Create(code_block.code))
         graph = Graph1(MAP_MST, POSITION_MST)
-        self.add(graph.graph_mobject.shift(3.2 * RIGHT))
-        self.mst_prim_basic(graph)
+        self.play(FadeIn(graph.graph_mobject.scale(0.9).shift(3.7*RIGHT)))
+        self.mst_prim_basic(graph, code_block=code_block)
+        self.wait(5)
+
+        # create thumbnail
+        # l = Legend({PINK1: "MST so far"})
+        # l.mobjects.move_to(1.6*UP+1.7*RIGHT)
+        # code_block = CodeBlock(CODE_FOR_PRIM_BASIC)
+        # graph = Graph1(MAP_MST, POSITION_MST)
+        # graph.graph_mobject.scale(0.9).shift(3.7*RIGHT)
+        # self.add(l.mobjects, code_block.code, graph.graph_mobject)
 
         # Comment out BFS code  
         # graph = Graph(MAP_UNDIRECTED, POSITION2, is_directed=False)

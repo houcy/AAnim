@@ -15,7 +15,7 @@ class Legend:
             inside += text
         inside = inside.arrange_in_grid(cols=2, buff=LEGEND_BUFF)
         box = SurroundingRectangle(inside, corner_radius=0, color=LINE_COLOR, stroke_width=LEGEND_STROKE_WIDTH, buff=0.2)
-        self.animation = AnimationGroup(FadeIn(inside), Create(box))
+        self.animation = AnimationGroup(FadeIn(inside), Create(box), Wait())
         self.mobjects = VGroup(inside, box)
 
 class Test(Scene):
@@ -23,5 +23,3 @@ class Test(Scene):
         self.camera.background_color = BLACK
         l = Legend({PINK1: "curr level", PINK3: "next level", BLUE1: "finished"})
         self.play(l.animation)
-
-            

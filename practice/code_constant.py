@@ -47,28 +47,33 @@ CODE2_FOR_BFS = """BFS(G, s) {
 """
 
 CODE_FOR_PRIM_BASIC = """MST-PRIM(G) {
-    T = ∅;
-    add an arbitrary v vertex to U;
-    while (U ≠ V)
-        find (u, v) be the min edge
-        such that u ∈ V - U
-        T = T ∪ {(u, v)}
-        U = U ∪ {v}
+    Edges = ∅
+    ReachSet = ∅
+    UnReachSet = G.V
+    add an arbitrary vertex v to ReachSet
+    while ReachSet ≠ G.V
+        find (v, u) be the min edge such that
+        v ∈ ReachSet and u ∈ UnReachSet
+        Edges = Edges ∪ {(v, u)}
+        ReachSet = ReachSet ∪ {u}
+        UnReachSet = UnReachSet - {u}
+    return Edges
 }
 """
 
-CODE_FOR_PRIM_QUEUE = """MST-PRIM(G, w, s) {
-    for each vertex v
-        v.key = ∞
-    s.key = 0
-    Q = G.V
-    T = Φ
-    while Q != Φ
-        v = EXTRACT-MIN(Q)
-        add edge(v) to T
+CODE_FOR_PRIM_QUEUE = """MST-PRIM(G) {
+    Edges = ∅
+    UnReachSet = G.V
+    MinEdge = {}   // Hashmap
+    set an arbitrary vertex v.key = 0
+    set the rest vertices v.key = ∞
+    while UnReachSet ≠ ∅
+        v = EXTRACT-MIN(UnReachSet)
+        add MinEdge(v) to Edges if exists
         for each neighbor u of v
-            if u ∈ Q and w(u, v) < u.key
-                edge(u) = uv
-                u.key = w(u, v)
+            if u ∈ UnReachSet and weight(v, u) < u.key
+                MinEdge(u) = (v, u)
+                u.key = weight(v, u)  // DecreaseKey
+    return Edges
 }
 """

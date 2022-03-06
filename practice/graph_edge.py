@@ -25,8 +25,9 @@ class GraphEdge:
 
         # If it's a weighted edge
         if self.weight:
-            text = Text(str(weight), color=EDGE_COLOR, font=FONT, weight=ULTRAHEAVY, font_size=EDGE_WEIGHT_SIZE).move_to(line.get_center()).set_z_index(1).set_stroke(color=EDGE_STROKE_COLOR, width=2)
-            self.mobject["text"] = text
+            text = Text(str(weight), color=EDGE_COLOR, font=FONT, weight=WEIGHT_WEIGHT, font_size=WEIGHT_SIZE).move_to(line.get_center()).set_z_index(10).set_stroke(color=EDGE_STROKE_COLOR, width=EDGE_STROKE_WIDTH)
+            text_background = Circle(radius=WEIGHT_CIRCLE_RADIUS).set_stroke(color=BACKGROUND, width=WIDTH).set_fill(BACKGROUND, opacity=1.0).set_z_index(9).move_to(text.get_center())
+            self.mobject["text"] = VGroup(text, text_background)
 
     def get_the_other_end(self, node):
         if node == self.start_node:
@@ -38,7 +39,10 @@ class GraphEdge:
             return None
 
     def highlight(self, color):
-        return AnimationGroup(self.mobject["line"].animate.set_fill(color).set_stroke(color, width=WIDTH+5), Wait())
+        return AnimationGroup(self.mobject["line"].animate.set_fill(color).set_stroke(color, width=WIDTH+7))
 
     def dehighlight(self, color=GRAY):
-        return AnimationGroup(self.mobject["line"].animate.set_fill(color).set_stroke(color, width=WIDTH), Wait())
+        return AnimationGroup(self.mobject["line"].animate.set_fill(color).set_stroke(color, width=WIDTH))
+
+    def fade_out(self):
+        return FadeOut(self.mobject)
