@@ -44,7 +44,7 @@ class Graph1:
                     if not is_directed:
                         visited_edge.add((end, start))
                     self._create_edge(start, end, is_directed, is_topological_graph)
-                    
+        
         self.graph_mobject = self.graph_mobject.move_to(ORIGIN)
                 
     def _create_node(self, value, position_x, position_y):
@@ -62,14 +62,16 @@ class Graph1:
             is_cyclic = True
         edge_object = GraphEdge(start_node, end_node, weight, is_cyclic, is_directed, is_topological_graph)
         start_node.neighbor2edge[end_node] = edge_object
+        start_node.neighbors.append(end_node)
         start_node.edges.append(edge_object)
         self.edges.append(edge_object)
         # If it's not directed, link the edge on end -> start as well
         if not is_directed:
             end_node.neighbor2edge[start_node] = edge_object
+            end_node.neighbors.append(start_node)
             end_node.edges.append(edge_object)
         self.graph_mobject += edge_object.mobject
-        
+    
 
 class Test(Scene):
     def construct(self):

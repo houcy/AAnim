@@ -8,6 +8,7 @@ class GraphNode:
     def __init__(self, value, position_x, position_y):
         self.value = value
         self.neighbor2edge = {}
+        self.neighbors = []
         self.edges = []
         self.position_x = position_x
         self.position_y = position_y
@@ -16,6 +17,7 @@ class GraphNode:
         self._create_mobject()
         self.key = None
         self.key_mobject = None
+        self.animations = None
     
     def _create_mobject(self):
         """
@@ -26,22 +28,32 @@ class GraphNode:
         key_mobject_list = [("c", circle), ("t", self.text_mobject)]
         self.mobject = VDict(key_mobject_list).shift(RIGHT * self.position_x + UP * self.position_y).set_z_index(1)
 
-    def change_key(self, key):
+    def initialize_key(self, key):
         animations = []
-        if not self.key:
-            self.key = key
-            new_text_mobject = get_text(str(self.value), NODE_NAME_BACKGROUND_SIZE).move_to(self.mobject.get_center()).set_fill(opacity=NODE_NAME_BACKGROUND_OPACITY)
-            animations.append(Transform(self.text_mobject, new_text_mobject))
-            self.text_mobject = new_text_mobject
-            animations.append(Wait(2))
-            self.key_mobject = get_text(str(self.key), font_size=VALUE_SIZE).move_to(self.mobject.get_center()).set_z_index(2)
-            self.mobject["key"] = self.key_mobject
-            animations.append(FadeIn(self.key_mobject))
+        key_string = ''
+        if key == float('inf'):
+            key_string = '∞'
+        elif isinstance(key, int):
+            key_string = str(key)
         else:
-            new_key_mobject = get_text(str(key), font_size=VALUE_SIZE).move_to(self.mobject.get_center()).set_z_index(2)
-            animations.append(Transform(self.key_mobject, new_key_mobject))
-            self.key = key
-            self.key_mobject = new_key_mobject
+            print("Failed to initialize key: need passing an integer")
+            return
+        self.key = key
+        new_text_mobject = get_text(str(self.value), NODE_NAME_BACKGROUND_SIZE, color=NODE_NAME_BACKGROUND_COLOR, weight=NODE_NAME_BACKGROUND_WEIGHT).move_to(self.mobject.get_center()).set_fill(opacity=NODE_NAME_BACKGROUND_OPACITY)
+        animations.append(Transform(self.text_mobject, new_text_mobject))
+        self.text_mobject = new_text_mobject
+        self.key_mobject = get_text(key_string, font_size=VALUE_SIZE).move_to(self.mobject.get_center()).set_z_index(2)
+        animations.append(FadeIn(self.key_mobject))
+        self.animations = animations
+        return AnimationGroup(*animations, lag_ratios=1)
+    
+    def update_key(self, key):
+        animations = []
+        new_key_mobject = get_text(str(key), font_size=VALUE_SIZE).move_to(self.mobject.get_center()).set_z_index(2)
+        animations.append(ReplacementTransform(self.key_mobject, new_key_mobject))
+        self.key = key
+        self.key_mobject = new_key_mobject
+        self.animations = animations
         return AnimationGroup(*animations, lag_ratios=1)
 
 
