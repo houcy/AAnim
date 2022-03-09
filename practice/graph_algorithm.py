@@ -5,6 +5,7 @@ from graph import Graph1
 from code_block import CodeBlock
 from legend import Legend
 from graph_edges_group import GraphEdgesGroup
+from graph_nodes_group import GraphNodesGroup
 from util import *
 import copy
 
@@ -224,7 +225,7 @@ class Show(Scene):
                 for e in v.edges:
                     u = e.get_the_other_end(v)
                     if u not in selected:
-                        neighbor_edges.add(e.mobject)
+                        neighbor_edges.add(e)
                         if graph.adjacency_list[u.value][v.value] < minimum:
                             minimum = graph.adjacency_list[u.value][v.value]
                             minimum_node = u
@@ -252,20 +253,70 @@ class Show(Scene):
         self.play(code_block.highlight(13), run_time=speed)
         
 
-    def mst_prim_queue(self, graph, speed=1, code_block=None):
-        l = Legend({PINK1: "V (MST so far)"})
+    def mst_prim_queue(self, graph, source=None, speed=1, code_block=None):
+        def extract_min_node(list, unreach_nodes_group):
+            min_so_far = float('inf')
+            min_node = None
+            for n in list:
+                if n.key < min_so_far:
+                    min_so_far = n.key
+                    min_node = n
+            list.remove(min_node)
+            return min_node
+
+        l = Legend({PINK1: "MST so far"})
         # l.mobjects.next_to(graph.graph_mobject, DOWN, buff=0.3)
-        l.mobjects.move_to(2*UP+1*RIGHT)
-        self.play(l.animation)
+        l.mobjects.move_to(1.8*UP+1.5*RIGHT)
+        # self.play(l.animation)
         # self.wait()
         if not code_block:
             code_block = CodeBlock(CODE_FOR_PRIM_QUEUE)
             self.play(Create(code_block.code))
-        key_initialize = []
+        # self.play(code_block.highlight(1), run_time=speed)
+        # self.play(code_block.highlight(2, 3), run_time=speed)
+        edges = []
+        unreach = list(graph.value2node.values())
+        min_edge = {}
+        # self.play(code_block.highlight(5), run_time=speed)
+        transforms = []
+        fadeins = []
         for node in graph.value2node.values():
-            key_initialize.append(node.change_key("∞"))
-        self.play(*key_initialize)
-        
+            node.initialize_key(float('inf'), show_value=False)
+            transform, fadein = node.animations
+            transforms.append(transform)
+            fadeins.append(fadein)
+        unreach_nodes_group = GraphNodesGroup(unreach)
+        self.play(*transforms)
+        # self.wait()
+        self.play(*fadeins)
+        # self.play(code_block.highlight(6), run_time=speed)
+        if not source:
+            source_node = graph.value2node.values()[0]
+        else:
+            source_node = graph.value2node[source]
+        self.play(source_node.update_key(0))
+        while unreach:
+            self.play(unreach_nodes_group.color(PINK1, width=1))
+            self.play(unreach_nodes_group.color(GRAY, width=0))
+            v = extract_min_node(unreach, unreach_nodes_group)
+            self.play(v.color(has_key=True))
+            # Get the min edge
+            if v in min_edge:
+                edges.append(min_edge[v])
+                # self.play(min_edge[v].highlight(PINK1), run_time=0.5*speed)
+                # self.play(min_edge[v].dehighlight(), run_time=0.5*speed)
+                # self.play(min_edge[v].highlight(PINK1), run_time=0.5*speed)
+                # self.wait()
+            # Decrease key and save the min edge
+            for u in v.neighbors:
+                if u in unreach:
+                    edge_v_u = v.neighbor2edge[u]
+                    if edge_v_u.weight < u.key:
+                        self.play(u.update_key(edge_v_u.weight))
+                        u.key = edge_v_u.weight
+                        min_edge[u] = edge_v_u
+        return edges
+
 
     def construct(self):
         self.camera.background_color = BACKGROUND
@@ -298,13 +349,13 @@ class Show(Scene):
         # self.add(l.mobjects, code_block.code, graph.graph_mobject)
 
         # Prim-queue
-        # title_mobject = show_title_for_demo("PRIM'S ALGO FOR MST")
+        # title_mobject = show_title_for_demo("PRIM'S ALGO (USING QUEUE) FOR MST")
         # self.add(title_mobject)
         code_block = CodeBlock(CODE_FOR_PRIM_QUEUE)
         self.play(Create(code_block.code))
         graph = Graph1(MAP_MST, POSITION_MST)
-        self.play(FadeIn(graph.graph_mobject.scale(0.9).shift(3.7*RIGHT)))
-        self.mst_prim_queue(graph, code_block=code_block)
+        self.play(FadeIn(graph.graph_mobject.scale(0.9).shift(3.3*RIGHT)))
+        self.mst_prim_queue(graph, source='A', code_block=code_block)
         # self.wait(5)
 
         # Comment out BFS code  
