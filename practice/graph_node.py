@@ -3,7 +3,7 @@ from manim_fonts import *
 from style import *
 from util import *
 
-
+# z_index: circle: 1, text: 3, key: 5
 class GraphNode:
     def __init__(self, value, position_x, position_y):
         self.value = value
@@ -17,18 +17,27 @@ class GraphNode:
         self._create_mobject()
         self.key = None
         self.key_mobject = None
+        self.circle_mobject = None
         self.animations = None
     
     def _create_mobject(self):
         """
         Convert a node to an MObject so that it shows on the canvas
         """
-        circle = Circle(radius=RADIUS).set_stroke(color=LINE_COLOR, width=WIDTH).set_fill(BACKGROUND, opacity=1.0)
-        self.text_mobject = Text(str(self.value), color=LINE_COLOR, font=FONT, weight=BOLD, font_size=VALUE_SIZE)
-        key_mobject_list = [("c", circle), ("t", self.text_mobject)]
-        self.mobject = VDict(key_mobject_list).shift(RIGHT * self.position_x + UP * self.position_y).set_z_index(1)
+        self.circle_mobject = Circle(radius=RADIUS).set_stroke(color=LINE_COLOR, width=WIDTH).set_fill(BACKGROUND, opacity=1.0).set_z_index(1)
+        self.text_mobject = Text(str(self.value), color=LINE_COLOR, font=FONT, weight=BOLD, font_size=VALUE_SIZE).set_z_index(3)
+        key_mobject_list = [("c", self.circle_mobject), ("t", self.text_mobject)]
+        self.mobject = VDict(key_mobject_list).shift(RIGHT * self.position_x + UP * self.position_y)
 
-    def initialize_key(self, key):
+    def mobjects(self):
+        mobjects = VGroup()
+        for m in [self.circle_mobject, self.text_mobject. self.key_mobject]:
+            if m:
+                mobjects += m
+        return mobjects
+
+    
+    def initialize_key(self, key, show_value=True):
         animations = []
         key_string = ''
         if key == float('inf'):
@@ -39,17 +48,22 @@ class GraphNode:
             print("Failed to initialize key: need passing an integer")
             return
         self.key = key
-        new_text_mobject = get_text(str(self.value), NODE_NAME_BACKGROUND_SIZE, color=NODE_NAME_BACKGROUND_COLOR, weight=NODE_NAME_BACKGROUND_WEIGHT).move_to(self.mobject.get_center()).set_fill(opacity=NODE_NAME_BACKGROUND_OPACITY)
-        animations.append(Transform(self.text_mobject, new_text_mobject))
-        self.text_mobject = new_text_mobject
-        self.key_mobject = get_text(key_string, font_size=VALUE_SIZE).move_to(self.mobject.get_center()).set_z_index(2)
+        if show_value:
+            new_text_mobject = get_text(str(self.value), NODE_NAME_BACKGROUND_SIZE, color=NODE_NAME_BACKGROUND_COLOR, weight=NODE_NAME_BACKGROUND_WEIGHT).move_to(self.mobject.get_center()).set_fill(opacity=NODE_NAME_BACKGROUND_OPACITY).set_z_index(3)
+            animations.append(ReplacementTransform(self.text_mobject, new_text_mobject))
+            self.text_mobject = new_text_mobject
+            self.mobject["t"] = new_text_mobject
+        else:
+            animations.append(FadeOut(self.text_mobject))
+            self.mobject.remove("t")
+        self.key_mobject = get_text(key_string, font_size=VALUE_SIZE, weight=BOLD).move_to(self.mobject.get_center()).set_z_index(5)
         animations.append(FadeIn(self.key_mobject))
-        self.animations = animations
+        self.animations = animations    # 2 animations: Transform and FadeIn
         return AnimationGroup(*animations, lag_ratios=1)
     
     def update_key(self, key):
         animations = []
-        new_key_mobject = get_text(str(key), font_size=VALUE_SIZE).move_to(self.mobject.get_center()).set_z_index(2)
+        new_key_mobject = get_text(str(key), font_size=VALUE_SIZE, weight=BOLD).move_to(self.mobject.get_center()).set_z_index(5)
         animations.append(ReplacementTransform(self.key_mobject, new_key_mobject))
         self.key = key
         self.key_mobject = new_key_mobject
@@ -69,11 +83,16 @@ class GraphNode:
         """
         return AnimationGroup(self.mobject["c"].animate.set_fill(PINK1).set_stroke(PINK2), self.mobject["t"].animate.set_color(BACKGROUND))
 
-    def color(self, fill_color=PINK1, stroke_color=PINK2):
+    def color(self, fill_color=PINK1, stroke_color=PINK2, has_key=False):
         """
         Fill this node as PINK (light pink)
         """
-        return AnimationGroup(self.mobject["c"].animate.set_fill(fill_color).set_stroke(stroke_color), self.mobject["t"].animate.set_color(BACKGROUND))
+        if not has_key:
+            return AnimationGroup(self.mobject["c"].animate.set_fill(fill_color).set_stroke(stroke_color), self.key_mobject.animate.set_color(BACKGROUND))
+        elif "t" in self.mobject:
+            return AnimationGroup(self.mobject["c"].animate.set_fill(fill_color).set_stroke(stroke_color), self.key_mobject.animate.set_color(BACKGROUND), self.mobject["t"].animate.set_color(BACKGROUND))
+        else:
+            return AnimationGroup(self.mobject["c"].animate.set_fill(fill_color).set_stroke(stroke_color), self.key_mobject.animate.set_color(BACKGROUND))
 
     def mark_pink3(self):
         """
