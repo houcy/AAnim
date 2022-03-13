@@ -264,11 +264,11 @@ class Show(Scene):
             list.remove(min_node)
             return min_node
 
-        l = Legend({PINK1: "MST so far"})
-        # l.mobjects.next_to(graph.graph_mobject, DOWN, buff=0.3)
+        l = Legend({PINK1: "MST so far", ("HIGHLIGHT_ROUNDED_RECTANGLE", PINK1, HIGHLIGHT_STROKE): "v"})
+        l.mobjects.next_to(graph.graph_mobject, DOWN, buff=0.3)
         l.mobjects.move_to(1.8*UP+1.5*RIGHT)
-        # self.play(l.animation)
-        # self.wait()
+        self.play(l.animation)
+        self.wait()
         if not code_block:
             code_block = CodeBlock(CODE_FOR_PRIM_QUEUE)
             self.play(Create(code_block.code))
@@ -296,16 +296,21 @@ class Show(Scene):
             source_node = graph.value2node[source]
         self.play(source_node.update_key(0))
         while unreach:
-            self.play(unreach_nodes_group.color(PINK1, width=1))
-            self.play(unreach_nodes_group.color(GRAY, width=0))
+            self.play(unreach_nodes_group.color(PINK1, width=1), run_time=0.5*speed)
+            self.play(unreach_nodes_group.color(GRAY, width=0), run_time=0.5*speed)
+            self.play(unreach_nodes_group.color(PINK1, width=1), run_time=0.5*speed)
+            self.wait()
+            self.play(unreach_nodes_group.color(GRAY, width=0), run_time=0.5*speed)
             v = extract_min_node(unreach, unreach_nodes_group)
             self.play(v.color(has_key=True))
+            # self.play(v.highlight_stroke())
+            self.play(v.highlight_stroke_and_change_shape())
             # Get the min edge
             if v in min_edge:
                 edges.append(min_edge[v])
                 # self.play(min_edge[v].highlight(PINK1), run_time=0.5*speed)
                 # self.play(min_edge[v].dehighlight(), run_time=0.5*speed)
-                # self.play(min_edge[v].highlight(PINK1), run_time=0.5*speed)
+                self.play(min_edge[v].highlight(PINK1), run_time=0.5*speed)
                 # self.wait()
             # Decrease key and save the min edge
             for u in v.neighbors:
@@ -315,6 +320,8 @@ class Show(Scene):
                         self.play(u.update_key(edge_v_u.weight))
                         u.key = edge_v_u.weight
                         min_edge[u] = edge_v_u
+            # self.play(v.highlight_stroke(PINK2))
+            self.play(v.dehighlight_stroke_and_change_shape())
         return edges
 
 
@@ -352,7 +359,7 @@ class Show(Scene):
         # title_mobject = show_title_for_demo("PRIM'S ALGO (USING QUEUE) FOR MST")
         # self.add(title_mobject)
         code_block = CodeBlock(CODE_FOR_PRIM_QUEUE)
-        self.play(Create(code_block.code))
+        self.play(Create(code_block.code.shift(0.2*RIGHT)))
         graph = Graph1(MAP_MST, POSITION_MST)
         self.play(FadeIn(graph.graph_mobject.scale(0.9).shift(3.3*RIGHT)))
         self.mst_prim_queue(graph, source='A', code_block=code_block)

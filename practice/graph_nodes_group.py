@@ -11,8 +11,6 @@ class GraphNodesGroup:
         self.list_nodes.append(n)
 
     def remove(self, n):
-        print("n", n)
-        print("self.list_nodes", self.list_nodes)
         if n in self.list_nodes:
             self.list_nodes.remove(n)
 
@@ -33,4 +31,4 @@ class GraphNodesGroup:
     def color(self, color=PINK1, width=0, scale=1):
         circle_mobject = self.circle_mobject()
         key_mobject = self.key_mobject()
-        return AnimationGroup(circle_mobject.animate.set_stroke(color=color), key_mobject.animate.set_color(color=color).set_stroke(width=width), Wait())
+        return AnimationGroup(circle_mobject.animate.set_stroke(color=color), key_mobject.animate.set_color(color=color).set_stroke(width=width))

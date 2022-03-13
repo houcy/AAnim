@@ -3,7 +3,7 @@ from manim_fonts import *
 from style import *
 from util import *
 
-# z_index: circle: 1, text: 3, key: 5
+# z_index: edge: 0, circle: 1, text: 3, key: 5
 class GraphNode:
     def __init__(self, value, position_x, position_y):
         self.value = value
@@ -14,11 +14,12 @@ class GraphNode:
         self.position_y = position_y
         self.mobject = None
         self.text_mobject = None
+        self.circle_mobject = None
         self._create_mobject()
         self.key = None
         self.key_mobject = None
-        self.circle_mobject = None
         self.animations = None
+        self.rect = None
     
     def _create_mobject(self):
         """
@@ -36,7 +37,6 @@ class GraphNode:
                 mobjects += m
         return mobjects
 
-    
     def initialize_key(self, key, show_value=True):
         animations = []
         key_string = ''
@@ -70,12 +70,27 @@ class GraphNode:
         self.animations = animations
         return AnimationGroup(*animations, lag_ratios=1)
 
-
-    def highlight_stroke(self, color=GREEN):
+    def highlight_stroke(self, color=HIGHLIGHT_STROKE):
         """
         Change the stroke color of the node to be highlight color
         """
-        return self.mobject.animate.set_stroke(color=color)
+        return AnimationGroup(self.mobject.animate.set_stroke(color=color), Wait())
+
+    def highlight_stroke_and_change_shape(self, color=HIGHLIGHT_STROKE):
+        """
+        Change the stroke color of the node to be highlight color
+        """
+        circle = self.mobject["c"]
+        circle.save_state()
+        circle_color = circle.get_fill_color()
+        self.rect = RoundedRectangle(corner_radius=0.2, height=1.8*RADIUS, width=1.8*RADIUS).set_fill(circle_color, 1).set_stroke(color=color).move_to(circle.get_center()).set_z_index(1)
+        return AnimationGroup(ReplacementTransform(circle, self.rect), Wait())
+
+    def dehighlight_stroke_and_change_shape(self):
+        """
+        Change the stroke color of the node to be highlight color
+        """
+        return AnimationGroup(Wait(), FadeOut(self.rect), Restore(self.mobject["c"]), Wait())
 
     def mark_pink1(self):
         """
