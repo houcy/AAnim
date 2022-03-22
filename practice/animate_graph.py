@@ -4,6 +4,7 @@ import sys
 from style import *
 from collections import defaultdict
 from graph_algorithm import Show
+from scale_position import *
 
 def get_adjacency_list(file_name):
     is_directed = False
