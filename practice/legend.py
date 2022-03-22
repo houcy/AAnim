@@ -20,7 +20,8 @@ class Legend:
                     inside += text
 
             else:
-                circle = Circle(color=feature, radius=SM_RADIUS).set_fill(feature, 1)
+                fill_color, stroke_color = feature
+                circle = Circle(radius=SM_RADIUS).set_fill(fill_color, 1).set_stroke(stroke_color)
                 text = Text(str(explanation), color=LINE_COLOR, font=FONT, font_size=LEGEND_SIZE).next_to(circle, RIGHT, buff=2)
                 inside += circle
                 inside += text

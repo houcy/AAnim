@@ -27,8 +27,7 @@ class GraphNode:
         """
         self.circle_mobject = Circle(radius=RADIUS).set_stroke(color=LINE_COLOR, width=WIDTH).set_fill(BACKGROUND, opacity=1.0).set_z_index(1)
         self.text_mobject = Text(str(self.value), color=LINE_COLOR, font=FONT, weight=BOLD, font_size=VALUE_SIZE).set_z_index(3)
-        key_mobject_list = [("c", self.circle_mobject), ("t", self.text_mobject)]
-        self.mobject = VDict(key_mobject_list).shift(RIGHT * self.position_x + UP * self.position_y)
+        self.mobject = VDict([("c", self.circle_mobject), ("t", self.text_mobject)]).shift(RIGHT * self.position_x + UP * self.position_y)
 
     def mobjects(self):
         mobjects = VGroup()
@@ -53,17 +52,19 @@ class GraphNode:
             animations.append(ReplacementTransform(self.text_mobject, new_text_mobject))
             self.text_mobject = new_text_mobject
             self.mobject["t"] = new_text_mobject
+            self.key_mobject = get_text(key_string, font_size=KEY_SIZE, weight=BOLD).move_to(self.mobject.get_center()).set_z_index(5)
+            animations.append(FadeIn(self.key_mobject))
         else:
-            animations.append(FadeOut(self.text_mobject))
+            self.text_mobject.save_state()
+            self.key_mobject = get_text(key_string, font_size=KEY_SIZE, weight=BOLD).move_to(self.mobject.get_center()).set_z_index(5)
+            animations.append(ReplacementTransform(self.text_mobject, self.key_mobject))
             self.mobject.remove("t")
-        self.key_mobject = get_text(key_string, font_size=VALUE_SIZE, weight=BOLD).move_to(self.mobject.get_center()).set_z_index(5)
-        animations.append(FadeIn(self.key_mobject))
-        self.animations = animations    # 2 animations: Transform and FadeIn
-        return AnimationGroup(*animations, lag_ratios=1)
+        self.animations = animations    # If show_value is True, there will be 2 animations: Transform and FadeIn; Otherwise, only 1 animation
+        return AnimationGroup(*animations, lag_ratio=1)
     
     def update_key(self, key):
         animations = []
-        new_key_mobject = get_text(str(key), font_size=VALUE_SIZE, weight=BOLD).move_to(self.mobject.get_center()).set_z_index(5)
+        new_key_mobject = get_text(str(key), font_size=KEY_SIZE, weight=BOLD).move_to(self.mobject.get_center()).set_z_index(5)
         animations.append(ReplacementTransform(self.key_mobject, new_key_mobject))
         self.key = key
         self.key_mobject = new_key_mobject
@@ -76,14 +77,16 @@ class GraphNode:
         """
         return AnimationGroup(self.mobject.animate.set_stroke(color=color), Wait())
 
-    def highlight_stroke_and_change_shape(self, color=HIGHLIGHT_STROKE):
+    def highlight_stroke_and_change_shape(self, fill_color=PINK3, stroke_color=PINK1, shape="ROUNDEDRECTANGLE"):
         """
         Change the stroke color of the node to be highlight color
         """
         circle = self.mobject["c"]
         circle.save_state()
-        circle_color = circle.get_fill_color()
-        self.rect = RoundedRectangle(corner_radius=0.2, height=1.8*RADIUS, width=1.8*RADIUS).set_fill(circle_color, 1).set_stroke(color=color).move_to(circle.get_center()).set_z_index(1)
+        if shape == "ROUNDEDRECTANGLE":
+            self.rect = RoundedRectangle(corner_radius=0.2, height=HIGHLIGHT_RECTANGLE_WIDTH, width=HIGHLIGHT_RECTANGLE_WIDTH).set_fill(fill_color, 1).set_stroke(color=stroke_color, width=WIDTH+1).move_to(circle.get_center()).set_z_index(1)
+        elif shape == "HEART":
+            self.rect = SVGMobject("heart.svg", height=0.7, fill_color=PINK3).move_to(circle.get_center()).set_z_index(1)
         return AnimationGroup(ReplacementTransform(circle, self.rect), Wait())
 
     def dehighlight_stroke_and_change_shape(self):
@@ -98,12 +101,12 @@ class GraphNode:
         """
         return AnimationGroup(self.mobject["c"].animate.set_fill(PINK1).set_stroke(PINK2), self.mobject["t"].animate.set_color(BACKGROUND))
 
-    def color(self, fill_color=PINK1, stroke_color=PINK2, has_key=False):
+    def color(self, fill_color=PINK2, stroke_color=PINK2, has_key=False):
         """
         Fill this node as PINK (light pink)
         """
         if not has_key:
-            return AnimationGroup(self.mobject["c"].animate.set_fill(fill_color).set_stroke(stroke_color), self.key_mobject.animate.set_color(BACKGROUND))
+            return AnimationGroup(self.mobject["c"].animate.set_fill(fill_color).set_stroke(stroke_color), self.mobject["t"].animate.set_color(BACKGROUND))
         elif "t" in self.mobject:
             return AnimationGroup(self.mobject["c"].animate.set_fill(fill_color).set_stroke(stroke_color), self.key_mobject.animate.set_color(BACKGROUND), self.mobject["t"].animate.set_color(BACKGROUND))
         else:
@@ -139,5 +142,5 @@ class Test(Scene):
         self.camera.background_color = BACKGROUND
         node = GraphNode(value='A', position_x=1, position_y=1)
         self.add(node.mobject)
-        self.play(node.change_key(3))
-        self.play(node.change_key(5))
+        self.play(node.color())
+        self.play(node.highlight_stroke_and_change_shape(shape = "HEART"))

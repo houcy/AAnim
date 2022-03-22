@@ -28,7 +28,12 @@ class GraphNodesGroup:
                 mobject += n.circle_mobject
         return mobject
 
-    def color(self, color=PINK1, width=0, scale=1):
+    def color(self, key_color=PINK1, stroke_color=PINK1, width=0, scale=1):
         circle_mobject = self.circle_mobject()
         key_mobject = self.key_mobject()
-        return AnimationGroup(circle_mobject.animate.set_stroke(color=color), key_mobject.animate.set_color(color=color).set_stroke(width=width))
+        return AnimationGroup(circle_mobject.animate.set_stroke(color=stroke_color), key_mobject.animate.set_color(color=key_color).set_stroke(width=width))
+
+    def flash_keys(self, color=BACKGROUND):
+        key_mobject = self.key_mobject()
+        animations = [key_mobject.animate.set_color(color), key_mobject.animate.set_color(GRAY)]
+        return animations

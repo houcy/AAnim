@@ -34,7 +34,6 @@ class Graph1:
             if start not in self.value2node:
                 position_x, position_y = position[start]
                 self._create_node(start, position_x, position_y)
-                
             for end in self.adjacency_list[start]:
                 if end not in self.value2node:
                     position_x, position_y = position[end]
@@ -44,8 +43,16 @@ class Graph1:
                     if not is_directed:
                         visited_edge.add((end, start))
                     self._create_edge(start, end, is_directed, is_topological_graph)
-        
         self.graph_mobject = self.graph_mobject.move_to(ORIGIN)
+
+    def get_nodes(self):
+        return list(self.value2node.values())
+    
+    def n_nodes(self):
+        return len(self.value2node)
+
+    def n_edges(self):
+        return len(self.edges)
                 
     def _create_node(self, value, position_x, position_y):
         node = GraphNode(value, position_x, position_y)

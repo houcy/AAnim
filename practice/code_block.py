@@ -60,23 +60,23 @@ class CodeBlock():
             self.highlight_rect = RoundedRectangle(corner_radius=0.05, width=self.width+CODE_BLOCK_WIDTH_PADDING, height=self.line_height_include_spacing*n_lines+CODE_BLOCK_HEIGHT_PADDING).set_stroke(color=GRAY, width=2).shift(SHIFT_LEFT_UNIT * LEFT + UP * y_position)
             self.last_n_lines = n_lines
             self.code = VGroup(self.code, self.highlight_rect)
-            return AnimationGroup(FadeIn(self.highlight_rect), Wait())
+            return AnimationGroup(FadeIn(self.highlight_rect), Wait(), lag_ratio=1)
         else:
             if self.last_n_lines == n_lines:
-                return AnimationGroup(self.highlight_rect.animate.move_to(SHIFT_LEFT_UNIT * LEFT + UP * y_position), Wait(2))
+                return AnimationGroup(Wait(), self.highlight_rect.animate.move_to(SHIFT_LEFT_UNIT * LEFT + UP * y_position), Wait(), lag_ratio=1)
             else:
                 self.last_n_lines = n_lines
                 last_highlight_rect = self.highlight_rect
                 self.highlight_rect = RoundedRectangle(corner_radius=0.05, width=self.width+CODE_BLOCK_WIDTH_PADDING, height=self.line_height_include_spacing*n_lines+CODE_BLOCK_HEIGHT_PADDING).set_stroke(color=GRAY, width=2).shift(SHIFT_LEFT_UNIT * LEFT + UP * y_position)
-                return AnimationGroup(ReplacementTransform(last_highlight_rect, self.highlight_rect), Wait(2))
+                return AnimationGroup(Wait(), ReplacementTransform(last_highlight_rect, self.highlight_rect), Wait(), lag_ratio=1)
 
 
 class Test(Scene):
     def construct(self):
-        # code1 = CodeBlock(TEST_CODE)
-        # self.play(Create(code1.code.shift(4*RIGHT)))
+        code1 = CodeBlock(TEST_CODE)
+        self.play(Create(code1.code.shift(4*RIGHT)))
         code2 = CodeBlock(CODE_FOR_PRIM_BASIC)
         self.play(Create(code2.code))
-        # self.play(code2.highlight(1, 1))
-        # self.play(code2.highlight(2, 1))
-        # self.play(code2.highlight(4, 2))
+        self.play(code2.highlight(1, 1))
+        self.play(code2.highlight(2, 1))
+        self.play(code2.highlight(4, 2))

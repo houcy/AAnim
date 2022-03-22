@@ -27,7 +27,7 @@ class GraphEdge:
         if self.weight:
             text = Text(str(weight), color=EDGE_COLOR, font=FONT, weight=WEIGHT_WEIGHT, font_size=WEIGHT_SIZE).move_to(line.get_center()).set_z_index(10).set_stroke(color=EDGE_STROKE_COLOR, width=EDGE_STROKE_WIDTH)
             text_background = Circle(radius=WEIGHT_CIRCLE_RADIUS).set_stroke(color=BACKGROUND, width=WIDTH).set_fill(BACKGROUND, opacity=1.0).set_z_index(9).move_to(text.get_center())
-            self.mobject["text"] = VGroup(text, text_background)
+            self.mobject["text"] = VDict([("text", text), ("text_background", text_background)])
 
     def get_the_other_end(self, node):
         if node == self.start_node:
@@ -38,8 +38,8 @@ class GraphEdge:
             print("Failed to output the other end of the edge, the input node is incorrect")
             return None
 
-    def highlight(self, color):
-        return AnimationGroup(self.mobject["line"].animate.set_fill(color).set_stroke(color, width=WIDTH+7))
+    def highlight(self, fill_color=PINK1):
+        return AnimationGroup(self.mobject["line"].animate.set_fill(fill_color).set_stroke(fill_color, width=EDGE_HIGHLIGHT_STROKE_WIDTH))
 
     def dehighlight(self, color=GRAY):
         return AnimationGroup(self.mobject["line"].animate.set_fill(color).set_stroke(color, width=WIDTH))
