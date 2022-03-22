@@ -64,16 +64,43 @@ CODE_FOR_PRIM_BASIC = """MST-PRIM(G) {
 CODE_FOR_PRIM_QUEUE = """MST-PRIM(G) {
     Edges = ∅
     UnReachSet = G.V
-    MinEdge = {}   // Hashmap
+    set all vertices v.minEdge = ∅
+    set all vertices v.key = ∞
     set an arbitrary vertex v.key = 0
-    set the rest vertices v.key = ∞
     while UnReachSet ≠ ∅
         v = EXTRACT-MIN(UnReachSet)
-        add MinEdge(v) to Edges if exists
+        if v.minEdge ≠ ∅
+            add v.minEdge to Edges
         for each neighbor u of v
-            if u ∈ UnReachSet and weight(v, u) < u.key
-                MinEdge(u) = (v, u)
-                u.key = weight(v, u)  // DecreaseKey
+            if u ∈ UnReachSet and
+            weight(v, u) < u.key
+                u.key = weight(v, u)
+                u.minEdge = (v, u)
     return Edges
+}
+"""
+
+
+CODE_FOR_KRUSKAL = """MST-KRUSKAL(G) {
+    Edges = ∅
+    scan all edges by nondecreasing weight
+        if an edge is safe (doesn't create
+        any cycle with the MST so far)
+            add the edge to Edges
+    return Edges 
+}
+"""
+
+
+CODE_FOR_KRUSKAL_UNION_FIND = """MST-KRUSKAL(G) {
+    Edges = ∅
+    for each vertex v ∈ G.V
+        MAKE-SET(v)
+    sort all edges by nondecreasing weight
+    for each edge (u, v)
+        if FIND-SET(u) ≠ FIND-SET(v)
+            Edges = Edges ∪ {(u, v)}   
+            UNION(u, v)
+    return Edges 
 }
 """
