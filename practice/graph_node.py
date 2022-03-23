@@ -101,16 +101,16 @@ class GraphNode:
         """
         return AnimationGroup(self.mobject["c"].animate.set_fill(PINK1).set_stroke(PINK2), self.mobject["t"].animate.set_color(BACKGROUND))
 
-    def color(self, fill_color=PINK2, stroke_color=PINK2, has_key=False):
+    def color(self, fill_color=PINK2, stroke_color=PINK2, stroke_width=WIDTH, has_key=False):
         """
         Fill this node as PINK (light pink)
         """
         if not has_key:
-            return AnimationGroup(self.mobject["c"].animate.set_fill(fill_color).set_stroke(stroke_color), self.mobject["t"].animate.set_color(BACKGROUND))
+            return AnimationGroup(self.mobject["c"].animate.set_fill(fill_color).set_stroke(stroke_color, width=stroke_width), self.mobject["t"].animate.set_color(BACKGROUND))
         elif "t" in self.mobject:
-            return AnimationGroup(self.mobject["c"].animate.set_fill(fill_color).set_stroke(stroke_color), self.key_mobject.animate.set_color(BACKGROUND), self.mobject["t"].animate.set_color(BACKGROUND))
+            return AnimationGroup(self.mobject["c"].animate.set_fill(fill_color).set_stroke(stroke_color, width=stroke_width), self.key_mobject.animate.set_color(BACKGROUND), self.mobject["t"].animate.set_color(BACKGROUND))
         else:
-            return AnimationGroup(self.mobject["c"].animate.set_fill(fill_color).set_stroke(stroke_color), self.key_mobject.animate.set_color(BACKGROUND))
+            return AnimationGroup(self.mobject["c"].animate.set_fill(fill_color).set_stroke(stroke_color, width=stroke_width), self.key_mobject.animate.set_color(BACKGROUND))
 
     def mark_pink3(self):
         """
@@ -142,5 +142,6 @@ class Test(Scene):
         self.camera.background_color = BACKGROUND
         node = GraphNode(value='A', position_x=1, position_y=1)
         self.add(node.mobject)
-        self.play(node.color())
-        self.play(node.highlight_stroke_and_change_shape(shape = "HEART"))
+        self.play(node.color(fill_color=PINK3, stroke_color=PINK1, stroke_width=WIDTH+2))
+        self.play(node.color(fill_color=PINK2, stroke_color=PINK2, stroke_width=WIDTH))
+        # self.play(node.highlight_stroke_and_change_shape(shape = "HEART"))
