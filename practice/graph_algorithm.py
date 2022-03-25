@@ -1,7 +1,7 @@
 from manim import *
 from style import *
 from code_constant import *
-from graph import Graph1
+from graph import GraphObject
 from code_block import CodeBlock
 from legend import Legend
 from graph_edges_group import GraphEdgesGroup
@@ -206,10 +206,10 @@ class Show(Scene):
     # MST: Prim
     ##################################
 
-    def mst_prim_basic(self, graph, create_legend=True, create_code_block=True, code_block=None, speed=1):
+    def mst_prim_basic(self, graph, create_legend=True, legend_is_horizontal=False, create_code_block=True, code_block=None, speed=1):
         speed = 1 / speed
         if create_legend:
-            l = Legend({PINK2: "MST so far"})
+            l = Legend({PINK2: "MST so far"}, is_horizontal=legend_is_horizontal)
             l.mobjects.move_to(1.6*UP+1.7*RIGHT)
             self.play(l.animation)
             self.wait()
@@ -308,12 +308,11 @@ class Show(Scene):
             self.play(code_block.highlight(8), run_time=speed) if create_code_block else None
             # Flash candidates
             self.wait()
-            self.play(unreach_nodes_group.color(stroke_color=GRAY, key_color=BACKGROUND), run_time=0.5*speed)
-            self.wait(0.7)
-            self.play(unreach_nodes_group.color(stroke_color=GRAY, key_color=GRAY), run_time=0.5*speed)
+            self.play(unreach_nodes_group.color(stroke_color=GRAY, key_color=BACKGROUND), run_time=1.2*speed)
+            self.play(unreach_nodes_group.color(stroke_color=GRAY, key_color=GRAY), run_time=1.2*speed)
             # Color the min node
             v = extract_min_node(unreach)
-            self.play(v.color(fill_color=PINK4, stroke_color=PINK5, has_key=True))
+            self.play(v.color(fill_color=PINK4, stroke_color=PINK5, stroke_width=WIDTH+2, has_key=True))
             # Get the min edge
             self.play(code_block.highlight(9), run_time=speed) if create_code_block else None
             if v in min_edge:
@@ -357,13 +356,13 @@ class Show(Scene):
                             u.key = edge_v_u.weight
                             min_edge[u] = edge_v_u
                 if mobject_to_flash:
-                    self.play(*[m.animate.set_color(BACKGROUND) for m in mobject_to_flash], run_time=1.2*speed)
-                    self.play(*[m.animate.set_color(GRAY) for m in mobject_to_flash], run_time=1.2*speed)
+                    self.play(*[m.animate.set_color(BACKGROUND) for m in mobject_to_flash], run_time=speed)
+                    self.play(*[m.animate.set_color(GRAY) for m in mobject_to_flash], run_time=speed)
                 if animations_update_key:
                     self.play(code_block.highlight(14), run_time=speed) if create_code_block else None
                     self.play(*animations_update_key, run_time=1.5*speed)
                     self.play(code_block.highlight(15), run_time=speed) if create_code_block else None
-            self.play(v.color(fill_color=PINK4, stroke_color=PINK3, has_key=True), run_time=speed)
+            self.play(v.color(fill_color=PINK4, stroke_color=PINK3, stroke_width=WIDTH, has_key=True))
 
         self.play(code_block.highlight(16), run_time=speed) if create_code_block else None
         self._remove_edges(graph, edges, speed=speed)
@@ -374,10 +373,10 @@ class Show(Scene):
     # MST: Kruskal
     ##################################
 
-    def mst_kruskal_basic(self, graph, create_legend=True, create_code_block=True, code_block=None, speed=1):
+    def mst_kruskal_basic(self, graph, create_legend=True, create_code_block=True, code_block=None, use_multiple_colors=False, speed=1):
         speed = 1 / speed
         if create_legend:
-            l = Legend({GREEN: "Current min edge", PINK2: "MST so far"})
+            l = Legend({(PINK2, PINK2): "MST so far", (GREEN, GREEN): "Current min edge"})
             l.mobjects.move_to(1.9*UP+1.6*RIGHT)
             self.play(l.animation)
             self.wait()
@@ -385,41 +384,45 @@ class Show(Scene):
         if create_code_block and not code_block:
             code_block = CodeBlock(CODE_FOR_KRUSKAL)
             self.play(Create(code_block.code))
-        self.play(code_block.highlight(1), run_time=speed) if create_code_block else None
-        self.play(code_block.highlight(2), run_time=speed) if create_code_block else None
+        # self.play(code_block.highlight(1), run_time=speed) if create_code_block else None
+        # self.play(code_block.highlight(2), run_time=speed) if create_code_block else None
         mst_edges = []
         mst_nodes = []
         all_edges = graph.edges
         all_edges.sort(key=lambda edge: edge.weight)
         union_find = UnionFind(graph.get_nodes())
         for i in range(0, graph.n_edges()):
-            self.play(code_block.highlight(3), run_time=speed) if create_code_block else None
+            # self.play(code_block.highlight(3), run_time=speed) if create_code_block else None
             min_edge = all_edges[i]
-            self.play(min_edge.highlight(color=GREEN))
+            self.play(min_edge.highlight(fill_color=GREEN))
             start_node = min_edge.start_node
             end_node = min_edge.end_node
             parent_of_start = union_find.find(start_node)
             parent_of_end = union_find.find(end_node)
-            self.play(code_block.highlight(4, 2), run_time=speed) if create_code_block else None
+            # self.play(code_block.highlight(4, 2), run_time=speed) if create_code_block else None
             if parent_of_start != parent_of_end:
-                self.play(code_block.highlight(6), run_time=speed) if create_code_block else None
-                self.play(min_edge.highlight(color='#F4B1E6'), run_time=speed)
+                # self.play(code_block.highlight(6), run_time=speed) if create_code_block else None
+                self.play(min_edge.highlight(fill_color=PINK4), run_time=speed)
                 animations = []
                 if start_node not in mst_nodes:
                     mst_nodes.append(start_node)
-                    animations.append(start_node.color(fill_color='#F4B1E6'))
+                    animations.append(start_node.color(fill_color=PINK4, stroke_color=PINK3))
                 if end_node not in mst_nodes:
                     mst_nodes.append(end_node)
-                    animations.append(end_node.color(fill_color='#F4B1E6'))
+                    animations.append(end_node.color(fill_color=PINK4, stroke_color=PINK3))
                 if animations:
                     self.play(*animations, run_time=speed)
                 union_find.union(start_node, end_node)
                 mst_edges.append(min_edge)
             else:
-                self.play(min_edge.dehighlight(), run_time=speed)
-        self.play(code_block.highlight(7), run_time=speed) if create_code_block else None
+                path_array = graph.get_path(start_node, end_node, mst_edges)
+                path_group = GraphEdgesGroup(path_array)
+                print(path_group.mobject)
+                self.play(path_group.highlight(GREEN), run_time=speed)
+                self.play(path_group.dehighlight(), min_edge.dehighlight(), run_time=speed)
+        # self.play(code_block.highlight(7), run_time=speed) if create_code_block else None
         self._remove_edges(graph, mst_edges)
-        self.play(code_block.highlight(8), run_time=speed) if create_code_block else None
+        # self.play(code_block.highlight(8), run_time=speed) if create_code_block else None
         return mst_edges
 
 
@@ -463,7 +466,11 @@ class Show(Scene):
                 union_find.union(start_node, end_node)
                 mst_edges.append(min_edge)
             else:
-                self.play(min_edge.dehighlight(), run_time=speed)
+                path_array = graph.get_path(start_node, end_node, visited_nodes_only=True)
+                print(path_array)
+                path_group = GraphEdgesGroup(path_array)
+                path_group.highlight(GREEN)
+                path_group.dehighlight()
         self._remove_edges(graph, mst_edges)
         return mst_edges       
 
@@ -492,7 +499,7 @@ class Show(Scene):
         # l.mobjects.move_to(2.7*UP + 5*RIGHT)
         # code_block = CodeBlock(CODE_FOR_PRIM_BASIC)
         # new_position = scale_position(POSITION_HARD, 1.4, 1.8)
-        # graph = Graph1(MAP_HARD, new_position)
+        # graph = GraphObject(MAP_HARD, new_position)
         # self.play(FadeIn(graph.graph_mobject.shift(0.3*DOWN)))
         # self.play(l.animation)
         # self.mst_prim_basic(graph, create_legend=False, create_code_block=False, code_block=None, speed=2)
@@ -502,7 +509,7 @@ class Show(Scene):
         # l = Legend({PINK1: "MST so far"})
         # l.mobjects.move_to(1.6*UP+1.7*RIGHT)
         # code_block = CodeBlock(CODE_FOR_PRIM_BASIC)
-        # graph = Graph1(MAP_MST, POSITION_MST)
+        # graph = GraphObject(MAP_MST, POSITION_MST)
         # graph.graph_mobject.scale(0.9).shift(3.7*RIGHT)
         # self.add(l.mobjects, code_block.code, graph.graph_mobject)
 
@@ -511,33 +518,50 @@ class Show(Scene):
         # self.add(title_mobject)
         # code_block = CodeBlock(CODE_FOR_PRIM_QUEUE)
         # self.play(Create(code_block.code))
-        # graph = Graph1(MAP_MST, POSITION_MST)
+        # graph = GraphObject(MAP_MST, POSITION_MST)
         # self.play(FadeIn(graph.graph_mobject.scale(0.9).shift(3.3*RIGHT)))
         # self.mst_prim_queue(graph, source='A', code_block=code_block, hide_details=True)
         # self.wait(10)
 
         # Prim-queue-no-code
-        title_mobject = show_title_for_demo("PRIM'S ALGO FOR MST")
-        self.add(title_mobject)
-        l = Legend({(PINK4, PINK4): "MST so far", (PINK4, PINK5): "curr min node"})
-        l.mobjects.move_to(2.7*UP + 4.9*RIGHT)
-        new_position = scale_position(POSITION_HARD, 1.4, 1.7)
-        graph = Graph1(MAP_HARD, new_position)
-        self.play(FadeIn(graph.graph_mobject.shift(0.2*DOWN)))
-        self.play(l.animation)
-        self.mst_prim_queue(graph, source='A', create_legend=False, create_code_block=False, hide_details=True, speed=2)
-        self.wait(10)
+        # title_mobject = show_title_for_demo("PRIM'S ALGO FOR MST")
+        # self.add(title_mobject)
+        # new_position = scale_position(POSITION_HARD, 1.4, 1.8)
+        # graph = GraphObject(MAP_HARD, new_position)
+        # graph.graph_mobject.shift(0.3*DOWN)
+        # l = Legend({(PINK4, PINK4): "MST so far", (PINK4, PINK5): "vertex with min edge"}, is_horizontal=True)
+        # l.mobjects.next_to(graph.graph_mobject, UP, buff=0.5).align_to(graph.graph_mobject, RIGHT)
+        # self.play(FadeIn(graph.graph_mobject))
+        # self.play(l.animation)
+        # self.mst_prim_queue(graph, source='A', create_legend=False, create_code_block=False, hide_details=True, speed=2)
+        # self.wait(10)
+
+        # Prim-queue-no-code-Chinese
+        # title_mobject = show_title_for_demo("PRIM 算法  ·  最小生成树")
+        # self.add(title_mobject)
+        # new_position = scale_position(POSITION_HARD, 1.4, 1.8)
+        # graph = GraphObject(MAP_HARD, new_position)
+        # graph.graph_mobject.shift(0.3*DOWN)
+        # l = Legend({(PINK4, PINK4): "最小生成树", (PINK4, PINK5): "与最短边相连的点"}, is_horizontal=True)
+        # l.mobjects.next_to(graph.graph_mobject, UP, buff=0.5).align_to(graph.graph_mobject, RIGHT)
+        # self.play(FadeIn(graph.graph_mobject))
+        # self.play(l.animation)
+        # self.mst_prim_queue(graph, source='A', create_legend=False, create_code_block=False, hide_details=True, speed=2)
+        # self.wait(10)
 
         # Kruskal-basic
         # title_mobject = show_title_for_demo("PRIM'S ALGO FOR MST")
         # self.add(title_mobject)
-        # l = Legend({PINK1: "MST so far"})
+        # l = Legend({(PINK4, PINK4): "MST so far"})
         # l.mobjects.move_to(2.7*UP + 5*RIGHT)
         # code_block = CodeBlock(CODE_FOR_PRIM_BASIC)
-        # graph = Graph1(MAP_MST, POSITION_MST)
-        # self.play(FadeIn(graph.graph_mobject.shift(3.3*RIGHT)))
-        # self.mst_kruskal_basic(graph)
-        # for n in graph.get_nodes():
-        #     self.play(n.color(fill_color='#EDC0E8', stroke_color='#FDDDFF'))
+        graph = GraphObject(MAP_MST, POSITION_MST)
+        self.play(FadeIn(graph.graph_mobject.scale(0.9).shift(3.3*RIGHT)))
+        self.mst_kruskal_basic(graph)
+        # start = graph.value2node['A']
+        # end = graph.value2node['H']
+        # b = graph.value2node['B']
+        # graph.visited_nodes = [b, start]
+        # print(graph.get_path(start, end, visited_nodes_only=True))
 
         
