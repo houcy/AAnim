@@ -21,7 +21,7 @@ POSITION_CYCLE3 = {'A': (-2, -2), 'B': (2, 2)}
 
 MAP_CYCLE = {'A': {'B': 3}, 'B': {'A': 2}}
 
-class Graph1:
+class GraphObject:
     def __init__(self, adjacency_list, position, is_directed=False, is_topological_graph=False):
         self.graph_mobject = VGroup()
         self.value2node = {}
@@ -78,8 +78,27 @@ class Graph1:
             end_node.neighbors.append(start_node)
             end_node.edges.append(edge_object)
         self.graph_mobject += edge_object.mobject
-    
 
+    def get_path(self, start, end, visited_edges=None):
+        def helper(curr, end, path, visited, depth):
+            if curr in visited:
+                return False
+            visited.add(curr)
+            if curr == end and depth > 1:
+                return True
+            for edge in curr.edges:
+                if visited_edges and edge in visited_edges:
+                    neighbor_node = edge.get_the_other_end(curr)
+                    path.append(edge)
+                    if helper(neighbor_node, end, path, visited, depth+1):
+                        return True
+                    path.pop()
+            return False
+        path = []
+        visited = set()
+        helper(start, end, path, visited, 0)
+        return path
+    
 class Test(Scene):
     def construct(self):
         self.camera.background_color = BACKGROUND
