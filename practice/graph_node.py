@@ -20,6 +20,8 @@ class GraphNode:
         self.key_mobject = None
         self.animations = None
         self.rect = None
+        self.parent = None  # for Union-Find
+        self.children = []  # for Union-Find
     
     def _create_mobject(self):
         """
@@ -101,7 +103,7 @@ class GraphNode:
         """
         return AnimationGroup(self.mobject["c"].animate.set_fill(PINK1).set_stroke(PINK2), self.mobject["t"].animate.set_color(BACKGROUND))
 
-    def color(self, fill_color=PINK2, stroke_color=PINK2, stroke_width=WIDTH, has_key=False):
+    def color(self, fill_color=PINK2, stroke_color=PINK3, stroke_width=WIDTH, has_key=False):
         """
         Fill this node as PINK (light pink)
         """
