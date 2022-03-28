@@ -26,3 +26,15 @@ def get_text(text, font_size=VALUE_SIZE, color=GRAY, weight=NORMAL):
 def show_title_for_demo(text):
     title_mobject = get_text(text, font_size=TITLE_SIZE_FOR_DEMO, color=GRAY_OUT, weight=BOLD).to_edge(UL, buff=0.8).shift(0.2 * UP)
     return title_mobject
+
+def extract_min_node(list):
+    min_so_far = float('inf')
+    min_node = None
+    for n in list:
+        if n.key < min_so_far:
+            min_so_far = n.key
+            min_node = n
+    list.remove(min_node)
+    return min_node
+
+

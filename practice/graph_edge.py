@@ -11,6 +11,7 @@ class GraphEdge:
         self.start_node = start_node
         self.end_node = end_node
         self.is_directed = is_directed
+        self.save_state = False
         if not is_directed:
             line = Line(start_node.mobject.get_center(), end_node.mobject.get_center()).set_stroke(color=LINE_COLOR, width=WIDTH).set_z_index(0)
         else:
@@ -38,11 +39,17 @@ class GraphEdge:
             print("Failed to output the other end of the edge, the input node is incorrect")
             return None
 
-    def highlight(self, fill_color=PINK1):
-        return AnimationGroup(self.mobject["line"].animate.set_fill(fill_color).set_stroke(fill_color, width=EDGE_HIGHLIGHT_STROKE_WIDTH))
+    def highlight(self, color=PINK4):
+        self.mobject["line"].save_state()
+        self.save_state = True
+        return AnimationGroup(self.mobject["line"].animate.set_stroke(color=color, width=EDGE_HIGHLIGHT_STROKE_WIDTH))
 
     def dehighlight(self, color=GRAY):
-        return AnimationGroup(self.mobject["line"].animate.set_fill(color).set_stroke(color, width=WIDTH))
+        if self.save_state:
+            self.save_state = False
+            return AnimationGroup(Restore(self.mobject["line"]))
+        else:
+            return AnimationGroup(self.mobject["line"].animate.set_stroke(color=color, width=WIDTH))
 
     def fade_out(self):
         return FadeOut(self.mobject)

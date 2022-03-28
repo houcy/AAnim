@@ -18,17 +18,17 @@ def get_adjacency_list(file_name):
             line = line.strip("\n").strip().replace(" ", "")
             start, end = "", ""
             i = 0
-            while line[i].isalnum():
+            while i < len(line) and line[i].isalnum():
                 start += line[i]
                 i+=1
             i+=2
-            while line[i].isalnum():
+            while i < len(line) and line[i].isalnum():
                 end += line[i]
                 i+=1
             weight = ""
             if "xlabel" in line:
                 i+=8
-            while line[i].isalnum():
+            while i < len(line) and line[i].isalnum():
                 weight += line[i]
                 i+=1
             if weight:
