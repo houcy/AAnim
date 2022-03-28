@@ -376,7 +376,7 @@ class Show(Scene):
     def mst_kruskal_basic(self, graph, create_legend=True, create_code_block=True, code_block=None, use_multiple_colors=False, speed=1):
         speed = 1 / speed
         if create_legend:
-            l = Legend({(PINK2, PINK2): "MST so far", (GREEN, GREEN): "Current min edge"})
+            l = Legend({(PINK2, PINK2): "MST so far", (GREEN, GREEN): "curr min edge", (RED, RED): "cycle"})
             l.mobjects.move_to(1.9*UP+1.6*RIGHT)
             self.play(l.animation)
             self.wait()
@@ -394,7 +394,7 @@ class Show(Scene):
         for i in range(0, graph.n_edges()):
             # self.play(code_block.highlight(3), run_time=speed) if create_code_block else None
             min_edge = all_edges[i]
-            self.play(min_edge.highlight(fill_color=GREEN))
+            self.play(min_edge.highlight(color=GREEN))
             start_node = min_edge.start_node
             end_node = min_edge.end_node
             parent_of_start = union_find.find(start_node)
@@ -402,7 +402,7 @@ class Show(Scene):
             # self.play(code_block.highlight(4, 2), run_time=speed) if create_code_block else None
             if parent_of_start != parent_of_end:
                 # self.play(code_block.highlight(6), run_time=speed) if create_code_block else None
-                self.play(min_edge.highlight(fill_color=PINK4), run_time=speed)
+                self.play(min_edge.highlight(color=PINK4), run_time=speed)
                 animations = []
                 if start_node not in mst_nodes:
                     mst_nodes.append(start_node)
@@ -417,9 +417,15 @@ class Show(Scene):
             else:
                 path_array = graph.get_path(start_node, end_node, mst_edges)
                 path_group = GraphEdgesGroup(path_array)
-                print(path_group.mobject)
-                self.play(path_group.highlight(GREEN), run_time=speed)
-                self.play(path_group.dehighlight(), min_edge.dehighlight(), run_time=speed)
+                # edges which are not part of the cycle will disappear, to make the cycle prominent
+                non_path_array = [e for e in graph.edges if (e not in path_array and e != min_edge)]
+                non_path_group = GraphEdgesGroup(non_path_array)
+                # self.play(path_group.highlight(color=GREEN), non_path_group.disappear(include_label=True), run_time=speed)
+                # self.play(path_group.dehighlight(), non_path_group.appear(include_label=True), run_time=speed)
+                # self.play(min_edge.dehighlight(), run_time=speed)
+                self.play(min_edge.highlight(color=RED), path_group.highlight(color=RED), non_path_group.disappear(include_label=True), run_time=speed)
+                self.play(path_group.dehighlight(), non_path_group.appear(include_label=True), run_time=speed)
+                self.play(min_edge.dehighlight(), run_time=speed)
         # self.play(code_block.highlight(7), run_time=speed) if create_code_block else None
         self._remove_edges(graph, mst_edges)
         # self.play(code_block.highlight(8), run_time=speed) if create_code_block else None
@@ -429,9 +435,9 @@ class Show(Scene):
     def mst_kruskal_union_find(self, graph, create_legend=True, create_code_block=True, code_block=None, speed=1):
         speed = 1 / speed
         if create_legend:
-            l = Legend({GREEN: "Current min edge", PINK2: "MST so far"})
+            l = Legend({(PINK2, PINK2): "MST so far", (GREEN, GREEN): "curr min edge", (RED, RED): "cycle"})
             l.mobjects.move_to(1.9*UP+1.6*RIGHT)
-            self.play(l.animation)
+            # self.play(l.animation)
             self.wait()
         # l.mobjects.next_to(graph.graph_mobject, DOWN, buff=0.3)
         if create_code_block and not code_block:
@@ -440,38 +446,29 @@ class Show(Scene):
         # self.play(code_block.highlight(1), run_time=speed) if create_code_block else None
         # self.play(code_block.highlight(2), run_time=speed) if create_code_block else None
         mst_edges = []
-        mst_nodes = []
         all_edges = graph.edges
         all_edges.sort(key=lambda edge: edge.weight)
         union_find = UnionFind(graph.get_nodes())
+        self.play(union_find.show_set())
         for i in range(0, graph.n_edges()):
-            self.play(code_block.highlight(3), run_time=speed) if create_code_block else None
+            # self.play(code_block.highlight(3), run_time=speed) if create_code_block else None
             min_edge = all_edges[i]
-            self.play(min_edge.highlight(color=GREEN))
+            self.play(min_edge.highlight(color=GREEN), run_time=0.5*speed)
+            self.play(min_edge.dehighlight(), run_time=0.5*speed)
+            self.play(min_edge.highlight(color=GREEN), run_time=0.5*speed)
+            self.wait()
             start_node = min_edge.start_node
             end_node = min_edge.end_node
             parent_of_start = union_find.find(start_node)
             parent_of_end = union_find.find(end_node)
             if parent_of_start != parent_of_end:
-                self.play(min_edge.highlight(color=PINK4), run_time=speed)
-                animations = []
-                if start_node not in mst_nodes:
-                    mst_nodes.append(start_node)
-                    animations.append(start_node.color(fill_color=PINK4))
-                if end_node not in mst_nodes:
-                    mst_nodes.append(end_node)
-                    animations.append(end_node.color(fill_color=PINK4))
-                if animations:
-                    self.play(*animations, run_time=speed)
-                union_find.union(start_node, end_node)
+                self.play(union_find.union(start_node, end_node, min_edge))
                 mst_edges.append(min_edge)
             else:
-                path_array = graph.get_path(start_node, end_node, visited_nodes_only=True)
-                print(path_array)
-                path_group = GraphEdgesGroup(path_array)
-                path_group.highlight(GREEN)
-                path_group.dehighlight()
-        self._remove_edges(graph, mst_edges)
+                self.play(min_edge.dehighlight(), run_time=speed)
+            self.wait()
+        # self._remove_edges(graph, mst_edges)
+        union_find.destroy()
         return mst_edges       
 
 
@@ -555,13 +552,18 @@ class Show(Scene):
         # l = Legend({(PINK4, PINK4): "MST so far"})
         # l.mobjects.move_to(2.7*UP + 5*RIGHT)
         # code_block = CodeBlock(CODE_FOR_PRIM_BASIC)
+        # graph = GraphObject(MAP_MST, POSITION_MST)
+        # self.play(FadeIn(graph.graph_mobject.scale(0.9).shift(3.3*RIGHT)))
+        # self.mst_kruskal_basic(graph)
+
+        # Kruskal-union-find
+        # title_mobject = show_title_for_demo("PRIM'S ALGO FOR MST")
+        # self.add(title_mobject)
+        # l = Legend({(PINK4, PINK4): "MST so far"})
+        # l.mobjects.move_to(2.7*UP + 5*RIGHT)
+        # code_block = CodeBlock(CODE_FOR_PRIM_BASIC)
         graph = GraphObject(MAP_MST, POSITION_MST)
         self.play(FadeIn(graph.graph_mobject.scale(0.9).shift(3.3*RIGHT)))
-        self.mst_kruskal_basic(graph)
-        # start = graph.value2node['A']
-        # end = graph.value2node['H']
-        # b = graph.value2node['B']
-        # graph.visited_nodes = [b, start]
-        # print(graph.get_path(start, end, visited_nodes_only=True))
+        self.mst_kruskal_union_find(graph)
 
         
