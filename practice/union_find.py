@@ -43,17 +43,25 @@ class UnionFind:
                 descendants += self.all_descendants(child)
             return descendants
     
-    def union(self, element_a, element_b, edge=None):
+    def union(self, element_b, element_a, edge=None):
         root_of_a = self.find(element_a)
         root_of_b = self.find(element_b)
+        a_and_descendants = self.all_descendants(root_of_a)
+        b_and_descendants = self.all_descendants(root_of_b)
+        # assign the larger tree to b such that the smaller root will be the child of the larger root
+        if len(a_and_descendants) > len(b_and_descendants):
+            root_of_a, root_of_b = root_of_b, root_of_a
+            a_and_descendants, b_and_descendants = b_and_descendants, a_and_descendants
         root_of_a.parent = root_of_b
         root_of_b.children.append(root_of_a)
         # change the color of a and all descendants to the color of group b
         root_of_b_color = self.color[root_of_b]
-        a_and_descendants = self.all_descendants(root_of_a)
         animations = []
         for descendant in a_and_descendants:
             animations.append(descendant.color(fill_color=root_of_b_color))
+            new_text_mobject = root_of_b.text_mobject.copy().move_to(descendant.text_mobject.get_center())
+            animations.append(ReplacementTransform(descendant.text_mobject, new_text_mobject))
+            descendant.text_mobject = new_text_mobject
         self.donimant_color = root_of_b_color
         # update b.edges
         self.root2edges[root_of_b] = [edge] + self.root2edges[root_of_b] + self.root2edges[root_of_a]
