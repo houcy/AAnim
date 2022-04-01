@@ -64,7 +64,7 @@ class GraphObject:
         end_node = self.value2node[end]
         weight = self.adjacency_list[start][end]
         is_cyclic = False
-        # if adjacency_list[start][end] and adjacency_list[end][start], then it's a cyclic graph
+        # for cyclic graph, we need to use curved edges
         if end in self.adjacency_list and start in self.adjacency_list[end]:
             is_cyclic = True
         edge_object = GraphEdge(start_node, end_node, weight, is_cyclic, is_directed, is_topological_graph)
@@ -72,7 +72,7 @@ class GraphObject:
         start_node.neighbors.append(end_node)
         start_node.edges.append(edge_object)
         self.edges.append(edge_object)
-        # If it's not directed, link the edge on end -> start as well
+        # for undirected graph, mark the edge on end -> start as well
         if not is_directed:
             end_node.neighbor2edge[start_node] = edge_object
             end_node.neighbors.append(start_node)

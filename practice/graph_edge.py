@@ -1,7 +1,7 @@
-from turtle import width
 from manim import *
 from manim_fonts import *
 from style import *
+from curved_arrow import Curved_Arrow
 
 
 class GraphEdge:
@@ -16,15 +16,16 @@ class GraphEdge:
             line = Line(start_node.mobject.get_center(), end_node.mobject.get_center()).set_stroke(color=LINE_COLOR, width=WIDTH).set_z_index(0)
         else:
             if is_topological_graph:
-                line = CurvedArrow(start_node.mobject.get_bottom(), end_node.mobject.get_bottom(), color=LINE_COLOR, stroke_width=WIDTH).set_z_index(0)
+                line = Curved_Arrow(start_node.mobject.get_bottom(), end_node.mobject.get_bottom(), color=LINE_COLOR, stroke_width=WIDTH).mobject.set_z_index(0)
             else:
                 if is_cyclic:
-                    line = CurvedArrow(start_node.mobject.get_center(), end_node.mobject.get_center(), color=LINE_COLOR, stroke_width=WIDTH).scale(0.8).set_z_index(0)
+                    line = Curved_Arrow(start_node.mobject.get_center(), end_node.mobject.get_center(), color=LINE_COLOR, stroke_width=WIDTH).mobject.scale(0.8).set_z_index(0)
                 else:
-                    line = Line(start_node.mobject.get_center(), end_node.mobject.get_center(), buff=0.4, stroke_width=WIDTH).add_tip(tip_length=0.05).set_stroke(color=LINE_COLOR, width=WIDTH).set_z_index(0)
+                    # normal
+                    line = Line(start_node.mobject.get_center(), end_node.mobject.get_center(), buff=0.4, stroke_width=WIDTH).add_tip(tip_length=TIP_LENGTH_FOR_STRAIGHT_LINE).set_stroke(color=LINE_COLOR, width=WIDTH).set_z_index(0)
         self.mobject = VDict([("line", line)])
 
-        # If it's a weighted edge
+        # for weighted edge
         if self.weight:
             text = Text(str(weight), color=EDGE_COLOR, font=FONT, weight=WEIGHT_WEIGHT, font_size=WEIGHT_SIZE).move_to(line.get_center()).set_z_index(10).set_stroke(color=EDGE_STROKE_COLOR, width=EDGE_STROKE_WIDTH)
             text_background = Circle(radius=WEIGHT_CIRCLE_RADIUS).set_stroke(color=BACKGROUND, width=WIDTH).set_fill(BACKGROUND, opacity=1.0).set_z_index(9).move_to(text.get_center())
