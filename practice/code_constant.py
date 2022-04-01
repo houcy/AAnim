@@ -84,7 +84,7 @@ CODE_FOR_PRIM_QUEUE = """MST-PRIM(G) {
 CODE_FOR_KRUSKAL = """MST-KRUSKAL(G) {
     Edges = ∅
     scan all edges by nondecreasing weight
-        if an edge is safe (doesn't create
+        if an edge is safe (does not form
         any cycle with the MST so far)
             add the edge to Edges
     return Edges 
@@ -93,14 +93,53 @@ CODE_FOR_KRUSKAL = """MST-KRUSKAL(G) {
 
 
 CODE_FOR_KRUSKAL_UNION_FIND = """MST-KRUSKAL(G) {
-    Edges = ∅
+    Edges = 
     for each vertex v ∈ G.V
         MAKE-SET(v)
-    sort all edges by nondecreasing weight
+    scan all edges by nondecreasing weight
     for each edge (u, v)
         if FIND-SET(u) ≠ FIND-SET(v)
             Edges = Edges ∪ {(u, v)}   
             UNION(u, v)
     return Edges 
+}
+"""
+
+CODE_FOR_DIJKASTRA_WITH_RELAX = """DIJKASTRA(G, s) {
+    Edges = ∅
+    UnReachSet = G.V
+    set all vertices v.minEdge = ∅
+    set all vertices v.key = ∞
+    set an arbitrary vertex v.key = 0
+    while UnReachSet ≠ ∅
+        v = EXTRACT-MIN(UnReachSet)
+        for each neighbor u of v
+            RELAX(u, v, G.Weight)
+    return Edges
+}
+}
+"""
+
+CODE_FOR_RELAX = """RELAX(u, v, weight) {
+    if v.key > u.key + weight(u, v)
+        v.key = u.key + weight(u, v)
+        v.minEdge = (v, u)
+}
+"""
+
+CODE_FOR_DIJKASTRA_WITHOUT_RELAX = """DIJKASTRA(G, s) {
+    Edges = ∅
+    UnReachSet = G.V
+    set all vertices v.previous = ∅
+    set all vertices v.key = ∞
+    set an arbitrary vertex v.key = 0
+    while UnReachSet ≠ ∅
+        v = EXTRACT-MIN(UnReachSet)
+        for each neighbor u of v
+            // Relaxation
+            if v.key + weight(u, v) < u.key
+                u.key = v.key + weight(u, v)
+                u.previous = v
+    return Edges
 }
 """
