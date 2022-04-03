@@ -40,13 +40,13 @@ class GraphEdge:
             print("Failed to output the other end of the edge, the input node is incorrect")
             return None
 
-    def highlight(self, color=PINK4):
+    def highlight(self, color=PINK4, width=EDGE_HIGHLIGHT_STROKE_WIDTH):
         self.mobject["line"].save_state()
         self.save_state = True
-        return AnimationGroup(self.mobject["line"].animate.set_stroke(color=color, width=EDGE_HIGHLIGHT_STROKE_WIDTH))
+        return AnimationGroup(self.mobject["line"].animate.set_stroke(color=color, width=width))
 
-    def dehighlight(self, color=GRAY):
-        if self.save_state:
+    def dehighlight(self, color=GRAY, force_color=False):
+        if self.save_state and not force_color:
             self.save_state = False
             return AnimationGroup(Restore(self.mobject["line"]))
         else:

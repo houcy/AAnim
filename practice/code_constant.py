@@ -91,6 +91,15 @@ CODE_FOR_KRUSKAL = """MST-KRUSKAL(G) {
 }
 """
 
+CODE_FOR_KRUSKAL_CHINESE = """MST-KRUSKAL(G) {
+    Edges = ∅
+    按从小到大的顺序检查每条边
+        如果这条边是安全的（没有和最小生成树形成任何环）
+            将这条边加入 Edges
+    return Edges 
+}
+"""
+
 
 CODE_FOR_KRUSKAL_UNION_FIND = """MST-KRUSKAL(G) {
     Edges = 
@@ -105,8 +114,7 @@ CODE_FOR_KRUSKAL_UNION_FIND = """MST-KRUSKAL(G) {
 }
 """
 
-CODE_FOR_DIJKASTRA_WITH_RELAX = """DIJKASTRA(G, s) {
-    Edges = ∅
+CODE_FOR_DIJKASTRA_WITH_RELAX = """DIJKSTRA(G, s) {
     UnReachSet = G.V
     set all vertices v.minEdge = ∅
     set all vertices v.key = ∞
@@ -115,7 +123,6 @@ CODE_FOR_DIJKASTRA_WITH_RELAX = """DIJKASTRA(G, s) {
         v = EXTRACT-MIN(UnReachSet)
         for each neighbor u of v
             RELAX(u, v, G.Weight)
-    return Edges
 }
 }
 """
@@ -127,8 +134,7 @@ CODE_FOR_RELAX = """RELAX(u, v, weight) {
 }
 """
 
-CODE_FOR_DIJKASTRA_WITHOUT_RELAX = """DIJKASTRA(G, s) {
-    Edges = ∅
+CODE_FOR_DIJKASTRA_WITHOUT_RELAX = """DIJKSTRA(G, s) {
     UnReachSet = G.V
     set all vertices v.previous = ∅
     set all vertices v.key = ∞
@@ -140,6 +146,5 @@ CODE_FOR_DIJKASTRA_WITHOUT_RELAX = """DIJKASTRA(G, s) {
             if v.key + weight(u, v) < u.key
                 u.key = v.key + weight(u, v)
                 u.previous = v
-    return Edges
 }
 """

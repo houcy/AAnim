@@ -19,13 +19,10 @@ TEST_CODE = """EXTRACT-FIRST(A) {
 }
 """
 
-CODE_LINE_SPACING = 1
-CODE_FONT = "Source Code Pro"
-
 class CodeBlock():
-    def __init__(self, code):
+    def __init__(self, code, font=CODE_FONT):
         with RegisterFont(CODE_FONT) as fonts:
-            self.code = Code(code=code, stroke_width=1, line_spacing=CODE_LINE_SPACING, font=CODE_FONT, background="rectangle", margin=0, background_stroke_width=0, tab_width=2, language="Python", font_size=16).shift(SHIFT_LEFT_UNIT * LEFT)
+            self.code = Code(code=code, stroke_width=1, line_spacing=CODE_LINE_SPACING, font=font, background="rectangle", margin=0, background_stroke_width=0, tab_width=2, language="Python", font_size=16).shift(SHIFT_LEFT_UNIT * LEFT)
             self.top = self.code.get_top()[1]
             self.left = self.code.get_left()[0]
             self.bottom = self.code.get_bottom()[1]

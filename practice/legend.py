@@ -28,7 +28,7 @@ class Legend:
         if is_horizontal:
             inside = inside.arrange_in_grid(rows=1, buff=LEGEND_BUFF_MACRO_HORIZONTAL)
         else:
-            inside = inside.arrange_in_grid(cols=1, buff=LEGEND_BUFF_MACRO)
+            inside = inside.arrange_in_grid(cols=1, col_alignments="l", buff=LEGEND_BUFF_MACRO)
         box = SurroundingRectangle(inside, corner_radius=0, color=LINE_COLOR, stroke_width=LEGEND_STROKE_WIDTH, buff=0.2)
         self.animation = AnimationGroup(FadeIn(inside), Create(box), Wait())
         self.mobjects = VGroup(inside, box)
