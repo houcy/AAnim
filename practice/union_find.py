@@ -12,15 +12,17 @@ class UnionFind:
         for a in array:
             a.parent = a
             self.root2edges[a] = []
-        if len(LIGHT_COLORS) >= len(array):
-            color_index = 0
-            animations = []
-            for node in array:
-                node_color = LIGHT_COLORS[color_index]
-                animations.append(node.color(fill_color=node_color))
-                self.color[node] = node_color
-                color_index += 1
-            self.animation = AnimationGroup(*animations, lag_ratio=0.2)
+        # if len(LIGHT_COLORS) >= len(array):
+        color_index = 0
+        animations = []
+        for node in array:
+            if color_index == len(LIGHT_COLORS):
+                color_index = 0
+            node_color = LIGHT_COLORS[color_index]
+            animations.append(node.color(fill_color=node_color))
+            self.color[node] = node_color
+            color_index += 1
+        self.animation = AnimationGroup(*animations, lag_ratio=0.2)
     
     def show_set(self):
         """

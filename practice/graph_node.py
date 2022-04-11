@@ -108,16 +108,16 @@ class GraphNode:
         """
         return AnimationGroup(self.circle_mobject.animate.set_fill(PINK1).set_stroke(PINK2), self.text_mobject.animate.set_color(BACKGROUND))
 
-    def color(self, fill_color=PINK2, stroke_color=PINK3, stroke_width=WIDTH, has_key=False):
+    def color(self, fill_color=PINK2, stroke_color=PINK3, stroke_width=WIDTH, text_color=BACKGROUND, has_key=False):
         """
         Fill this node as PINK (light pink)
         """
         if not has_key:
-            return AnimationGroup(self.circle_mobject.animate.set_fill(fill_color).set_stroke(stroke_color, width=stroke_width), self.text_mobject.animate.set_color(BACKGROUND))
+            return AnimationGroup(self.circle_mobject.animate.set_fill(fill_color).set_stroke(stroke_color, width=stroke_width), self.text_mobject.animate.set_color(text_color))
         elif self.text_mobject:
-            return AnimationGroup(self.circle_mobject.animate.set_fill(fill_color).set_stroke(stroke_color, width=stroke_width), self.key_mobject.animate.set_color(BACKGROUND), self.text_mobject.animate.set_color(BACKGROUND))
+            return AnimationGroup(self.circle_mobject.animate.set_fill(fill_color).set_stroke(stroke_color, width=stroke_width), self.key_mobject.animate.set_color(text_color), self.text_mobject.animate.set_color(text_color))
         else:
-            return AnimationGroup(self.circle_mobject.animate.set_fill(fill_color).set_stroke(stroke_color, width=stroke_width), self.key_mobject.animate.set_color(BACKGROUND))
+            return AnimationGroup(self.circle_mobject.animate.set_fill(fill_color).set_stroke(stroke_color, width=stroke_width), self.key_mobject.animate.set_color(text_color))
 
     def mark_pink3(self):
         """
