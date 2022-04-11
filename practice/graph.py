@@ -22,7 +22,7 @@ POSITION_CYCLE3 = {'A': (-2, -2), 'B': (2, 2)}
 MAP_CYCLE = {'A': {'B': 3}, 'B': {'A': 2}}
 
 class GraphObject:
-    def __init__(self, adjacency_list, position, is_directed=False, is_topological_graph=False):
+    def __init__(self, adjacency_list, position, is_directed=False, is_topological_graph=False, edge_radius=RADIUS):
         self.graph_mobject = VGroup()
         self.value2node = {}
         self.is_directed = is_directed
@@ -30,6 +30,7 @@ class GraphObject:
         self.adjacency_list = adjacency_list
         self.edges = []
         self.position = position
+        self.nodes2edge = {}
         for start in self.adjacency_list:
             if start not in self.value2node:
                 position_x, position_y = position[start]
@@ -42,8 +43,14 @@ class GraphObject:
                     # For undirected graph, save the counterpart
                     if not is_directed:
                         visited_edge.add((end, start))
-                    self._create_edge(start, end, is_directed, is_topological_graph)
+                    self._create_edge(start, end, is_directed, is_topological_graph, edge_radius)
         self.graph_mobject = self.graph_mobject.move_to(ORIGIN)
+
+    def get_node_names(self):
+        return list(self.value2node.keys())
+
+    def get_edges(self):
+        return self.edges
 
     def get_nodes(self):
         return list(self.value2node.values())
@@ -59,7 +66,10 @@ class GraphObject:
         self.value2node[value] = node
         self.graph_mobject += node.mobject
 
-    def _create_edge(self, start, end, is_directed, is_topological_graph):
+    def get_edge(self, start, end):
+        return self.nodes2edge[(start, end)]
+
+    def _create_edge(self, start, end, is_directed, is_topological_graph, edge_radius):
         start_node = self.value2node[start]
         end_node = self.value2node[end]
         weight = self.adjacency_list[start][end]
@@ -67,16 +77,18 @@ class GraphObject:
         # for cyclic graph, we need to use curved edges
         if end in self.adjacency_list and start in self.adjacency_list[end]:
             is_cyclic = True
-        edge_object = GraphEdge(start_node, end_node, weight, is_cyclic, is_directed, is_topological_graph)
+        edge_object = GraphEdge(start_node, end_node, weight, is_cyclic, is_directed, is_topological_graph, edge_radius)
         start_node.neighbor2edge[end_node] = edge_object
         start_node.neighbors.append(end_node)
         start_node.edges.append(edge_object)
         self.edges.append(edge_object)
+        self.nodes2edge[(start_node, end_node)] = edge_object
         # for undirected graph, mark the edge on end -> start as well
         if not is_directed:
             end_node.neighbor2edge[start_node] = edge_object
             end_node.neighbors.append(start_node)
             end_node.edges.append(edge_object)
+            self.nodes2edge[(end_node, start_node)] = edge_object
         self.graph_mobject += edge_object.mobject
 
     def get_path(self, start, end, visited_edges=None):
@@ -99,6 +111,10 @@ class GraphObject:
         helper(start, end, path, visited, 0)
         return path
     
+    def highlight(self, node_name, fill_color=PINK2, stroke_color=PINK3,  stroke_width=WIDTH, text_color=BACKGROUND):
+        node = self.value2node[node_name]        
+        return node.color(fill_color=fill_color, stroke_color=stroke_color, stroke_width=stroke_width, text_color=text_color)
+
 class Test(Scene):
     def construct(self):
         self.camera.background_color = BACKGROUND
