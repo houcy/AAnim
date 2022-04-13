@@ -23,6 +23,7 @@ class StackObject:
 
     def peek_last(self):
         if self.length() == 0:
-            return None
+            return None, None
         else:
-            return self.array[-1]
+            index = self.length()-1
+            return self.array[index], self.table.color(index)

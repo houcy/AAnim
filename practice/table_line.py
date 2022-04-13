@@ -3,7 +3,7 @@ from style import *
 
 
 class TableLine:
-    def __init__(self, array, is_mobject=False, buff=0.5, show_box=True):
+    def __init__(self, array, is_mobject=False, buff=0.5, show_box=True, x_position=0, y_position=0):
         """
         Parameter
         1. array: a list of content(int or str)
@@ -20,6 +20,9 @@ class TableLine:
         self.show_box = show_box
         self.current_index_scan = None
         self.highlight_rect = None
+        self.create_highlight_rec_animation = None
+        self.x_position = x_position
+        self.y_position = y_position
         if len(array) >= 15:
             print("Array is too long")
             return
@@ -51,10 +54,9 @@ class TableLine:
         self.animation = AnimationGroup(*animations, lag_ratios=0.5)
 
     def _update_table_line_mobject(self):
-        self.mobject = VDict(self.index2square).arrange(buff=0)
+        self.mobject = VDict(self.index2square).arrange(buff=0).move_to(self.x_position*RIGHT + self.y_position*UP)
 
     def _create_text_mobject(self, value):
-        print(value)
         return Text(str(value), color=LINE_COLOR, font=FONT, weight="BOLD", font_size=VALUE_SIZE)
 
     def _move_to_origin(self):
@@ -85,10 +87,13 @@ class TableLine:
             self._update_table_line_mobject()
         current_mobject = self.index2square[self.current_index_scan]
         self.highlight_rect = Square(side_length=TABLE_SIDE_LENGTH, stroke_color=GRAY).move_to(current_mobject.get_center())
-        return Create(self.highlight_rect)
+        self.create_highlight_rec_animation = Create(self.highlight_rect)
 
     def scan_next(self, next_index=None):
-        print(next_index, self.length())
+        if self.create_highlight_rec_animation:
+            temp = self.create_highlight_rec_animation
+            self.create_highlight_rec_animation = None
+            return temp
         if (not next_index and self.current_index_scan == self.length() - 1) or (next_index and next_index >= self.length()):
             return FadeOut(self.highlight_rect)
         elif next_index:
@@ -148,7 +153,6 @@ class TableLine:
         else:
             animations.append(self._move_to_origin())
         self.animation = AnimationGroup(*animations, lag_ratio=0.5)
-        print(self.animation)
         return self.animation
 
     def _reduce_index_by_one(self):
@@ -157,6 +161,10 @@ class TableLine:
             if index in self.index2square:
                 new_index2square[index-1] = self.index2square[index]
         self.index2square = new_index2square
+
+    def color(self, index, stroke_color=PINK1, fill_color=BACKGROUND):
+        square = self.index2square[index]
+        return AnimationGroup(square["box"].animate.set_stroke(stroke_color).set_fill(fill_color), square["text"].animate.set_color(stroke_color))
 
     def remove_first(self):
         if self.highlight_rect:
@@ -184,14 +192,14 @@ class TableLine:
         return self.animation
 
 
-# class Test(Scene):
-#     def construct(self):
-#         self.camera.background_color = BACKGROUND
-#         table = TableLine([1, 3, 2], show_box=False)
-#         self.play(table.show())
-#         self.play(table.initialize_scan())
-#         self.play(table.scan_next(2))
-#         self.play(table.scan_next(1))
+class Test(Scene):
+    def construct(self):
+        self.camera.background_color = BACKGROUND
+        table = TableLine("A{{}F", show_box=False, x_position=1, y_position=2)
+        self.play(table.show())
+        self.play(table.initialize_scan())
+        self.play(table.scan_next(2))
+        self.play(table.scan_next(1))
         # self.play(table.add(4))
         # self.play(table.remove_first())
         # self.play(table.remove_last())
