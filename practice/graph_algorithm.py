@@ -9,6 +9,7 @@ from graph_nodes_group import GraphNodesGroup
 from util import *
 from scale_position import *
 from union_find import UnionFind
+from color_generator import ColorGenerator
 import copy
 
 MAP_DIRECTED = {'A': {'B': None, 'C': None}, 'B': {'D': None, 'E': None}, 'D': {'F': None}, 'E': {'F': None}}
@@ -36,7 +37,7 @@ class Show(Scene):
     def _remove_edges(self, graph, selected_edges):
         for edge in graph.edges:
             if edge not in selected_edges:
-                self.play(edge.fade_out(), run_time=0.2)
+                self.play(edge.fade_out(), run_time=0.3)
 
     def flash(self, temp_group):
         self.play(*[m.animate.set_color(BACKGROUND) for m in temp_group])
@@ -209,10 +210,10 @@ class Show(Scene):
     # MST: Prim
     ##################################
 
-    def mst_prim_basic(self, graph, create_legend=True, legend_is_horizontal=False, animate_code_block=True, code_block=None, speed=1):
+    def mst_prim_basic(self, graph, create_legend=True, show_horizontal_legend=False, animate_code_block=True, code_block=None, speed=1):
         speed = 1 / speed
         if create_legend:
-            l = Legend({PINK2: "MST so far"}, is_horizontal=legend_is_horizontal)
+            l = Legend({PINK2: "MST so far"}, is_horizontal=show_horizontal_legend)
             l.mobjects.move_to(1.6*UP+1.7*RIGHT)
             self.play(l.animation)
             self.wait()
@@ -376,10 +377,10 @@ class Show(Scene):
     # MST: Kruskal
     ##################################
 
-    def mst_kruskal_basic(self, graph, create_legend=True, is_horizontal=False, animate_code_block=True, code_block=None, speed=1, add_sound=False):
+    def mst_kruskal_basic(self, graph, create_legend=True, show_horizontal_legend=False, animate_code_block=True, code_block=None, speed=1, add_sound=False):
         speed = 1 / speed
         if create_legend:
-            l = Legend({(PINK2, PINK2): "MST so far", (PURPLE, PURPLE): "curr min edge"}, legend_is_horizontal=legend_is_horizontal)
+            l = Legend({(PINK2, PINK2): "MST so far", (PURPLE, PURPLE): "curr min edge"}, show_horizontal_legend=show_horizontal_legend)
             l.mobjects.next_to(graph.graph_mobject, UP, buff=0.3)
             self.play(l.animation)
             self.wait()
@@ -439,42 +440,69 @@ class Show(Scene):
         return mst_edges
 
 
-    def mst_kruskal_union_find(self, graph, create_legend=True, animate_code_block=True, code_block=None, speed=1):
+    def mst_kruskal_union_find(self, graph, create_legend=True, show_horizontal_legend=False, animate_code_block=True, code_block=None, speed=1, add_sound=False):
         speed = 1 / speed
         if create_legend:
-            l = Legend({(PINK2, PINK2): "MST so far", (GREEN, GREEN): "curr min edge", (RED, RED): "cycle"})
-            l.mobjects.move_to(1.9*UP+1.6*RIGHT)
-            # self.play(l.animation)
+            l = Legend({("MULTICOLORS", "CIRCLE"): "MST so far", (GREEN, GREEN): "curr min edge"}, is_horizontal=show_horizontal_legend)
+            l.mobjects.move_to(2.1*UP+1.8*RIGHT)
+            # l.mobjects.next_to(graph.graph_mobject, DOWN, buff=0.3)
+            self.play(l.animation)
             self.wait()
-        # l.mobjects.next_to(graph.graph_mobject, DOWN, buff=0.3)
         if animate_code_block and not code_block:
             code_block = CodeBlock(CODE_FOR_KRUSKAL_UNION_FIND)
             self.play(Create(code_block.code))
-        # self.play(code_block.highlight(1), run_time=speed) if animate_code_block else None
-        # self.play(code_block.highlight(2), run_time=speed) if animate_code_block else None
+        self.play(code_block.highlight(1), run_time=speed) if animate_code_block else None
+        self.wait()
+        self.play(code_block.highlight(2), run_time=speed) if animate_code_block else None
+        self.wait()
+        self.play(code_block.highlight(3, 2), run_time=speed) if animate_code_block else None
+        self.wait()
         mst_edges = []
         all_edges = graph.edges
         all_edges.sort(key=lambda edge: edge.weight)
-        union_find = UnionFind(graph.get_nodes())
+        all_nodes = graph.get_nodes()
+        union_find = UnionFind(all_nodes)
         self.play(union_find.show_set())
         for i in range(0, graph.n_edges()):
-            # self.play(code_block.highlight(3), run_time=speed) if animate_code_block else None
+            self.play(code_block.highlight(5, 2), run_time=speed) if animate_code_block else None
+            self.wait(1.5)
             min_edge = all_edges[i]
             self.play(min_edge.highlight(color=GREEN), run_time=0.5*speed)
             self.play(min_edge.dehighlight(), run_time=0.5*speed)
             self.play(min_edge.highlight(color=GREEN), run_time=0.5*speed)
             self.wait()
+            self.play(code_block.highlight(7), run_time=speed) if animate_code_block else None
+            self.wait()
             start_node = min_edge.start_node
             end_node = min_edge.end_node
             parent_of_start = union_find.find(start_node)
             parent_of_end = union_find.find(end_node)
+            remain_nodes = list(union_find.all_descendants(parent_of_start)) + list(union_find.all_descendants(parent_of_end))
+            remain_edges = list(union_find.all_edges_under_root(parent_of_start)) + list(union_find.all_edges_under_root(parent_of_end))
+            disappear_edges = [e for e in graph.get_edges() if not (e == min_edge or e in remain_edges)]
+            disappear_nodes = [n for n in all_nodes if n not in remain_nodes]
+            disappear_edges_group = GraphEdgesGroup(disappear_edges)
+            disappear_nodes_group = GraphNodesGroup(disappear_nodes)
             if parent_of_start != parent_of_end:
+                self.play(disappear_edges_group.disappear(include_label=True), disappear_nodes_group.disappear(), run_time=0.8*speed)
+                self.add_sound("correct.wav") if add_sound else None
+                self.wait(speed)
+                self.play(disappear_edges_group.appear(include_label=True), disappear_nodes_group.appear(), run_time=0.8*speed)
+                self.play(code_block.highlight(8, 2), run_time=speed) if animate_code_block else None
+                self.wait()
                 self.play(union_find.union(start_node, end_node, min_edge))
                 mst_edges.append(min_edge)
             else:
+                # everything except current edge and start node and end node should disappear
+                self.play(disappear_edges_group.disappear(include_label=True), disappear_nodes_group.disappear(), run_time=0.8*speed)
+                self.add_sound("wrong.wav") if add_sound else None
+                self.wait(speed)
+                self.play(disappear_edges_group.appear(include_label=True), disappear_nodes_group.appear(), run_time=0.8*speed)
                 self.play(min_edge.dehighlight(), run_time=speed)
             self.wait()
-        # self._remove_edges(graph, mst_edges)
+        self.play(code_block.highlight(10), run_time=speed) if animate_code_block else None
+        self._remove_edges(graph, mst_edges)
+        self.play(code_block.highlight(11), run_time=speed) if animate_code_block else None
         union_find.destroy()
         return mst_edges       
 
@@ -647,7 +675,7 @@ class Show(Scene):
         # new_position = scale_position(POSITION_HARD, 1.4, 1.8)
         # graph = GraphObject(MAP_HARD, new_position)
         # graph.graph_mobject.shift(0.3*DOWN)
-        # l = Legend({(PINK4, PINK4): "MST so far", (PINK4, PINK5): "vertex with min edge"}, is_horizontal=True)
+        # l = Legend({(PINK4, PINK4): "MST so far", (PINK4, PINK5): "vertex with min edge"}, show_horizontal_legend=True)
         # l.mobjects.next_to(graph.graph_mobject, UP, buff=0.5).align_to(graph.graph_mobject, RIGHT)
         # self.play(FadeIn(graph.graph_mobject))
         # self.play(l.animation)
@@ -660,7 +688,7 @@ class Show(Scene):
         # new_position = scale_position(POSITION_HARD, 1.4, 1.8)
         # graph = GraphObject(MAP_HARD, new_position)
         # graph.graph_mobject.shift(0.3*DOWN)
-        # l = Legend({(PINK4, PINK4): "最小生成树", (PINK4, PINK5): "与最短边相连的点"}, is_horizontal=True)
+        # l = Legend({(PINK4, PINK4): "最小生成树", (PINK4, PINK5): "与最短边相连的点"}, show_horizontal_legend=True)
         # l.mobjects.next_to(graph.graph_mobject, UP, buff=0.5).align_to(graph.graph_mobject, RIGHT)
         # self.play(FadeIn(graph.graph_mobject))
         # self.play(l.animation)
@@ -699,7 +727,7 @@ class Show(Scene):
         # new_position = scale_position(POSITION_HARD, 1.4, 1.8)
         # graph = GraphObject(MAP_HARD, new_position)
         # graph.graph_mobject.shift(0.3*DOWN)
-        # l = Legend({(PINK2, PINK2): "MST so far", (GREEN, GREEN): "curr min edge"}, is_horizontal=True)
+        # l = Legend({(PINK2, PINK2): "MST so far", (GREEN, GREEN): "curr min edge"}, show_horizontal_legend=True)
         # l.mobjects.next_to(graph.graph_mobject, UP, buff=0.5).align_to(graph.graph_mobject, RIGHT)
         # self.play(FadeIn(graph.graph_mobject))
         # self.play(l.animation)
@@ -707,27 +735,43 @@ class Show(Scene):
         # self.wait(10)
 
         # Kruskal-basic-no-code-Chinese
-        title_mobject = show_title_for_demo("KRUSKAL 算法  ·  最小生成树")
-        self.add(title_mobject)
-        new_position = scale_position(POSITION_HARD, 1.4, 1.8)
-        graph = GraphObject(MAP_HARD, new_position)
-        graph.graph_mobject.shift(0.3*DOWN)
-        l = Legend({(PINK2, PINK2): "最小生成树", (GREEN, GREEN): "当前最小边"}, is_horizontal=True)
-        l.mobjects.next_to(graph.graph_mobject, UP, buff=0.5).align_to(graph.graph_mobject, RIGHT)
-        self.play(FadeIn(graph.graph_mobject))
-        self.play(l.animation)
-        self.mst_kruskal_basic(graph, create_legend=False, animate_code_block=False, speed=2)
-        self.wait(10)
+        # title_mobject = show_title_for_demo("KRUSKAL 算法  ·  最小生成树")
+        # self.add(title_mobject)
+        # new_position = scale_position(POSITION_HARD, 1.4, 1.8)
+        # graph = GraphObject(MAP_HARD, new_position)
+        # graph.graph_mobject.shift(0.3*DOWN)
+        # l = Legend({(PINK2, PINK2): "最小生成树", (GREEN, GREEN): "当前最小边"}, show_horizontal_legend=True)
+        # l.mobjects.next_to(graph.graph_mobject, UP, buff=0.5).align_to(graph.graph_mobject, RIGHT)
+        # self.play(FadeIn(graph.graph_mobject))
+        # self.play(l.animation)
+        # self.mst_kruskal_basic(graph, create_legend=False, animate_code_block=False, speed=2)
+        # self.wait(10)
 
         # Kruskal-union-find
-        # title_mobject = show_title_for_demo("PRIM'S ALGO FOR MST")
+        title_mobject = show_title_for_demo("KRUSKAL'S ALGO FOR MST")
+        self.add(title_mobject)
+        code_block = CodeBlock(CODE_FOR_KRUSKAL_UNION_FIND)
+        self.play(Create(code_block.code))
+        graph = GraphObject(MAP_MST, POSITION_MST)
+        self.play(FadeIn(graph.graph_mobject.scale(0.9).shift(3.5*RIGHT+0.2*DOWN)))
+        l = Legend({("MULTICOLORS", "CIRCLE"): "MST so far", (GREEN, GREEN): "curr min edge"})
+        l.mobjects.move_to(2.1*UP+1.9*RIGHT)
+        self.play(l.animation)
+        self.mst_kruskal_union_find(graph, code_block=code_block, create_legend=False)
+        self.wait(15)
+
+        # Kruskal-union-find-Chinese
+        # title_mobject = show_title_for_demo("KRUSKAL 算法  ·  最小生成树")
         # self.add(title_mobject)
-        # l = Legend({(PINK4, PINK4): "MST so far"})
-        # l.mobjects.move_to(2.7*UP + 5*RIGHT)
-        # code_block = CodeBlock(CODE_FOR_PRIM_BASIC)
+        # code_block = CodeBlock(CODE_FOR_KRUSKAL_UNION_FIND)
+        # self.play(Create(code_block.code))
         # graph = GraphObject(MAP_MST, POSITION_MST)
-        # self.play(FadeIn(graph.graph_mobject.scale(0.9).shift(3.3*RIGHT)))
-        # self.mst_kruskal_union_find(graph)
+        # self.play(FadeIn(graph.graph_mobject.scale(0.9).shift(3.5*RIGHT+0.1*DOWN)))
+        # l = Legend({("MULTICOLORS", "CIRCLE"): "最小生成树", (GREEN, GREEN): "当前最小边"})
+        # l.mobjects.move_to(2.2*UP+1.9*RIGHT)
+        # self.play(l.animation)
+        # self.mst_kruskal_union_find(graph, code_block=code_block, create_legend=False)
+        # self.wait(15)
 
         # Dijkastra
         # title_mobject = show_title_for_demo("DIJKSTRA'S ALGO FOR SHORTEST-PATHS PROBLEM")

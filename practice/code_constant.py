@@ -102,7 +102,7 @@ CODE_FOR_KRUSKAL_CHINESE = """MST-KRUSKAL(G) {
 
 
 CODE_FOR_KRUSKAL_UNION_FIND = """MST-KRUSKAL(G) {
-    Edges = 
+    Edges = ∅
     for each vertex v ∈ G.V
         MAKE-SET(v)
     scan all edges by nondecreasing weight
