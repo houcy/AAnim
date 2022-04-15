@@ -5,7 +5,7 @@ from util import *
 
 # z_index: edge: 0, circle: 1, text: 3, key: 5
 class GraphNode:
-    def __init__(self, value, position_x, position_y):
+    def __init__(self, value, position_x, position_y, is_music_note=False):
         self.value = value
         self.neighbor2edge = {}
         self.neighbors = []
@@ -15,20 +15,30 @@ class GraphNode:
         self.mobject = None
         self.text_mobject = None
         self.circle_mobject = None
-        self._create_mobject()
+        self._create_mobject(is_music_note=is_music_note)
         self.key = None
         self.key_mobject = None
         self.animations = None
         self.rect = None
         self.parent = None  # for Union-Find
         self.children = []  # for Union-Find
+        self.is_isolated = False
     
-    def _create_mobject(self):
+    def _create_mobject(self, is_music_note):
         """
         Convert a node to an MObject so that it shows on the canvas
         """
         self.circle_mobject = Circle(radius=RADIUS).set_stroke(color=LINE_COLOR, width=WIDTH).set_fill(BACKGROUND, opacity=1.0).set_z_index(1).shift(RIGHT * self.position_x + UP * self.position_y)
-        self.text_mobject = Text(str(self.value), color=LINE_COLOR, font=FONT, weight=BOLD, font_size=VALUE_SIZE).set_z_index(3).shift(self.circle_mobject.get_center())
+        if not is_music_note:
+            self.text_mobject = Text(str(self.value), color=LINE_COLOR, font=FONT, weight=BOLD, font_size=VALUE_SIZE).set_z_index(3).shift(self.circle_mobject.get_center())
+        else:
+            # for music note
+            value = str(self.value)
+            note, octave = value[0], value[1]
+            note_mobject = Text(note, color=LINE_COLOR, font=FONT, weight=BOLD, font_size=VALUE_SIZE).set_z_index(3)
+            octave_mobject = Text(octave, color=LINE_COLOR, font=FONT, weight=BOLD, font_size=TINY_VALUE_SIZE).set_z_index(3).next_to(note_mobject, RIGHT).align_to(note_mobject, DOWN).shift(0.23*LEFT + 0.05*DOWN)
+            self.text_mobject = VDict({"note": note_mobject, "octave": octave_mobject})
+            self.text_mobject.move_to(self.circle_mobject.get_center())
         self.mobject = VDict([("c", self.circle_mobject), ("t", self.text_mobject)])
 
     def mobject(self):
