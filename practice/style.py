@@ -68,6 +68,9 @@ TIP_LENGTH_FOR_CURVED_LINE = 0.2 # for music graph
 TIP_LENGTH_FOR_STRAIGHT_LINE = TIP_LENGTH_FOR_CURVED_LINE / 2
 EDGE_RADIUS = 3 # for directed graph, the larger the straighter
 
+# Music graph
+NODE_BUFF = 1.5
+
 # Node
 NODE_NAME_BACKGROUND_SIZE = 45
 NODE_NAME_BACKGROUND_OPACITY = 0.3
