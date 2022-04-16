@@ -22,7 +22,8 @@ class GraphNode:
         self.rect = None
         self.parent = None  # for Union-Find
         self.children = []  # for Union-Find
-        self.is_isolated = False
+        self.is_isolated = True
+        self.is_showing = False
     
     def _create_mobject(self, is_music_note):
         """
