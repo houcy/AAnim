@@ -81,35 +81,35 @@ class Show(Scene):
                 self.play(music_graph.highlight(note_name, fill_color=BACKGROUND, stroke_color=PINK5, text_color=GRAY), run_time=speed)
                 node = music_graph.value2node[note_name]
                 edge = None
-                color_index = 0
                 if i < len(notes) - 1:
                     next_note, _ = notes[i+1]
                     next_node = music_graph.value2node[next_note]
-                    edge = music_graph.get_edge(node, next_node)
-                    color_index = edge.visit_count
-                    if color_index >= len(colors):
-                        color_index = len(colors) - 1
-                    if edge.visit_count == 0:
-                        if last_animation:
-                            self.play(music_graph.highlight(note_name, fill_color=PINK4, stroke_color=PINK5), last_animation, run_time=note_duration)
-                        else:
-                            self.play(music_graph.highlight(note_name, fill_color=PINK4, stroke_color=PINK5), run_time=note_duration)
-                        self.play(music_graph.highlight(note_name, fill_color=BACKGROUND, stroke_color=GRAY, text_color=GRAY), run_time=speed)
-                        last_animation = edge.fade_in()
+                    if node != next_node:
+                        edge = music_graph.get_edge(node, next_node)
+                    if last_animation:
+                        self.play(music_graph.highlight(note_name, fill_color=PINK4, stroke_color=PINK5), last_animation, run_time=note_duration)
                     else:
-                        if last_animation:
-                            self.play(music_graph.highlight(note_name, fill_color=PINK4, stroke_color=PINK5), last_animation, run_time=note_duration)
+                        self.play(music_graph.highlight(note_name, fill_color=PINK4, stroke_color=PINK5), run_time=note_duration)
+                    self.play(music_graph.highlight(note_name, fill_color=BACKGROUND, stroke_color=GRAY, text_color=GRAY), run_time=speed)
+
+                    if edge:
+                        color_index = edge.visit_count
+                        if color_index >= len(colors):
+                            color_index = len(colors) - 1
+                        if edge.visit_count == 0:
+                            print("value", node)
+                            last_animation = edge.fade_in()
                         else:
-                            self.play(music_graph.highlight(note_name, fill_color=PINK4, stroke_color=PINK5), run_time=note_duration)
-                        self.play(music_graph.highlight(note_name, fill_color=BACKGROUND, stroke_color=GRAY, text_color=GRAY), run_time=speed)
-                        last_animation = edge.highlight(color=colors[color_index], width=WIDTH+edge.visit_count/2, change_tip_width=True)
-                    edge.visit_count += 1
+                            last_animation = edge.highlight(color=colors[color_index], width=WIDTH+edge.visit_count/2, change_tip_width=True)
+                        edge.visit_count += 1
+                    else:
+                        last_animation = None
                 else:
                     # last node
                     if last_animation:
                         self.play(music_graph.highlight(note_name, fill_color=PINK4, stroke_color=PINK5), last_animation, run_time=note_duration)
                     else:
-                        elf.play(music_graph.highlight(note_name, fill_color=PINK4, stroke_color=PINK5), run_time=note_duration)
+                        self.play(music_graph.highlight(note_name, fill_color=PINK4, stroke_color=PINK5), run_time=note_duration)
                     self.play(music_graph.highlight(note_name, fill_color=BACKGROUND, stroke_color=GRAY, text_color=GRAY), run_time=speed)
                 i += 1
 
@@ -120,15 +120,16 @@ class Show(Scene):
         player = pygame.midi.Output(0)
         player.set_instrument(0)
 
-        music_graph_inline = StraightGraph(SONG_ADJACENCY_LIST, ALL_NOTES, is_music_note=True)
+        music_graph_inline = StraightGraph(D4_ADJACENCY_LIST, ALL_NOTES, is_music_note=True)
+        self.play(FadeIn(music_graph_inline.mobject()))
 
-        self.play(music_graph_inline.show('D5', 'D6'))
-        play(music_graph_inline, D5_NOTES, PINKS, SPEED, player)
-        self.play(music_graph_inline.hide_all_edges())
+        # self.play(music_graph_inline.show('D5', 'D6'))
+        # play(music_graph_inline, D5_NOTES, PINKS, SPEED, player)
+        # self.play(music_graph_inline.hide_all_edges())
 
-        self.play(music_graph_inline.show_all_hidden_nodes())
-        self.play(music_graph_inline.shift('D4', 'D5'))
-        self.play(music_graph_inline.hide_nodes_not_in('D4', 'D5'))
-        play(music_graph_inline, D4_NOTES, PINKS, SPEED, player)
-        self.wait(10)
+        # self.play(music_graph_inline.show_all_hidden_nodes())
+        # self.play(music_graph_inline.shift('D4', 'D5'))
+        # self.play(music_graph_inline.hide_nodes_not_in('D4', 'D5'))
+        # play(music_graph_inline, D4_NOTES, PINKS, SPEED, player)
+        # self.wait(10)
         
