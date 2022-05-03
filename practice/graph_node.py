@@ -154,6 +154,18 @@ class GraphNode:
         """
         return self.neighbor2edge[neighbor].mobject.animate.set_fill(BLUE1).set_stroke(BLUE1)
 
+    def highlight(self, stroke_color=PINK5, stroke_width=WIDTH):
+        self.circle_mobject.save_state()
+        self.save_state = True
+        return AnimationGroup(self.circle_mobject.animate.set_stroke(color=stroke_color, width=stroke_width))
+
+
+    def dehighlight(self):
+        if self.save_state:
+            self.save_state = False
+            return AnimationGroup(Restore(self.circle_mobject))
+            
+
 
 class Test(Scene):
     def construct(self):

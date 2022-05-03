@@ -11,6 +11,7 @@ class GraphEdge:
         self.start_node = start_node
         self.end_node = end_node
         self.is_directed = is_directed
+        self.is_curvy = False
         self.save_state = False
         self.visit_count = 0
         self.is_showing = False
@@ -22,13 +23,17 @@ class GraphEdge:
                 end_position = end_node.position_x
                 if start_position < end_position:
                     line = Curved_Arrow(start_node.mobject.get_bottom(), end_node.mobject.get_bottom(), color=color, stroke_width=WIDTH, edge_radius=edge_radius).mobject.set_z_index(0)
+                    self.is_curvy = True
                 else:
                     line = Curved_Arrow(start_node.mobject.get_top(), end_node.mobject.get_top(), color=color, stroke_width=WIDTH, edge_radius=edge_radius).mobject.set_z_index(0)
+                    self.is_curvy = True
             elif is_topological_graph:
                 line = Curved_Arrow(start_node.mobject.get_bottom(), end_node.mobject.get_bottom(), color=color, stroke_width=WIDTH, edge_radius=edge_radius).mobject.set_z_index(0)
+                self.is_curvy = True
             else:
                 if is_cyclic:
                     line = Curved_Arrow(start_node.mobject.get_center(), end_node.mobject.get_center(), color=color, stroke_width=WIDTH, edge_radius=edge_radius).mobject.scale(0.78).set_z_index(0)
+                    self.is_curvy = True
                 else:
                     # normal
                     line = Line(start_node.mobject.get_center(), end_node.mobject.get_center(), buff=0.4, stroke_width=WIDTH).add_tip(tip_length=TIP_LENGTH_FOR_STRAIGHT_LINE).set_stroke(color=color, width=WIDTH).set_z_index(0)
@@ -50,6 +55,11 @@ class GraphEdge:
             return None
 
     def highlight(self, color=PINK4, width=EDGE_HIGHLIGHT_STROKE_WIDTH, change_tip_width=True):
+        if self.is_directed:
+            if self.is_curvy:
+                width = EDGE_HIGHLIGHT_STROKE_WIDTH_FOR_DIGRAPH_CURVY
+            else:
+                width = EDGE_HIGHLIGHT_STROKE_WIDTH_FOR_DIGRAPH
         self.mobject["line"].save_state()
         self.save_state = True
         if change_tip_width:

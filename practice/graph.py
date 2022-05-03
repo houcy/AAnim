@@ -46,6 +46,9 @@ class GraphObject:
                     self._create_edge(start, end, is_directed, is_topological_graph, edge_radius)
         self.graph_mobject = self.graph_mobject.move_to(ORIGIN)
 
+    def show(self, x_offset=0, y_offset=0):
+        return FadeIn(self.graph_mobject.shift(RIGHT*x_offset+UP*y_offset))
+
     def get_node_names(self):
         return list(self.value2node.keys())
 
@@ -74,10 +77,10 @@ class GraphObject:
         end_node = self.value2node[end]
         weight = self.adjacency_list[start][end]
         is_cyclic = False
-        # for cyclic graph, we need to use curved edges
+        # if start -> end && end -> strt, we need to use curved edges
         if end in self.adjacency_list and start in self.adjacency_list[end]:
             is_cyclic = True
-        edge_object = GraphEdge(start_node, end_node, weight, is_cyclic, is_directed, is_topological_graph, edge_radius)
+        edge_object = GraphEdge(start_node=start_node, end_node=end_node, weight=weight, is_cyclic=is_cyclic, is_directed=is_directed, is_topological_graph=is_topological_graph, edge_radius=4)
         start_node.neighbor2edge[end_node] = edge_object
         start_node.neighbors.append(end_node)
         start_node.edges.append(edge_object)

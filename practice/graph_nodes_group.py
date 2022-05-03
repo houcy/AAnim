@@ -38,17 +38,24 @@ class GraphNodesGroup:
                 mobject += n.text_mobject
         return mobject
 
-    def disappear(self):
+    def disappear(self, has_text=False):
         self.circle_mobject = self.get_circle_mobject()
         self.key_mobject = self.get_key_mobject()
-        self.text_mobject = self.get_text_mobject()
         self.circle_mobject.save_state()
         self.key_mobject.save_state()
-        self.text_mobject.save_state()
-        return AnimationGroup(self.circle_mobject.animate.set_stroke(color=BACKGROUND).set_fill(color=BACKGROUND), self.key_mobject.animate.set_color(color=BACKGROUND), self.text_mobject.animate.set_color(color=BACKGROUND), lag_ratios=1)
+        if has_text:
+            self.text_mobject = self.get_text_mobject()
+            self.text_mobject.save_state()
+            return AnimationGroup(self.circle_mobject.animate.set_stroke(color=BACKGROUND).set_fill(color=BACKGROUND), self.key_mobject.animate.set_color(color=BACKGROUND), self.text_mobject.animate.set_color(color=BACKGROUND), lag_ratios=1)
+        else:
+            return AnimationGroup(self.circle_mobject.animate.set_stroke(color=BACKGROUND).set_fill(color=BACKGROUND), self.key_mobject.animate.set_color(color=BACKGROUND), lag_ratios=1)
 
-    def appear(self):
-        return AnimationGroup(Restore(self.circle_mobject), Restore(self.key_mobject), Restore(self.text_mobject), Wait(), lag_ratios=1)
+
+    def appear(self, has_text=False):
+        if has_text:
+            return AnimationGroup(Restore(self.circle_mobject), Restore(self.key_mobject), Restore(self.text_mobject), Wait(), lag_ratios=1)
+        else:
+            return AnimationGroup(Restore(self.circle_mobject), Restore(self.key_mobject), Wait(), lag_ratios=1)
 
     def color(self, key_color=PINK1, stroke_color=PINK1, width=0):
         circle_mobject = self.get_circle_mobject()

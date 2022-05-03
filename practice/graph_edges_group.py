@@ -32,9 +32,9 @@ class GraphEdgesGroup:
         self.line_mobject.save_state()
         if include_label:
             self.text_mobject.save_state()
-            return AnimationGroup(self.line_mobject.animate.set_stroke(color=BACKGROUND), self.text_mobject.animate.set_color(color=BACKGROUND), Wait(), lag_ratios=1)
+            return AnimationGroup(self.line_mobject.animate.set_color(color=BACKGROUND), self.text_mobject.animate.set_color(color=BACKGROUND), Wait(), lag_ratios=1)
         else:
-            return AnimationGroup(self.line_mobject.animate.set_stroke(color=BACKGROUND), Wait(), lag_ratios=1)
+            return AnimationGroup(self.line_mobject.animate.set_color(color=BACKGROUND), Wait(), lag_ratios=1)
 
     def appear(self, include_label=False):
         if include_label:
