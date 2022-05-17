@@ -278,8 +278,8 @@ class Show(Scene):
             return min_node
         if create_legend:
             l = Legend({(PINK4, PINK4): "MST so far", (PINK4, PINK5): "v"}, is_horizontal=show_horizontal_legend)
-            # l.mobjects.next_to(graph.graph_mobject, DOWN, buff=0.3)
-            l.mobjects.move_to(2*UP+1.5*RIGHT)
+            l.mobjects.next_to(graph.graph_mobject, UP, buff=0.3)
+            # l.mobjects.move_to(2*UP+1.5*RIGHT)
             self.play(l.animation)
             self.wait()
         if animate_code_block and not code_block:
@@ -444,8 +444,8 @@ class Show(Scene):
         speed = 1 / speed
         if create_legend:
             l = Legend({("MULTICOLORS", "CIRCLE"): "MST so far", (GREEN, GREEN): "curr min edge"}, is_horizontal=show_horizontal_legend)
-            l.mobjects.move_to(2.1*UP+1.8*RIGHT)
-            # l.mobjects.next_to(graph.graph_mobject, DOWN, buff=0.3)
+            # l.mobjects.move_to(2.1*UP+1.8*RIGHT)
+            l.mobjects.next_to(graph.graph_mobject, UP, buff=0.3)
             self.play(l.animation)
             self.wait()
         if animate_code_block and not code_block:
@@ -569,9 +569,9 @@ class Show(Scene):
             if v in min_edge:
                 edges.append(min_edge[v])
                 self.wait(speed)
-                self.play(min_edge[v].highlight(color=PINK4), width=EDGE_HIGHLIGHT_STROKE_WIDTH_FOR_DIGRAPH, run_time=0.5*speed)
-                self.play(min_edge[v].dehighlight(), run_time=0.5*speed)
-                self.play(min_edge[v].highlight(color=PINK4), width=EDGE_HIGHLIGHT_STROKE_WIDTH_FOR_DIGRAPH, run_time=0.5*speed)
+                self.play(min_edge[v].highlight(color=PINK4), width=EDGE_HIGHLIGHT_STROKE_WIDTH_FOR_DIGRAPH, run_time=0.5)
+                self.play(min_edge[v].dehighlight(), run_time=0.5)
+                self.play(min_edge[v].highlight(color=PINK4), width=EDGE_HIGHLIGHT_STROKE_WIDTH_FOR_DIGRAPH, run_time=0.5)
                 self.wait(speed)
             # Decrease key and save the min edge
             # Full version - playing each for loop one by one
@@ -656,11 +656,11 @@ class Show(Scene):
         unreach = list(graph.value2node.values())
         min_edge = {}
         self.play(code_block.highlight(1), run_time=speed) if animate_code_block else None
-        self.wait()
+        self.wait() if animate_code_block else None
         self.play(code_block.highlight(2), run_time=speed) if animate_code_block else None
-        self.wait()
+        self.wait() if animate_code_block else None
         self.play(code_block.highlight(3), run_time=speed) if animate_code_block else None
-        self.wait()
+        self.wait() if animate_code_block else None
         self.play(code_block.highlight(4), run_time=speed) if animate_code_block else None
         self.wait()
         # Accumulate animations for all nodes and show them at once
@@ -681,24 +681,32 @@ class Show(Scene):
         while unreach:
             # Show group of unreached nodes
             self.play(code_block.highlight(6), run_time=speed) if animate_code_block else None
-            self.wait()
+            self.wait() if animate_code_block else None
             self.play(code_block.highlight(7), run_time=speed) if animate_code_block else None
             # Color the min node
             v = extract_min_node(unreach)
-            if prev_v:
-                self.play(prev_v.color(fill_color=PINK4, stroke_color=PINK3, stroke_width=WIDTH, has_key=True), v.color(fill_color=PINK4, stroke_color=PINK5, stroke_width=WIDTH+2, has_key=True))
+            if not hide_details:
+                if prev_v:
+                    self.wait(speed)
+                    self.play(prev_v.color(fill_color=PINK4, stroke_color=PINK3, stroke_width=WIDTH, has_key=True), v.color(fill_color=PINK4, stroke_color=PINK5, stroke_width=WIDTH+2, has_key=True))
+                    edges.append(min_edge[v])
+                    self.play(min_edge[v].highlight(color=PINK4), run_time=0.5*speed)
+                    self.play(min_edge[v].dehighlight(), run_time=0.5*speed)
+                    self.play(min_edge[v].highlight(color=PINK4), run_time=0.5*speed)
+                else:
+                    self.wait(speed)
+                    self.play(v.color(fill_color=PINK4, stroke_color=PINK5, stroke_width=NODE_HIGHLIGHT_STROKE_WIDTH, has_key=True))
+                self.wait(1.5*speed)
+                prev_v = v
             else:
-                self.wait()
-                self.play(v.color(fill_color=PINK4, stroke_color=PINK5, stroke_width=NODE_HIGHLIGHT_STROKE_WIDTH, has_key=True))
-            self.wait(speed)
-            prev_v = v
-            # Get the min edge
-            if v in min_edge:
-                edges.append(min_edge[v])
-                self.play(min_edge[v].highlight(color=PINK4), width=EDGE_HIGHLIGHT_STROKE_WIDTH_FOR_DIGRAPH, run_time=0.5*speed)
-                self.play(min_edge[v].dehighlight(), run_time=0.5*speed)
-                self.play(min_edge[v].highlight(color=PINK4), width=EDGE_HIGHLIGHT_STROKE_WIDTH_FOR_DIGRAPH, run_time=0.5*speed)
-                self.wait(speed)
+                if prev_v:
+                    edges.append(min_edge[v])
+                    self.play(min_edge[v].highlight(color=PINK4, width=EDGE_HIGHLIGHT_STROKE_WIDTH), prev_v.color(fill_color=PINK4, stroke_color=PINK3, stroke_width=WIDTH, has_key=True), v.color(fill_color=PINK4, stroke_color=PINK5, stroke_width=WIDTH+2, has_key=True))
+                else:
+                    self.wait()
+                    self.play(v.color(fill_color=PINK4, stroke_color=PINK5, stroke_width=NODE_HIGHLIGHT_STROKE_WIDTH, has_key=True))
+                self.wait(1.5*speed)
+                prev_v = v
             # Decrease key and save the min edge
             # Full version - playing each for loop one by one
             if not hide_details:
@@ -739,26 +747,40 @@ class Show(Scene):
 
             # Shortened version - playing all for loops at the same time
             else:
-                self.play(code_block.highlight(8, 5), run_time=speed) if animate_code_block else None
-                # Accumulate animations for all qualified mobjects and show them at once
-                mobject_to_flash = []
-                v_mobject_to_flash = []
-                animations_update_key = []
+                # self.play(code_block.highlight(8, 5), run_time=speed) if animate_code_block else None
+                # Accumulate animations for all qualified nodes and show them at once
+                nodes_to_keep = [u for u in v.neighbors]
+                nodes_to_keep.append(v)
+                edges_to_keep = list(v.neighbor2edge.values())
+                nodes_to_disappear = [n for n in graph.get_nodes() if n not in nodes_to_keep]
+                edges_to_disappear = [e for e in graph.get_edges() if e not in edges_to_keep]
+                nodes_to_disappear_group = GraphNodesGroup(nodes_to_disappear)
+                edges_to_disappear_group = GraphEdgesGroup(edges_to_disappear)
+                self.play(edges_to_disappear_group.disappear(include_label=True), nodes_to_disappear_group.disappear(), run_time=0.8*speed)
+                highlight_animations = []
+                relax_animations = []
+                dehighlight_animations = []
                 for u in v.neighbors:
-                    if u in unreach:
-                        edge_v_u = v.neighbor2edge[u]
-                        new_key = edge_v_u.weight + v.key
-                        if new_key < u.key:
-                            mobject_to_flash += [edge_v_u.mobject["text"]["text"], edge_v_u.mobject["line"], u.key_mobject]
-                            v_mobject_to_flash.append(v.key_mobject)
-                            animations_update_key.append(u.update_key(new_key))
-                            u.key = new_key
-                            min_edge[u] = edge_v_u
-                if mobject_to_flash:
-                    self.play(*[m.animate.set_color(BACKGROUND) for m in mobject_to_flash], *[m.animate.set_color(PINK4) for m in v_mobject_to_flash], run_time=speed)
-                    self.play(*[m.animate.set_color(GRAY) for m in mobject_to_flash], *[m.animate.set_color(BACKGROUND) for m in v_mobject_to_flash], run_time=speed)
-                if animations_update_key:
-                    self.play(*animations_update_key, run_time=1.5*speed)
+                    edge_v_u = v.neighbor2edge[u]
+                    if edge_v_u.weight + v.key < u.key:
+                        highlight_animations.append(u.highlight(stroke_color=GREEN, stroke_width=NODE_HIGHLIGHT_STROKE_WIDTH))
+                        u.key = edge_v_u.weight + v.key
+                        relax_animations.append(u.update_key(u.key))
+                        min_edge[u] = edge_v_u
+                        dehighlight_animations.append(u.dehighlight())
+                if highlight_animations:
+                    self.wait(speed)
+                    self.play(*highlight_animations)
+                if relax_animations:
+                    self.wait(speed)
+                    self.play(*relax_animations)
+                if dehighlight_animations:
+                    self.wait(speed)
+                    self.play(*dehighlight_animations)
+                if not highlight_animations and not relax_animations and not dehighlight_animations:
+                    self.wait(1.5*speed)
+                self.wait(1.2*speed)
+                self.play(edges_to_disappear_group.appear(include_label=True), nodes_to_disappear_group.appear(), run_time=0.8*speed)
         self.play(prev_v.color(fill_color=PINK4, stroke_color=PINK3, stroke_width=WIDTH, has_key=True))
         self.play(code_block.highlight(13), run_time=speed) if animate_code_block else None
         self._remove_edges(graph, edges, speed=speed)
@@ -768,12 +790,37 @@ class Show(Scene):
     # Construct
     ##################################
 
+    # Comment out for easy testing
+    # def construct(self, command):
+    #     self.camera.background_color = BACKGROUND
+    #     w = watermark()
+    #     self.add(w)
+        
+    #     graph = GraphObject(self.adjacency_list, self.position, self.is_directed)
+    #     if command == "prim":
+    #         title_mobject = show_title_for_demo("PRIM'S ALGO FOR MST")
+    #         self.add(title_mobject)
+    #         code_block = CodeBlock(CODE_FOR_PRIM_QUEUE)
+    #         self.play(Create(code_block.code))
+    #         graph = GraphObject(self.adjacency_list, self.position)
+    #         self.play(FadeIn(graph.graph_mobject.scale(0.9).shift(3.3*RIGHT)))
+    #         self.mst_prim_queue(graph, source='A', code_block=code_block, hide_details=True)
+    #         self.wait(2)
+    #     elif command == "kruskal":
+    #         title_mobject = show_title_for_demo("KRUSKAL'S ALGO FOR MST")
+    #         self.add(title_mobject)
+    #         code_block = CodeBlock(CODE_FOR_KRUSKAL_UNION_FIND)
+    #         self.play(Create(code_block.code))
+    #         graph = GraphObject(self.adjacency_list, self.position)
+    #         self.play(FadeIn(graph.graph_mobject.scale(0.9).shift(3.5*RIGHT+0.2*DOWN)))
+    #         self.mst_kruskal_union_find(graph, code_block=code_block)
+    #         self.wait(2)
+
+
     def construct(self):
         self.camera.background_color = BACKGROUND
         w = watermark()
         self.add(w)
-        # Comment out for easy testing
-        # graph = Graph(self.adjacency_list, self.position, self.is_directed)
 
         # Comment out BFS code  
         # graph = Graph(MAP_UNDIRECTED, POSITION2, is_directed=False)
@@ -947,18 +994,18 @@ class Show(Scene):
         # self.wait(15)
 
         # Dijkastra
-        title_mobject = show_title_for_demo("DIJKSTRA'S ALGO FOR SINGLE-SOURCE SHORTEST PATHS")
-        self.add(title_mobject)
-        code_block = CodeBlock(CODE_FOR_DIJKASTRA_WITHOUT_RELAX)
-        self.play(Create(code_block.code))
-        new_position = scale_position(DIPOSITION_DIJKASTRA_CLRS, 1.8, 2)
-        graph = GraphObject(DIMAP_DIJKASTRA_CLRS, new_position, is_directed=True)
-        self.play(FadeIn(graph.graph_mobject.scale(0.9).shift(3.5*RIGHT+0.4*DOWN)))
-        l = Legend({(PINK4, PINK4): "shortest paths", (PINK4, PINK5): "v", (BACKGROUND, GREEN): "u"}, is_horizontal=True)
-        l.mobjects.next_to(graph.graph_mobject, UP, buff=0.5)
-        self.play(l.animation)
-        self.shortest_paths_dijkstra(graph, source='A', code_block=code_block, create_legend=False, hide_details=False)
-        self.wait(15)
+        # title_mobject = show_title_for_demo("DIJKSTRA'S ALGO FOR SINGLE-SOURCE SHORTEST PATHS")
+        # self.add(title_mobject)
+        # code_block = CodeBlock(CODE_FOR_DIJKASTRA_WITHOUT_RELAX)
+        # self.play(Create(code_block.code))
+        # new_position = scale_position(DIPOSITION_DIJKASTRA_CLRS, 1.8, 2)
+        # graph = GraphObject(DIMAP_DIJKASTRA_CLRS, new_position, is_directed=True)
+        # self.play(FadeIn(graph.graph_mobject.scale(0.9).shift(3.5*RIGHT+0.4*DOWN)))
+        # l = Legend({(PINK4, PINK4): "shortest paths", (PINK4, PINK5): "v", (BACKGROUND, GREEN): "u"}, is_horizontal=True)
+        # l.mobjects.next_to(graph.graph_mobject, UP, buff=0.5)
+        # self.play(l.animation)
+        # self.shortest_paths_dijkstra(graph, source='A', code_block=code_block, create_legend=False, hide_details=False)
+        # self.wait(15)
 
         # Dijkastra-Chinese
         # title_mobject = show_title_for_demo("DIJKSTRA 算法  ·  单源最短路径")
@@ -972,4 +1019,30 @@ class Show(Scene):
         # l.mobjects.next_to(graph.graph_mobject, UP, buff=0.5)
         # self.play(l.animation)
         # self.shortest_paths_dijkstra(graph, source='A', code_block=code_block, create_legend=False, hide_details=False)
+        # self.wait(15)
+
+        # Dijkastra-no-code-Chinese
+        title_mobject = show_title_for_demo("DIJKSTRA'S ALGO FOR SHORTEST PATHS")
+        self.add(title_mobject)
+        new_position = scale_position(POSITION_HARD, 1.4, 1.8)
+        graph = GraphObject(MAP_HARD, new_position)
+        self.play(FadeIn(graph.graph_mobject.shift(0.5*DOWN)))
+        l = Legend({(PINK4, PINK4): "s h o r t e s t  p a t h s", (PINK4, PINK5): "n e a r e s t  n o d e", (BACKGROUND, GREEN): "n o d e  n e e d s  r e l a x a t i o n"}, is_horizontal=True)
+        l.mobjects.next_to(graph.graph_mobject, UP, buff=0.5).align_to(graph.graph_mobject, RIGHT)
+        self.play(l.animation)
+        self.wait()
+        self.shortest_paths_dijkstra(graph, source='A', create_legend=False, animate_code_block=False, speed=2, hide_details=True)
+        self.wait(15)
+
+        # Dijkastra-no-code-Chinese
+        # title_mobject = show_title_for_demo("DIJKSTRA 算法  ·  单源最短路径")
+        # self.add(title_mobject)
+        # new_position = scale_position(POSITION_HARD, 1.4, 1.8)
+        # graph = GraphObject(MAP_HARD, new_position)
+        # self.play(FadeIn(graph.graph_mobject.shift(0.3*DOWN)))
+        # l = Legend({(PINK4, PINK4): "最短路径", (PINK4, PINK5): "当前最近的点", (BACKGROUND, GREEN): "需要放松的点"}, is_horizontal=True)
+        # l.mobjects.next_to(graph.graph_mobject, UP, buff=0.5).align_to(graph.graph_mobject, RIGHT)
+        # self.play(l.animation)
+        # self.wait()
+        # self.shortest_paths_dijkstra(graph, source='A', create_legend=False, animate_code_block=False, speed=2, hide_details=True)
         # self.wait(15)
