@@ -42,7 +42,11 @@ class GraphEdge:
         # for weighted edge
         if self.weight:
             text = Text(str(weight), color=EDGE_COLOR, font=FONT, weight=WEIGHT_WEIGHT, font_size=WEIGHT_SIZE).move_to(line.get_center()).set_z_index(10).set_stroke(color=EDGE_STROKE_COLOR, width=EDGE_STROKE_WIDTH)
-            text_background = Circle(radius=WEIGHT_CIRCLE_RADIUS).set_stroke(color=BACKGROUND, width=WIDTH).set_fill(BACKGROUND, opacity=1.0).set_z_index(9).move_to(text.get_center())
+            circle_radius = WEIGHT_CIRCLE_RADIUS
+            count_digit = len(str(weight))
+            if count_digit > 2:
+                circle_radius = circle_radius + (count_digit - 2) * 0.1
+            text_background = Circle(radius=circle_radius).set_stroke(color=BACKGROUND, width=WIDTH).set_fill(BACKGROUND, opacity=1.0).set_z_index(9).move_to(text.get_center())
             self.mobject["text"] = VDict([("text", text), ("text_background", text_background)])
 
     def get_the_other_end(self, node):
@@ -65,7 +69,7 @@ class GraphEdge:
         if change_tip_width:
             return AnimationGroup(self.mobject["line"].animate.set_stroke(width=width).set_color(color=color))
         else:
-            return AnimationGroup(self.mobject["line"].animate.set_color(color=color))
+            return AnimationGroup(self.mobject["line"].animate.set_color(color=color), self.mobject["text"]["text"].set_color(color=color))
 
 
     def dehighlight(self, color=GRAY, force_color=False):

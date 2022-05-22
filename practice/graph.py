@@ -22,10 +22,9 @@ POSITION_CYCLE3 = {'A': (-2, -2), 'B': (2, 2)}
 MAP_CYCLE = {'A': {'B': 3}, 'B': {'A': 2}}
 
 class GraphObject:
-    def __init__(self, adjacency_list, position, is_directed=False, is_topological_graph=False, edge_radius=RADIUS):
+    def __init__(self, adjacency_list, position, is_topological_graph=False, edge_radius=RADIUS):
         self.graph_mobject = VGroup()
         self.value2node = {}
-        self.is_directed = is_directed
         visited_edge = set()
         self.adjacency_list = adjacency_list
         self.edges = []
@@ -39,11 +38,16 @@ class GraphObject:
                 if end not in self.value2node:
                     position_x, position_y = position[end]
                     self._create_node(end, position_x, position_y)
-                if (start, end) not in visited_edge:
-                    # For undirected graph, save the counterpart
-                    if not is_directed:
-                        visited_edge.add((end, start))
+                is_directed = True
+                not_created = True
+                # Not directed
+                if start in self.adjacency_list[end]:
+                    is_directed = False
+                    if (end, start) in visited_edge:
+                        not_created = False
+                if is_directed or (not is_directed and not_created):
                     self._create_edge(start, end, is_directed, is_topological_graph, edge_radius)
+                    visited_edge.add((start, end))
         self.graph_mobject = self.graph_mobject.move_to(ORIGIN)
 
     def show(self, x_offset=0, y_offset=0):
@@ -71,6 +75,9 @@ class GraphObject:
 
     def get_edge(self, start, end):
         return self.nodes2edge[(start, end)]
+
+    def get_edge_from_value(self, start_value, end_value):
+        return self.nodes2edge[(self.value2node[start_value], self.value2node[end_value])]
 
     def _create_edge(self, start, end, is_directed, is_topological_graph, edge_radius):
         start_node = self.value2node[start]
