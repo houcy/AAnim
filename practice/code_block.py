@@ -3,26 +3,11 @@ from style import *
 from manim_fonts import *
 from code_constant import *
 
-TEST_CODE = """EXTRACT-FIRST(A) {
-    heapsize = length(A)
-    Exchange A[1] with A[heapsize]
-    Remove A[heapsize]
-    HeapifyDown(A, 1)
-    heapsize = length(A)
-    Exchange A[1] with A[heapsize]
-    Remove A[heapsize]
-    HeapifyDown(A, 1)
-    heapsize = length(A)
-    Exchange A[1] with A[heapsize]
-    Remove A[heapsize]
-    HeapifyDown(A, 1)
-}
-"""
 
 class CodeBlock():
     def __init__(self, code, font=CODE_FONT):
         with RegisterFont(CODE_FONT) as fonts:
-            self.code = Code(code=code, stroke_width=1, line_spacing=CODE_LINE_SPACING, font=font, background="rectangle", margin=0, background_stroke_width=0, tab_width=2, language="Python", font_size=16).shift(SHIFT_LEFT_UNIT * LEFT)
+            self.code = Code(code=code, stroke_width=1, line_spacing=CODE_LINE_SPACING, font=font, background="rectangle", margin=0, background_stroke_width=0, tab_width=2, language="Python", font_size=16).shift(SHIFT_LEFT_UNIT * LEFT + SHIFT_UP_UNIT * UP)
             self.top = self.code.get_top()[1]
             self.left = self.code.get_left()[0]
             self.bottom = self.code.get_bottom()[1]
@@ -54,26 +39,29 @@ class CodeBlock():
         y_base = self.top - self.line_height_include_spacing * (line_number - 1) - 0.5 * self.line_height
         y_position = y_base - (n_lines - 1) * (self.line_height_include_spacing / 2)
         if not self.highlight_rect:
-            self.highlight_rect = RoundedRectangle(corner_radius=0.05, width=self.width+CODE_BLOCK_WIDTH_PADDING, height=self.line_height_include_spacing*n_lines+CODE_BLOCK_HEIGHT_PADDING).set_stroke(color=GRAY, width=2).shift(SHIFT_LEFT_UNIT * LEFT + UP * y_position)
+            self.highlight_rect = RoundedRectangle(corner_radius=0.05, width=self.width+CODE_BLOCK_WIDTH_PADDING, height=self.line_height_include_spacing*n_lines+CODE_BLOCK_HEIGHT_PADDING).set_stroke(color=GRAY, width=2).shift(SHIFT_LEFT_UNIT * LEFT + UP * (y_position))
             self.last_n_lines = n_lines
             self.code = VGroup(self.code, self.highlight_rect)
             return AnimationGroup(FadeIn(self.highlight_rect), Wait(), lag_ratio=1)
         else:
             if self.last_n_lines == n_lines:
-                return AnimationGroup(Wait(), self.highlight_rect.animate.move_to(SHIFT_LEFT_UNIT * LEFT + UP * y_position), Wait(), lag_ratio=1)
+                return AnimationGroup(Wait(), self.highlight_rect.animate.move_to(SHIFT_LEFT_UNIT * LEFT + UP * (y_position)), Wait(), lag_ratio=1)
             else:
                 self.last_n_lines = n_lines
                 last_highlight_rect = self.highlight_rect
-                self.highlight_rect = RoundedRectangle(corner_radius=0.05, width=self.width+CODE_BLOCK_WIDTH_PADDING, height=self.line_height_include_spacing*n_lines+CODE_BLOCK_HEIGHT_PADDING).set_stroke(color=GRAY, width=2).shift(SHIFT_LEFT_UNIT * LEFT + UP * y_position)
+                self.highlight_rect = RoundedRectangle(corner_radius=0.05, width=self.width+CODE_BLOCK_WIDTH_PADDING, height=self.line_height_include_spacing*n_lines+CODE_BLOCK_HEIGHT_PADDING).set_stroke(color=GRAY, width=2).shift(SHIFT_LEFT_UNIT * LEFT + UP * (y_position))
                 return AnimationGroup(Wait(), ReplacementTransform(last_highlight_rect, self.highlight_rect), Wait(), lag_ratio=1)
 
 
 class Test(Scene):
     def construct(self):
-        code1 = CodeBlock(TEST_CODE)
-        self.play(Create(code1.code.shift(4*RIGHT)))
-        code2 = CodeBlock(CODE_FOR_PRIM_BASIC)
-        self.play(Create(code2.code))
-        self.play(code2.highlight(1, 1))
-        self.play(code2.highlight(2, 1))
-        self.play(code2.highlight(4, 2))
+        TEST_CODE = """EXTRACT-FIRST(A) {
+        heapsize = length(A)
+        Exchange A[1] with A[heapsize]
+        }
+        """
+        test_code = CodeBlock(TEST_CODE)
+        self.play(Create(test_code.code.shift(4*RIGHT)))
+        self.play(test_code.highlight(1, 1))
+        self.play(test_code.highlight(2, 1))
+        self.play(test_code.highlight(4, 2))
