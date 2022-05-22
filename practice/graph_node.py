@@ -80,9 +80,9 @@ class GraphNode:
         self.animations = animations    # If show_value is True, there will be 2 animations: Transform and FadeIn; Otherwise, only 1 animation
         return AnimationGroup(*animations, lag_ratio=1)
     
-    def update_key(self, key):
+    def update_key(self, key, color=GRAY):
         animations = []
-        new_key_mobject = get_text(str(key), font_size=KEY_SIZE, weight=BOLD).move_to(self.circle_mobject.get_center()).set_z_index(5)
+        new_key_mobject = get_text(str(key), font_size=KEY_SIZE, weight=BOLD, color=color).move_to(self.circle_mobject.get_center()).set_z_index(5)
         animations.append(ReplacementTransform(self.key_mobject, new_key_mobject))
         self.key = key
         self.key_mobject = new_key_mobject

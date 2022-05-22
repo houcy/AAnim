@@ -9,6 +9,12 @@ class GraphNodesGroup:
         self.circle_mobject = None
         self.key_mobject = None
         self.text_mobject = None
+
+    def get_mobject(self):
+        if self.key_mobject:
+            return VGroup(self.circle_mobject, self.text_mobject, self.key_mobject)
+        else:
+            return VGroup(self.circle_mobject, self.text_mobject)
     
     def add(self, n):
         self.list_nodes.append(n)
@@ -57,10 +63,15 @@ class GraphNodesGroup:
         else:
             return AnimationGroup(Restore(self.circle_mobject), Restore(self.key_mobject), Wait(), lag_ratios=1)
 
-    def color(self, key_color=PINK1, stroke_color=PINK1, width=0):
+    def color(self, key_color=PINK1, text_color=GRAY, stroke_color=PINK1, fill_color=BACKGROUND, stroke_width=WIDTH, key_width=0, has_key=False):
         circle_mobject = self.get_circle_mobject()
-        key_mobject = self.get_key_mobject()
-        return AnimationGroup(circle_mobject.animate.set_stroke(color=stroke_color), key_mobject.animate.set_color(color=key_color).set_stroke(width=width))
+        if has_key:
+            key_mobject = self.get_key_mobject()
+            return AnimationGroup(circle_mobject.animate.set_stroke(color=stroke_color, width=stroke_width).set_fill(color=fill_color), key_mobject.animate.set_color(color=key_color).set_stroke(width=key_width))
+        else:
+            print(fill_color, stroke_color)
+            text_mobject = self.get_text_mobject()
+            return AnimationGroup(circle_mobject.animate.set_stroke(color=stroke_color, width=stroke_width).set_fill(color=fill_color), text_mobject.animate.set_color(color=text_color).set_stroke(width=key_width))     
 
     def flash_keys(self, color=BACKGROUND):
         key_mobject = self.key_mobject()
