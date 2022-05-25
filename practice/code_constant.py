@@ -1,3 +1,24 @@
+CODE_FOR_BUILD = """BUILD-HEAP(A[1,...,n]) {
+    for i = floor(n/2) downto 1
+        HeapifyDown(A, i)
+}
+"""
+
+CODE_FOR_EXTRACT = """EXTRACT-FIRST(A) {
+    heapsize = length(A)
+    Exchange A[1] with A[heapsize]
+    Remove A[heapsize]
+    HeapifyDown(A, 1)
+}
+"""
+
+CODE_FOR_INSERT = """INSERT(A, value) {
+    heapsize = length(A) + 1
+    A[heapsize] = value
+    HeapifyUp(A, heapsize)
+}
+"""
+
 CODE_FOR_DFS = """DFS(G) {
     for each vertex u
         if u.color = BLACK
@@ -136,14 +157,29 @@ CODE_FOR_RELAX = """RELAX(u, v, weight) {
 
 CODE_FOR_DIJKASTRA_WITHOUT_RELAX = """DIJKSTRA(G, s) {
     UnReachSet = G.V
-    set all vertices v.previous = ∅
     set all vertices v.key = ∞
-    set an arbitrary vertex v.key = 0
+    set all vertices v.previous = ∅
+    s.key = 0
     while UnReachSet ≠ ∅
         v = EXTRACT-MIN(UnReachSet)
         for each neighbor u of v
-            // Relaxation
-            if v.key + weight(u, v) < u.key
+            // Relax edge (v, u)
+            if u.key > v.key + weight(u, v)
+                u.key = v.key + weight(u, v)
+                u.previous = v
+}
+"""
+
+CODE_FOR_DIJKASTRA_WITHOUT_RELAX_CH = """DIJKSTRA(G, s) {
+    UnReachSet = G.V
+    对于每一个点v设置 v.key = ∞
+    对于每一个点v设置 v.previous = ∅
+    对于源点s设置 s.key = 0
+    while UnReachSet ≠ ∅
+        v = EXTRACT-MIN(UnReachSet)
+        对于从v出发的每条边(v, u)
+            // 松弛边(v, u)
+            if u.key > v.key + weight(u, v)
                 u.key = v.key + weight(u, v)
                 u.previous = v
 }
