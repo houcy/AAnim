@@ -41,7 +41,7 @@ class GraphObject:
                 is_directed = True
                 not_created = True
                 # Not directed
-                if start in self.adjacency_list[end]:
+                if end in self.adjacency_list and start in self.adjacency_list[end]:
                     is_directed = False
                     if (end, start) in visited_edge:
                         not_created = False

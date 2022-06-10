@@ -31,7 +31,12 @@ class GraphNode:
         """
         self.circle_mobject = Circle(radius=RADIUS).set_stroke(color=LINE_COLOR, width=WIDTH).set_fill(BACKGROUND, opacity=1.0).set_z_index(1).shift(RIGHT * self.position_x + UP * self.position_y)
         if not is_music_note:
-            self.text_mobject = Text(str(self.value), color=LINE_COLOR, font=FONT, weight=BOLD, font_size=VALUE_SIZE).set_z_index(3).shift(self.circle_mobject.get_center())
+            count_digit = len(str(self.value))
+            font_size = VALUE_SIZE
+            if count_digit >= 3:
+                font_size = font_size - (count_digit - 2) * 5
+            self.text_mobject = Text(str(self.value), color=LINE_COLOR, font=FONT, weight=BOLD, font_size=font_size).set_z_index(3).shift(self.circle_mobject.get_center())
+
         else:
             # for music note
             value = str(self.value)
@@ -42,18 +47,17 @@ class GraphNode:
             self.text_mobject.move_to(self.circle_mobject.get_center())
         self.mobject = VDict([("c", self.circle_mobject), ("t", self.text_mobject)])
 
-    def mobject(self):
-        m = VDict([("c", self.circle_mobject), ("t", self.text_mobject)])
+    def mobjects(self):
+        print(self.circle_mobject)
+        print(self.text_mobject)
+        print(self.key_mobject)
+        m = VDict([("c", self.circle_mobject)])
+        if self.text_mobject:
+            m["t"] = self.text_mobject
         if self.key_mobject:
             m["k"] = self.key_mobject
+        print(m)
         return m
-
-    def mobjects(self):
-        mobjects = VGroup()
-        for m in [self.circle_mobject, self.text_mobject. self.key_mobject]:
-            if m:
-                mobjects += m
-        return mobjects
 
     def initialize_key(self, key, show_value=True):
         animations = []
@@ -159,12 +163,20 @@ class GraphNode:
         self.save_state = True
         return AnimationGroup(self.circle_mobject.animate.set_stroke(color=stroke_color, width=stroke_width))
 
-
     def dehighlight(self):
         if self.save_state:
             self.save_state = False
             return AnimationGroup(Restore(self.circle_mobject))
             
+    def fade_out(self):
+        self.is_showing = False
+        print(self.value)
+        print("self.mobject()", self.mobjects())
+        return FadeOut(self.mobjects())
+
+    def fade_in(self):
+        self.is_showing = True
+        return FadeIn(self.mobject())
 
 
 class Test(Scene):

@@ -69,7 +69,6 @@ class GraphNodesGroup:
             key_mobject = self.get_key_mobject()
             return AnimationGroup(circle_mobject.animate.set_stroke(color=stroke_color, width=stroke_width).set_fill(color=fill_color), key_mobject.animate.set_color(color=key_color).set_stroke(width=key_width))
         else:
-            print(fill_color, stroke_color)
             text_mobject = self.get_text_mobject()
             return AnimationGroup(circle_mobject.animate.set_stroke(color=stroke_color, width=stroke_width).set_fill(color=fill_color), text_mobject.animate.set_color(color=text_color).set_stroke(width=key_width))     
 
