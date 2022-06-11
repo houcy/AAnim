@@ -39,7 +39,7 @@ class CodeBlock():
         y_base = self.top - self.line_height_include_spacing * (line_number - 1) - 0.5 * self.line_height
         y_position = y_base - (n_lines - 1) * (self.line_height_include_spacing / 2)
         if not self.highlight_rect:
-            self.highlight_rect = RoundedRectangle(corner_radius=0.05, width=self.width+CODE_BLOCK_WIDTH_PADDING, height=self.line_height_include_spacing*n_lines+CODE_BLOCK_HEIGHT_PADDING).set_stroke(color=GRAY, width=2).shift(SHIFT_LEFT_UNIT * LEFT + UP * (y_position))
+            self.highlight_rect = RoundedRectangle(corner_radius=0.05, width=self.width+CODE_BLOCK_WIDTH_PADDING, height=self.line_height_include_spacing*n_lines+CODE_BLOCK_HEIGHT_PADDING).set_stroke(color=GRAY, width=BOX_STROKE_WIDTH).shift(SHIFT_LEFT_UNIT * LEFT + UP * (y_position))
             self.last_n_lines = n_lines
             self.code = VGroup(self.code, self.highlight_rect)
             return AnimationGroup(FadeIn(self.highlight_rect), Wait(), lag_ratio=1)
@@ -49,8 +49,16 @@ class CodeBlock():
             else:
                 self.last_n_lines = n_lines
                 last_highlight_rect = self.highlight_rect
-                self.highlight_rect = RoundedRectangle(corner_radius=0.05, width=self.width+CODE_BLOCK_WIDTH_PADDING, height=self.line_height_include_spacing*n_lines+CODE_BLOCK_HEIGHT_PADDING).set_stroke(color=GRAY, width=2).shift(SHIFT_LEFT_UNIT * LEFT + UP * (y_position))
+                self.highlight_rect = RoundedRectangle(corner_radius=0.05, width=self.width+CODE_BLOCK_WIDTH_PADDING, height=self.line_height_include_spacing*n_lines+CODE_BLOCK_HEIGHT_PADDING).set_stroke(color=GRAY, width=BOX_STROKE_WIDTH).shift(SHIFT_LEFT_UNIT * LEFT + UP * (y_position))
                 return AnimationGroup(Wait(), ReplacementTransform(last_highlight_rect, self.highlight_rect), Wait(), lag_ratio=1)
+
+    def if_condition(self, is_true=True, wait_time=1):
+        mark = None
+        if is_true:
+            mark = SVGMobject("check.svg", height=0.2).set_fill(color=GREEN).next_to(self.highlight_rect, RIGHT, buff=0.2)
+        else:
+            mark = SVGMobject("xmark.svg", height=0.2).set_fill(color=RED).next_to(self.highlight_rect, RIGHT, buff=0.2)
+        return Succession(FadeIn(mark), Wait(wait_time), FadeOut(mark), lag_ratio=1)
 
 
 class Test(Scene):
