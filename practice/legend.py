@@ -14,7 +14,7 @@ class Legend:
                 command, fill_color, stroke_color = feature
                 if command == "HIGHLIGHT_ROUNDED_RECTANGLE":
                     rect = RoundedRectangle(corner_radius=0.06, height=2.2*SM_RADIUS, width=2.2*SM_RADIUS).set_fill(fill_color, 1).set_stroke(color=stroke_color)
-                    text = Text(str(explanation), color=LINE_COLOR, font=FONT, font_size=LEGEND_SIZE).next_to(circle, RIGHT, buff=2)
+                    text = Text(str(explanation), color=LINE_COLOR, font=FONT, font_size=LEGEND_SIZE*2).scale(0.5).next_to(circle, RIGHT, buff=2)
                     if is_horizontal or save_space:
                         row = VGroup(rect, text).arrange_in_grid(rows=1, buff=LEGEND_BUFF_MICRO)
                         inside += row
@@ -36,7 +36,7 @@ class Legend:
             else:
                 fill_color, stroke_color = feature
                 circle = Circle(radius=SM_RADIUS).set_fill(fill_color, 1).set_stroke(stroke_color)
-                text = Text(str(explanation), color=LINE_COLOR, font=FONT, font_size=LEGEND_SIZE).next_to(circle, RIGHT, buff=2)
+                text = Text(str(explanation), color=LINE_COLOR, font=FONT, font_size=LEGEND_SIZE*2).scale(0.5).next_to(circle, RIGHT, buff=2)
                 if is_horizontal or save_space:
                     row = VGroup(circle, text).arrange_in_grid(rows=1, buff=LEGEND_BUFF_MICRO)
                     inside += row

@@ -52,16 +52,16 @@ class GraphNodesGroup:
         if has_text:
             self.text_mobject = self.get_text_mobject()
             self.text_mobject.save_state()
-            return AnimationGroup(self.circle_mobject.animate.set_stroke(color=BACKGROUND).set_fill(color=BACKGROUND), self.key_mobject.animate.set_color(color=BACKGROUND), self.text_mobject.animate.set_color(color=BACKGROUND), lag_ratios=1)
+            return AnimationGroup(self.circle_mobject.animate.set_stroke(color=BACKGROUND).set_fill(color=BACKGROUND), self.key_mobject.animate.set_color(color=BACKGROUND), self.text_mobject.animate.set_color(color=BACKGROUND))
         else:
-            return AnimationGroup(self.circle_mobject.animate.set_stroke(color=BACKGROUND).set_fill(color=BACKGROUND), self.key_mobject.animate.set_color(color=BACKGROUND), lag_ratios=1)
+            return AnimationGroup(self.circle_mobject.animate.set_stroke(color=BACKGROUND).set_fill(color=BACKGROUND), self.key_mobject.animate.set_color(color=BACKGROUND))
 
 
     def appear(self, has_text=False):
         if has_text:
-            return AnimationGroup(Restore(self.circle_mobject), Restore(self.key_mobject), Restore(self.text_mobject), Wait(), lag_ratios=1)
+            return AnimationGroup(Restore(self.circle_mobject), Restore(self.key_mobject), Restore(self.text_mobject))
         else:
-            return AnimationGroup(Restore(self.circle_mobject), Restore(self.key_mobject), Wait(), lag_ratios=1)
+            return AnimationGroup(Restore(self.circle_mobject), Restore(self.key_mobject))
 
     def color(self, key_color=PINK1, text_color=GRAY, stroke_color=PINK1, fill_color=BACKGROUND, stroke_width=WIDTH, key_width=0, has_key=False):
         circle_mobject = self.get_circle_mobject()

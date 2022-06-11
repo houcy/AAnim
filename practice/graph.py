@@ -61,6 +61,9 @@ class GraphObject:
 
     def get_nodes(self):
         return list(self.value2node.values())
+
+    def fade_out(self):
+        return AnimationGroup(*[e.fade_out() for e in self.get_nodes() + self.get_edges()])
     
     def n_nodes(self):
         return len(self.value2node)

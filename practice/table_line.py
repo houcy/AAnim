@@ -51,7 +51,7 @@ class TableLine:
             if index in self.index2square:
                 square = self.index2square[index]
                 animations.append(FadeIn(square))
-        self.animation = AnimationGroup(*animations, lag_ratios=0.5)
+        self.animation = AnimationGroup(*animations, lag_ratio=0.5)
 
     def _update_table_line_mobject(self):
         self.mobject = VDict(self.index2square).arrange(buff=0).move_to(self.x_position*RIGHT + self.y_position*UP)

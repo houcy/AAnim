@@ -36,6 +36,10 @@ POSITION_DIJKSTRA_NEGATIVE_CH = {'始': (0, 1.73), 'B': (-1, 0), 'C': (1, 0)}
 MAP_DIJKSTRA_NEGATIVE_EN = {'Src': {'B': 2, 'C': 1}, 'B': {'C': -100}}
 POSITION_DIJKSTRA_NEGATIVE_EN = {'Src': (0, 1.73), 'B': (-1, 0), 'C': (1, 0)}
 
+# RELAX - SIMPLE
+MAP_RELAX = {'u': {'v': 2}}
+POSITION_RELAX = {'u': (0, 0), 'v': (1, 0)}
+
 # Square for comparing Prim and Dijkstra
 MAP_SQUARE_1 = {
     'A': {'B': 1, 'D': 1, 'E': 1}, 
@@ -760,6 +764,14 @@ class Show(Scene):
     # Shortest-paths problem: Dijkstra
     ##################################
 
+    # Initialize
+    def initialize(self, graph, speed=1):
+        transforms = []
+        for node in graph.value2node.values():
+            node.initialize_key(float('inf'), show_value=False)
+            transforms += node.animations
+        self.play(*transforms, run_time=1.5*speed)
+
     # the new version
     def shortest_paths_dijkstra(self, graph, source=None, create_legend=True, show_horizontal_legend=False, animate_code_block=True, code_block=None, speed=1, hide_details=False):
         speed = 1 / speed
@@ -791,12 +803,13 @@ class Show(Scene):
         self.play(code_block.highlight(3), run_time=speed) if animate_code_block else None
         self.wait() if animate_code_block else None
         # Accumulate animations for all nodes and show them at once
+
         transforms = []
         for node in graph.value2node.values():
             node.initialize_key(float('inf'), show_value=False)
             transforms += node.animations
-        unreach_nodes_group = GraphNodesGroup(unreach)
         self.play(*transforms, run_time=1.5*speed)
+
         self.play(code_block.highlight(4), run_time=speed) if animate_code_block else None
         self.wait() if animate_code_block else None
         self.play(code_block.highlight(5), run_time=speed) if animate_code_block else None
@@ -926,6 +939,159 @@ class Show(Scene):
         self.wait() if animate_code_block else None
         self._remove_edges(graph, edges, speed=0.5)
         return edges
+
+
+    ##################################
+    # Relaxation
+    ##################################
+
+
+    def relax(self, graph, source, dest, source_key, dest_key, create_legend=True, show_horizontal_legend=False, animate_code_block=True, code_block=None, speed=1, hide_details=False):
+        source_node = graph.value2node[source]
+        dest_node = graph.value2node[dest]
+        edge = graph.get_edge_from_value(source, dest)
+        self.play(source_node.initialize_key(source_key, show_value='TOP'), dest_node.initialize_key(dest_key, show_value='TOP'))
+        if not code_block:
+            code_block = CodeBlock(CODE_FOR_RELAX)
+            self.play(Create(code_block.code))
+            self.wait()
+        if create_legend:
+            l = Legend({(BACKGROUND, GREEN): "需要放松的点"}, is_horizontal=True)
+            l.mobjects.next_to(graph.graph_mobject, UP, buff=0.8)
+            self.play(l.animation)
+        self.play(code_block.highlight(1), run_time=speed) if animate_code_block else None
+        self.wait() if animate_code_block else None
+        self.play(code_block.highlight(2), run_time=speed) if animate_code_block else None
+        self.wait() if animate_code_block else None
+        if dest_node.key > source_node.key + edge.weight:
+            self.play(dest_node.highlight(stroke_color=GREEN, stroke_width=NODE_HIGHLIGHT_STROKE_WIDTH))
+            self.wait() if animate_code_block else None
+            self.play(code_block.highlight(3), run_time=speed) if animate_code_block else None
+            self.wait() if animate_code_block else None
+            new_key = source_node.key + edge.weight
+            self.play(dest_node.update_key(new_key))
+            self.wait() if animate_code_block else None
+            self.play(code_block.highlight(4), run_time=speed) if animate_code_block else None
+            self.wait() if animate_code_block else None
+            dest_node.minEdge = edge
+            string = 'prev: '
+            string += source
+            new_text = Text(string, color=GRAY, font=FONT, weight=BOLD, font_size=32).scale(0.5).next_to(dest_node.circle_mobject, DOWN, buff=0.18)
+            self.play(FadeIn(new_text))
+            self.wait() if animate_code_block else None
+        self.play(code_block.highlight(5), run_time=speed) if animate_code_block else None
+
+
+
+    def relax_for_video_only(self, graph_1, graph_2, source, dest, first, second, texts, create_legend=True, show_horizontal_legend=False, animate_code_block=True, code_block=None, speed=1, hide_details=False):
+        graph = graph_1
+        source_node = graph.value2node[source]
+        dest_node = graph.value2node[dest]
+        edge = graph.get_edge_from_value(source, dest)
+        source_key, dest_key = first
+        graph.graph_mobject.shift(3.5*RIGHT)
+        texts = title1, title2, legend
+        title = Text(title1, color=GRAY, font=FONT, weight=BOLD, font_size=SMALL_FONT_SIZE).next_to(graph.graph_mobject, DOWN, buff=1)
+        if not code_block:
+            code_block = CodeBlock(CODE_FOR_RELAX)
+            self.play(Create(code_block.code))
+            self.wait(5)
+        self.play(FadeIn(graph.graph_mobject), FadeIn(title))
+        self.wait(4)
+        self.play(source_node.initialize_key(source_key, show_value='TOP'), dest_node.initialize_key(dest_key, show_value='TOP'))
+        self.wait(3)
+        if create_legend:
+            l = Legend({(BACKGROUND, GREEN): legend}, is_horizontal=True)
+            l.mobjects.next_to(graph.graph_mobject, UP, buff=0.8)
+            self.play(l.animation)
+            self.wait(2)
+        self.play(code_block.highlight(1), run_time=speed) if animate_code_block else None
+        self.wait(2) if animate_code_block else None
+        self.play(code_block.highlight(2), run_time=speed) if animate_code_block else None
+        self.wait(2) if animate_code_block else None
+        if dest_node.key > source_node.key + edge.weight:
+            self.play(code_block.if_condition(wait_time=4)) if animate_code_block else None
+            self.play(code_block.highlight(3), run_time=speed) if animate_code_block else None
+            self.wait(2) if animate_code_block else None
+            self.play(dest_node.highlight(stroke_color=GREEN, stroke_width=NODE_HIGHLIGHT_STROKE_WIDTH))
+            self.wait(2) if animate_code_block else None
+            new_key = source_node.key + edge.weight
+            self.play(dest_node.update_key(new_key), run_time=2)
+            self.wait(2) if animate_code_block else None
+            self.play(code_block.highlight(4), run_time=speed) if animate_code_block else None
+            self.wait(2) if animate_code_block else None
+            dest_node.minEdge = edge
+            string = 'prev: '
+            string += source
+            new_text = Text(string, color=GRAY, font=FONT, weight=BOLD, font_size=32).scale(0.5).next_to(dest_node.circle_mobject, DOWN, buff=0.18)
+            self.play(FadeIn(new_text))
+            self.wait(2) if animate_code_block else None 
+        else:
+            self.play(code_block.if_condition(is_true=False, wait_time=4))
+        self.play(code_block.highlight(5), run_time=speed) if animate_code_block else None
+        self.wait(3)
+        self.play(graph.fade_out(), FadeOut(new_text), FadeOut(title))
+        self.wait()
+        
+        graph = graph_2
+        source_node = graph.value2node[source]
+        dest_node = graph.value2node[dest]
+        edge = graph.get_edge_from_value(source, dest)
+        source_key, dest_key = second
+        graph.graph_mobject.shift(3.5*RIGHT)
+        title = Text(title2, color=GRAY, font=FONT, weight=BOLD, font_size=SMALL_FONT_SIZE).next_to(graph.graph_mobject, DOWN, buff=1)
+        self.play(FadeIn(graph.graph_mobject), FadeIn(title))
+        self.wait(4)
+        self.play(source_node.initialize_key(source_key, show_value='TOP'), dest_node.initialize_key(dest_key, show_value='TOP'))
+        self.wait(3)
+        self.play(code_block.highlight(1), run_time=speed) if animate_code_block else None
+        self.wait(2) if animate_code_block else None
+        self.play(code_block.highlight(2), run_time=speed) if animate_code_block else None
+        self.wait(3) if animate_code_block else None
+        if dest_node.key > source_node.key + edge.weight:
+            self.play(code_block.if_condition(wait_time=3)) if animate_code_block else None
+            self.play(code_block.highlight(3), run_time=speed) if animate_code_block else None
+            self.wait(2) if animate_code_block else None
+            self.play(dest_node.highlight(stroke_color=GREEN, stroke_width=NODE_HIGHLIGHT_STROKE_WIDTH))
+            self.wait(2) if animate_code_block else None
+            new_key = source_node.key + edge.weight
+            self.play(dest_node.update_key(new_key), run_time=2)
+            self.wait(2) if animate_code_block else None
+            self.play(code_block.highlight(4), run_time=speed) if animate_code_block else None
+            self.wait(2) if animate_code_block else None
+            dest_node.minEdge = edge
+            string = 'prev: '
+            string += source
+            new_text = Text(string, color=GRAY, font=FONT, weight=BOLD, font_size=32).scale(0.5).next_to(dest_node.circle_mobject, DOWN, buff=0.18)
+            self.play(Write(new_text))
+            self.wait(2) if animate_code_block else None
+            self.play(dest_node.dehighlight())
+        else:
+            self.play(code_block.if_condition(is_true=False, wait_time=3))
+        self.play(code_block.highlight(5), run_time=speed) if animate_code_block else None
+
+
+    ##################################
+    # Shortest paths: Bellman-Ford
+    ##################################
+
+
+    def bellman_ford(self, graph, source=None, create_legend=True, show_horizontal_legend=False, animate_code_block=True, code_block=None, speed=1, hide_details=False):
+        speed = 1 / speed
+        if animate_code_block and not code_block:
+            code_block = CodeBlock(CODE_FOR_BELLMAN_FORD)
+            self.play(Create(code_block.code))
+        if create_legend:
+            l = Legend({(PINK4, PINK4): "shortest paths", (PINK4, PINK5): "min node v"}, is_horizontal=show_horizontal_legend)
+            l.mobjects.next_to(graph.graph_mobject, UP, buff=0.3)
+            self.play(l.animation)
+            self.wait()
+        self.play(code_block.highlight(1), run_time=speed) if animate_code_block else None
+        self.wait() if animate_code_block else None
+        self.play(code_block.highlight(2), run_time=speed) if animate_code_block else None
+        self.wait() if animate_code_block else None
+        self.initialize(graph, speed)
+
 
     ##################################
     # Construct
@@ -1258,33 +1424,32 @@ class Show(Scene):
         # self.shortest_paths_dijkstra(graph, source='Src', code_block=code_block, create_legend=False, hide_details=True)
         # self.wait(15)
 
-        # Compare Prim vs. Dijkstra
-        def title_group(title_text, legend_text):
-            name = Text(title_text, color=GRAY, font=FONT, weight=SEMIBOLD, font_size=SMALL_FONT_SIZE*2).scale(0.5)
-            l = Legend({(PINK4, PINK4): legend_text}, is_horizontal=True)
-            l.mobjects.next_to(name, RIGHT, buff=0.3)
-            return VGroup(name, l.mobjects)
+        # Compare Prim vs. Dijkstra (CH)
+        # def title_group(title_text, legend_text):
+        #     name = Text(title_text, color=GRAY, font=FONT, weight=SEMIBOLD, font_size=SMALL_FONT_SIZE*2).scale(0.5)
+        #     l = Legend({(PINK4, PINK4): legend_text}, is_horizontal=True)
+        #     l.mobjects.next_to(name, RIGHT, buff=0.3)
+        #     return VGroup(name, l.mobjects)
         # title_mobject = show_title_for_demo("PRIM'S VS. DIJKSTRA'S")
         # self.add(title_mobject)  
         # top_l = Legend({(PINK4, PINK5): "当前最近的点", (BACKGROUND, GREEN): "需要放松的点"}, is_horizontal=True)
         # top_l.mobjects.move_to(ORIGIN).to_edge(UP, buff=0.6)
         # self.play(top_l.animation)
-        prim_title = title_group("Prim's", "最小生成树")
-        prim_title.shift(LEFT * 4.1 + UP * 1.9)
-        dij_title = title_group("Dijkstra's", "最短路径")
-        dij_title.shift(RIGHT * 1.9 + UP * 1.9)
-        self.play(FadeIn(prim_title))
-        self.play(FadeIn(dij_title))
+        # prim_title = title_group("Prim's", "最小生成树")
+        # prim_title.shift(LEFT * 4.1 + UP * 1.9)
+        # dij_title = title_group("Dijkstra's", "最短路径")
+        # dij_title.shift(RIGHT * 1.9 + UP * 1.9)
+        # self.play(FadeIn(prim_title))
+        # self.play(FadeIn(dij_title))
         # self.wait()
-
         ## Prim
         # self.wait()
-        new_position = scale_position(POSITION_SQUARE, 1.8, 1.8)
+        # new_position = scale_position(POSITION_SQUARE, 1.8, 1.8)
         # # graph = GraphObject(MAP_SQUARE_1, new_position)
         # # graph = GraphObject(MAP_SQUARE_2, new_position)
-        graph = GraphObject(MAP_SQUARE_3, new_position)
-        graph.graph_mobject.scale(0.9).next_to(prim_title, DOWN, buff=0.5)
-        self.play(FadeIn(graph.graph_mobject))
+        # graph = GraphObject(MAP_SQUARE_3, new_position)
+        # graph.graph_mobject.scale(0.9).next_to(prim_title, DOWN, buff=0.5)
+        # self.play(FadeIn(graph.graph_mobject))
         # self.wait(3)
         # edges = self.mst_prim_queue(graph, source='A', create_legend=False, animate_code_block=False, hide_details=True, speed=1)
         # self.wait(5)
@@ -1292,15 +1457,14 @@ class Show(Scene):
         # fadeout_remain = [ e.fade_out() for e in nodes + edges]
         # self.play(*fadeout_remain)
         # self.wait()
-
         ## Dijkstra
-        self.wait()
-        new_position = scale_position(POSITION_SQUARE_SRC, 1.8, 1.8)
+        # self.wait()
+        # new_position = scale_position(POSITION_SQUARE_SRC, 1.8, 1.8)
         # # graph = GraphObject(MAP_SQUARE_SRC_1, new_position)
         # # graph = GraphObject(MAP_SQUARE_SRC_2, new_position)
-        graph = GraphObject(MAP_SQUARE_SRC_3, new_position)
-        graph.graph_mobject.scale(0.9).next_to(dij_title, DOWN, buff=0.5)
-        self.play(FadeIn(graph.graph_mobject))
+        # graph = GraphObject(MAP_SQUARE_SRC_3, new_position)
+        # graph.graph_mobject.scale(0.9).next_to(dij_title, DOWN, buff=0.5)
+        # self.play(FadeIn(graph.graph_mobject))
         # self.wait(3)
         # edges = self.shortest_paths_dijkstra(graph, source='Src', create_legend=False, animate_code_block=False, hide_details=True, speed=1)
         # self.wait(5)
@@ -1308,3 +1472,64 @@ class Show(Scene):
         # fadeout_remain = [ e.fade_out() for e in nodes + edges]
         # self.play(*fadeout_remain)
         # self.wait()
+
+        # Compare Prim vs. Dijkstra (EN)
+        def title_group(title_text, legend_text):
+            name = Text(title_text, color=GRAY, font=FONT, weight=SEMIBOLD, font_size=SMALL_FONT_SIZE*2).scale(0.5)
+            l = Legend({(PINK4, PINK4): legend_text}, is_horizontal=True)
+            l.mobjects.next_to(name, RIGHT, buff=0.3)
+            return VGroup(name, l.mobjects)
+        title_mobject = show_title_for_demo("PRIM'S VS. DIJKSTRA'S")
+        # self.add(title_mobject)  
+        top_l = Legend({(PINK4, PINK5): "nearest node", (BACKGROUND, GREEN): "node needs relaxation"}, is_horizontal=True)
+        top_l.mobjects.move_to(ORIGIN).to_edge(UP, buff=0.6)
+        # self.play(top_l.animation)
+        prim_title = title_group("Prim's", "MST")
+        prim_title.shift(LEFT * 4.1 + UP * 1.9)
+        dij_title = title_group("Dijkstra's", "shortest paths")
+        dij_title.shift(RIGHT * 1.9 + UP * 1.9)
+        # self.play(FadeIn(prim_title))
+        # self.play(FadeIn(dij_title))
+        # self.wait()
+        ## Prim
+        # self.wait()
+        new_position = scale_position(POSITION_SQUARE, 1.8, 1.8)
+        graph = GraphObject(MAP_SQUARE_1, new_position)
+        # graph = GraphObject(MAP_SQUARE_2, new_position)
+        # graph = GraphObject(MAP_SQUARE_3, new_position)
+        # graph.graph_mobject.scale(0.9).next_to(prim_title, DOWN, buff=0.5)
+        # self.play(FadeIn(graph.graph_mobject))
+        # self.wait(3)
+        # edges = self.mst_prim_queue(graph, source='A', create_legend=False, animate_code_block=False, hide_details=True, speed=1)
+        # self.wait(5)
+        # nodes = graph.get_nodes()
+        # fadeout_remain = [ e.fade_out() for e in nodes + edges]
+        # self.play(*fadeout_remain)
+        # self.wait()
+        ## Dijkstra
+        # self.wait()
+        # new_position = scale_position(POSITION_SQUARE_SRC, 1.8, 1.8)
+        # # graph = GraphObject(MAP_SQUARE_SRC_1, new_position)
+        # # graph = GraphObject(MAP_SQUARE_SRC_2, new_position)
+        # graph = GraphObject(MAP_SQUARE_SRC_3, new_position)
+        # graph.graph_mobject.scale(0.9).next_to(dij_title, DOWN, buff=0.5)
+        # self.play(FadeIn(graph.graph_mobject))
+        # self.wait(3)
+        # edges = self.shortest_paths_dijkstra(graph, source='Src', create_legend=False, animate_code_block=False, hide_details=True, speed=1)
+        # self.wait(5)
+        # nodes = graph.get_nodes()
+        # fadeout_remain = [ e.fade_out() for e in nodes + edges]
+        # self.play(*fadeout_remain)
+        # self.wait()
+
+        # Relax
+        # self.add(watermark_ch)
+        title_mobject = show_title_for_demo("放松一条边 ")
+        self.add(title_mobject)
+        self.wait()
+        new_position = scale_position(POSITION_RELAX, 2.8, 1)
+        graph_1 = GraphObject(MAP_RELAX, new_position)
+        graph_2 = GraphObject(MAP_RELAX, new_position)
+        self.add_sound('Firefly - Chris Haugen.mp3')
+        self.relax_for_video_only(graph_1, graph_2, source='u', dest='v', first=(1, 100), second=(1, 3), texts=('例子1: v 的键值降低', '例子2: v 的键值不变', '键值降低的点'), create_legend=True)
+        self.wait(15)

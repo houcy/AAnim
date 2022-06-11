@@ -48,18 +48,14 @@ class GraphNode:
         self.mobject = VDict([("c", self.circle_mobject), ("t", self.text_mobject)])
 
     def mobjects(self):
-        print(self.circle_mobject)
-        print(self.text_mobject)
-        print(self.key_mobject)
         m = VDict([("c", self.circle_mobject)])
         if self.text_mobject:
             m["t"] = self.text_mobject
         if self.key_mobject:
             m["k"] = self.key_mobject
-        print(m)
         return m
 
-    def initialize_key(self, key, show_value=True):
+    def initialize_key(self, key, show_value=False):
         animations = []
         key_string = ''
         if key == float('inf'):
@@ -71,14 +67,18 @@ class GraphNode:
             return
         self.key = key
         if show_value:
-            new_text_mobject = get_text(str(self.value), NODE_NAME_BACKGROUND_SIZE, color=NODE_NAME_BACKGROUND_COLOR, weight=NODE_NAME_BACKGROUND_WEIGHT).move_to(self.mobject.get_center()).set_fill(opacity=NODE_NAME_BACKGROUND_OPACITY).set_z_index(3)
+            new_text_mobject = None
+            if show_value == 'BACK':
+                new_text_mobject = get_text(str(self.value), NODE_NAME_BACKGROUND_SIZE, color=NODE_NAME_BACKGROUND_COLOR, weight=NODE_NAME_BACKGROUND_WEIGHT).move_to(self.mobject.get_center()).set_fill(opacity=NODE_NAME_BACKGROUND_OPACITY).set_z_index(3)
+            if show_value == 'TOP':
+                new_text_mobject = get_text(str(self.value), SMALL_FONT_SIZE, color=GRAY, weight=BOLD).next_to(self.mobject, UP, buff=0.15)
             animations.append(ReplacementTransform(self.text_mobject, new_text_mobject))
             self.text_mobject = new_text_mobject
-            self.key_mobject = get_text(key_string, font_size=KEY_SIZE, weight=BOLD).move_to(self.text_mobject.get_center()).set_z_index(5)
+            self.key_mobject = get_text(key_string, font_size=KEY_SIZE, weight=BOLD).move_to(self.circle_mobject.get_center()).set_z_index(5)
             animations.append(FadeIn(self.key_mobject))
         else:
             self.text_mobject.save_state()
-            self.key_mobject = get_text(key_string, font_size=KEY_SIZE, weight=BOLD).move_to(self.text_mobject.get_center()).set_z_index(5)
+            self.key_mobject = get_text(key_string, font_size=KEY_SIZE, weight=BOLD).move_to(self.circle_mobject.get_center()).set_z_index(5)
             animations.append(ReplacementTransform(self.text_mobject, self.key_mobject))
             self.text_mobject = None
         self.animations = animations    # If show_value is True, there will be 2 animations: Transform and FadeIn; Otherwise, only 1 animation
@@ -91,7 +91,7 @@ class GraphNode:
         self.key = key
         self.key_mobject = new_key_mobject
         self.animations = animations
-        return AnimationGroup(*animations, lag_ratios=1)
+        return AnimationGroup(*animations)
 
     def highlight_stroke(self, color=HIGHLIGHT_STROKE):
         """
@@ -170,8 +170,6 @@ class GraphNode:
             
     def fade_out(self):
         self.is_showing = False
-        print(self.value)
-        print("self.mobject()", self.mobjects())
         return FadeOut(self.mobjects())
 
     def fade_in(self):

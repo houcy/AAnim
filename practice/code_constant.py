@@ -50,8 +50,7 @@ CODE_FOR_BFS = """BFS(G, s) {
 """
 
 CODE2_FOR_BFS = """BFS(G, s) {
-    curr_level = ∅
-    next_level = ∅
+    curr_level, next_level = ∅, ∅
     ENQUEUE(curr_level, s)
     s.color = PINK
     while curr_level != ∅
@@ -151,7 +150,7 @@ CODE_FOR_DIJKASTRA_WITH_RELAX = """DIJKSTRA(G, s) {
 CODE_FOR_RELAX = """RELAX(u, v, weight) {
     if v.key > u.key + weight(u, v)
         v.key = u.key + weight(u, v)
-        v.minEdge = (v, u)
+        v.previous = u
 }
 """
 
@@ -182,5 +181,24 @@ CODE_FOR_DIJKASTRA_WITHOUT_RELAX_CH = """DIJKSTRA(G, s) {
             if u.key > v.key + weight(u, v)
                 u.key = v.key + weight(u, v)
                 u.previous = v
+}
+"""
+
+CODE_FOR_BELLMAN_FORD = """BELLMAN-FORD(G, s) {
+    UnReachSet = G.V
+    set all vertices v.key = ∞
+    set all vertices v.previous = ∅
+    s.key = 0
+    for i = 1 to |G.V| - 1
+        for each edge (v, u)
+            // Relax edge (v, u)
+            if u.key > v.key + weight(u, v)
+                u.key = v.key + weight(u, v)
+                u.previous = v
+    // Check negative cycle
+    for each edge (v, u)
+        if u.key > v.key + weight(u, v)
+            return FALSE
+    return True
 }
 """
