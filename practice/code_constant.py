@@ -190,15 +190,30 @@ CODE_FOR_BELLMAN_FORD = """BELLMAN-FORD(G, s) {
     set all vertices v.previous = ∅
     s.key = 0
     for i = 1 to |G.V| - 1
-        for each edge (v, u)
-            // Relax edge (v, u)
-            if u.key > v.key + weight(u, v)
-                u.key = v.key + weight(u, v)
-                u.previous = v
+        for each edge (u, v)
+            // Relax edge (u, v)
+            if v.key > u.key + weight(u, v)
+                v.key = u.key + weight(u, v)
+                v.previous = u
     // Check negative cycle
-    for each edge (v, u)
-        if u.key > v.key + weight(u, v)
+    for each edge (u, v)
+        if v.key > u.key + weight(u, v)
             return FALSE
-    return True
+    return TRUE
+}
+"""
+
+CODE_FOR_BELLMAN_FORD_WITH_RELAX = """BELLMAN-FORD(G, src) {
+    set all vertices v.key = ∞
+    set all vertices v.previous = ∅
+    src.key = 0
+    for i = 1 to |G.V| - 1
+        for each edge (u, v)
+            RELAX(u, v, weight(u, v))
+    // Check for a negative cycle
+    for each edge (u, v)
+        if v.key > u.key + weight(u, v)
+            return FALSE
+    return TRUE
 }
 """

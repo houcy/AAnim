@@ -5,7 +5,7 @@ from util import *
 
 # z_index: edge: 0, circle: 1, text: 3, key: 5
 class GraphNode:
-    def __init__(self, value, position_x, position_y, is_music_note=False):
+    def __init__(self, value, position_x, position_y, is_music_note=False, node_radius=RADIUS):
         self.value = value
         self.neighbor2edge = {}
         self.neighbors = []
@@ -15,7 +15,7 @@ class GraphNode:
         self.mobject = None
         self.text_mobject = None
         self.circle_mobject = None
-        self._create_mobject(is_music_note=is_music_note)
+        self._create_mobject(is_music_note=is_music_note, node_radius=node_radius)
         self.key = None
         self.key_mobject = None
         self.animations = None
@@ -24,12 +24,14 @@ class GraphNode:
         self.children = []  # for Union-Find
         self.is_isolated = True
         self.is_showing = False
+        self.variable_name = None
+        self.minEdge = None
     
-    def _create_mobject(self, is_music_note):
+    def _create_mobject(self, is_music_note, node_radius):
         """
         Convert a node to an MObject so that it shows on the canvas
         """
-        self.circle_mobject = Circle(radius=RADIUS).set_stroke(color=LINE_COLOR, width=WIDTH).set_fill(BACKGROUND, opacity=1.0).set_z_index(1).shift(RIGHT * self.position_x + UP * self.position_y)
+        self.circle_mobject = Circle(radius=node_radius).set_stroke(color=LINE_COLOR, width=WIDTH).set_fill(BACKGROUND, opacity=1.0).set_z_index(1).shift(RIGHT * self.position_x + UP * self.position_y)
         if not is_music_note:
             count_digit = len(str(self.value))
             font_size = VALUE_SIZE
@@ -176,6 +178,27 @@ class GraphNode:
         self.is_showing = True
         return FadeIn(self.mobject())
 
+    def fade_in_variable(self, variable_name, show_background=True, direction='UP'):
+        text = Text(variable_name, color=GRAY, font=FONT, weight=NORMAL, font_size=WEIGHT_SIZE).set_z_index(10).set_stroke(color=EDGE_STROKE_COLOR, width=EDGE_STROKE_WIDTH)
+        if direction == 'UP':
+            text.move_to(self.circle_mobject.get_top()).shift(UP * 0.22)
+        elif direction == 'LEFT':
+            text.move_to(self.circle_mobject.get_left()).shift(LEFT * 0.22)
+        elif direction == 'RIGHT':
+            text.move_to(self.circle_mobject.get_right()).shift(RIGHT * 0.22)
+        elif direction == 'DOWN':
+            text.move_to(self.circle_mobject.get_bottom()).shift(DOWN * 0.22)
+        side_length = VARIABLE_SQUARE_SIZE
+        text_background = Square(side_length=side_length).set_stroke(color=GRAY, width=2).set_fill(BACKGROUND, opacity=1.0).set_z_index(9).move_to(text.get_center())
+        self.variable_name = variable_name
+        if show_background:
+            self.variable_mobject = VDict([("text", text), ("text_background", text_background)])
+        else:
+            self.variable_mobject = VDict([("text", text)])
+        return FadeIn(self.variable_mobject)
+
+    def fade_out_variable(self):
+        return FadeOut(self.variable_mobject)
 
 class Test(Scene):
     def construct(self):

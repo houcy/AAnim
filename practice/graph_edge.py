@@ -59,17 +59,20 @@ class GraphEdge:
             return None
 
     def highlight(self, color=PINK4, width=EDGE_HIGHLIGHT_STROKE_WIDTH, change_tip_width=True):
-        if self.is_directed:
-            if self.is_curvy:
-                width = EDGE_HIGHLIGHT_STROKE_WIDTH_FOR_DIGRAPH_CURVY
-            else:
-                width = EDGE_HIGHLIGHT_STROKE_WIDTH_FOR_DIGRAPH
+        # if self.is_directed:
+        #     if self.is_curvy:
+        #         width = EDGE_HIGHLIGHT_STROKE_WIDTH_FOR_DIGRAPH_CURVY
+        #     else:
+        #         width = EDGE_HIGHLIGHT_STROKE_WIDTH_FOR_DIGRAPH
         self.mobject["line"].save_state()
         self.save_state = True
         if change_tip_width:
             return AnimationGroup(self.mobject["line"].animate.set_stroke(width=width).set_color(color=color))
         else:
-            return AnimationGroup(self.mobject["line"].animate.set_color(color=color), self.mobject["text"]["text"].set_color(color=color))
+            if self.weight:
+                return AnimationGroup(self.mobject["line"].animate.set_color(color=color), self.mobject["text"]["text"].set_color(color=color))
+            else:
+                return AnimationGroup(self.mobject["line"].animate.set_color(color=color))
 
 
     def dehighlight(self, color=GRAY, force_color=False):

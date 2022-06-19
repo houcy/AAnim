@@ -7,7 +7,6 @@ from legend import Legend
 from graph_edges_group import GraphEdgesGroup
 from graph_nodes_group import GraphNodesGroup
 from util import *
-from scale_position import *
 from union_find import UnionFind
 from color_generator import ColorGenerator
 import copy
@@ -26,8 +25,8 @@ MAP_HARD = {'A': {'B': 7, 'D': 8, 'G': 8}, 'B': {'A': 7, 'C': 5, 'D': 6}, 'C': {
 POSITION_HARD = {'A': (-4, -1), 'B': (-4, 0), 'C': (-4, 1), 'D': (-3, 0), 'E': (-2, 1), 'F': (-2, 0), 'G': (-2, -1), 'H': (-1, -1), 'I': (0, -1), 'J': (1, -1), 'K': (1, 0), 'L': (0, 0), 'M': (-1, 0), 'N': (-1, 1), 'O': (0, 1), 'P': (1, 1), 'Q': (2, 1), 'R': (3, 1), 'S': (4, 1), 'T': (3, 0), 'U': (3, -1)}
 
 # DIJKSTRA
-DIMAP_DIJKASTRA_CLRS = {'A': {'B': 10, 'E': 5}, 'B': {'C': 1, 'E': 2}, 'C': {'D': 4}, 'D': {'C': 6}, 'E': {'C': 9, 'D': 2, 'B': 3}}
-DIPOSITION_DIJKASTRA_CLRS = {'A': (1, 2), 'B': (2, 1), 'E': (0, 1), 'C': (2, 0), 'D': (0, 0)}
+DIMAP_DIJKASTRA_CLRS = {'Src': {'B': 10, 'E': 5}, 'B': {'C': 1, 'E': 2}, 'C': {'D': 4}, 'D': {'C': 6}, 'E': {'C': 9, 'D': 2, 'B': 3}}
+DIPOSITION_DIJKASTRA_CLRS = {'Src': (1, 2), 'B': (2, 1), 'E': (0, 1), 'C': (2, 0), 'D': (0, 0)}
 MAP_HARD_DIJKSTRA = {'Src': {'B': 7, 'D': 8, 'G': 8}, 'B': {'Src': 7, 'C': 5, 'D': 6}, 'C': {'B': 5, 'D': 5, 'E': 7}, 'D': {'C': 5, 'E': 3, 'Src': 8, 'B': 6, 'F': 5, 'G': 9}, 'E': {'D': 3, 'F': 2, 'C': 7, 'N': 8, 'M': 6}, 'F': {'E': 2, 'G': 5, 'D': 5, 'M': 7}, 'G': {'F': 5, 'H': 5, 'Src': 8, 'D': 9, 'M': 6}, 'H': {'G': 5, 'I': 5, 'M': 9}, 'P': {'Q': 5, 'O': 5, 'K': 8}, 'Q': {'P': 5, 'R': 5, 'K': 6, 'T': 7}, 'I': {'H': 5, 'J': 3, 'M': 6, 'L': 6, 'K': 9}, 'J': {'I': 3, 'K': 5, 'U': 6, 'T': 6}, 'K': {'J': 5, 'L': 3, 'P': 8, 'O': 5, 'I': 9, 'Q': 6, 'T': 9, 'U': 6}, 'L': {'K': 3, 'M': 3, 'O': 9, 'I': 6}, 'M': {'L': 3, 'N': 3, 'E': 6, 'F': 7, 'G': 6, 'O': 8, 'H': 9, 'I': 6}, 'N': {'M': 3, 'O': 2, 'E': 8}, 'O': {'N': 2, 'P': 5, 'L': 9, 'M': 8, 'K': 5}, 'R': {'Q': 5, 'S': 2, 'T': 5}, 'S': {'R': 2, 'T': 6}, 'T': {'R': 5, 'U': 3, 'K': 9, 'J': 6, 'S': 6, 'Q': 7}, 'U': {'T': 3, 'K': 6, 'J': 6}}
 POSITION_HARD_DIJKSTRA = {'Src': (-4, -1), 'B': (-4, 0), 'C': (-4, 1), 'D': (-3, 0), 'E': (-2, 1), 'F': (-2, 0), 'G': (-2, -1), 'H': (-1, -1), 'I': (0, -1), 'J': (1, -1), 'K': (1, 0), 'L': (0, 0), 'M': (-1, 0), 'N': (-1, 1), 'O': (0, 1), 'P': (1, 1), 'Q': (2, 1), 'R': (3, 1), 'S': (4, 1), 'T': (3, 0), 'U': (3, -1)}
 
@@ -803,17 +802,11 @@ class Show(Scene):
         self.play(code_block.highlight(3), run_time=speed) if animate_code_block else None
         self.wait() if animate_code_block else None
         # Accumulate animations for all nodes and show them at once
-
-        transforms = []
-        for node in graph.value2node.values():
-            node.initialize_key(float('inf'), show_value=False)
-            transforms += node.animations
-        self.play(*transforms, run_time=1.5*speed)
-
+        self.initialize(graph, speed)
         self.play(code_block.highlight(4), run_time=speed) if animate_code_block else None
         self.wait() if animate_code_block else None
         self.play(code_block.highlight(5), run_time=speed) if animate_code_block else None
-        self.wait()
+        self.wait() if animate_code_block else None
         if not source:
             source_node = graph.value2node.values()[0]
         else:
@@ -990,13 +983,13 @@ class Show(Scene):
         edge = graph.get_edge_from_value(source, dest)
         source_key, dest_key = first
         graph.graph_mobject.shift(3.5*RIGHT)
-        texts = title1, title2, legend
+        title1, title2, legend = texts
         title = Text(title1, color=GRAY, font=FONT, weight=BOLD, font_size=SMALL_FONT_SIZE).next_to(graph.graph_mobject, DOWN, buff=1)
         if not code_block:
             code_block = CodeBlock(CODE_FOR_RELAX)
             self.play(Create(code_block.code))
             self.wait(5)
-        self.play(FadeIn(graph.graph_mobject), FadeIn(title))
+        self.play(FadeIn(graph.fade_in()), FadeIn(title))
         self.wait(4)
         self.play(source_node.initialize_key(source_key, show_value='TOP'), dest_node.initialize_key(dest_key, show_value='TOP'))
         self.wait(3)
@@ -1010,7 +1003,7 @@ class Show(Scene):
         self.play(code_block.highlight(2), run_time=speed) if animate_code_block else None
         self.wait(2) if animate_code_block else None
         if dest_node.key > source_node.key + edge.weight:
-            self.play(code_block.if_condition(wait_time=4)) if animate_code_block else None
+            self.play(code_block.if_true(wait_time=4)) if animate_code_block else None
             self.play(code_block.highlight(3), run_time=speed) if animate_code_block else None
             self.wait(2) if animate_code_block else None
             self.play(dest_node.highlight(stroke_color=GREEN, stroke_width=NODE_HIGHLIGHT_STROKE_WIDTH))
@@ -1027,7 +1020,7 @@ class Show(Scene):
             self.play(FadeIn(new_text))
             self.wait(2) if animate_code_block else None 
         else:
-            self.play(code_block.if_condition(is_true=False, wait_time=4))
+            self.play(code_block.if_true(is_true=False, wait_time=4))
         self.play(code_block.highlight(5), run_time=speed) if animate_code_block else None
         self.wait(3)
         self.play(graph.fade_out(), FadeOut(new_text), FadeOut(title))
@@ -1049,7 +1042,7 @@ class Show(Scene):
         self.play(code_block.highlight(2), run_time=speed) if animate_code_block else None
         self.wait(3) if animate_code_block else None
         if dest_node.key > source_node.key + edge.weight:
-            self.play(code_block.if_condition(wait_time=3)) if animate_code_block else None
+            self.play(code_block.if_true(wait_time=3)) if animate_code_block else None
             self.play(code_block.highlight(3), run_time=speed) if animate_code_block else None
             self.wait(2) if animate_code_block else None
             self.play(dest_node.highlight(stroke_color=GREEN, stroke_width=NODE_HIGHLIGHT_STROKE_WIDTH))
@@ -1067,7 +1060,7 @@ class Show(Scene):
             self.wait(2) if animate_code_block else None
             self.play(dest_node.dehighlight())
         else:
-            self.play(code_block.if_condition(is_true=False, wait_time=3))
+            self.play(code_block.if_true(is_true=False, wait_time=3))
         self.play(code_block.highlight(5), run_time=speed) if animate_code_block else None
 
 
@@ -1076,21 +1069,75 @@ class Show(Scene):
     ##################################
 
 
-    def bellman_ford(self, graph, source=None, create_legend=True, show_horizontal_legend=False, animate_code_block=True, code_block=None, speed=1, hide_details=False):
+    def bellman_ford(self, graph, graph_position=(3.5, 0), graph_scale=1, source=None, create_graph=True, create_legend=True, show_horizontal_legend=False, animate_code_block=True, code_block=None, speed=1, hide_details=False):
         speed = 1 / speed
         if animate_code_block and not code_block:
-            code_block = CodeBlock(CODE_FOR_BELLMAN_FORD)
+            code_block = CodeBlock(CODE_FOR_BELLMAN_FORD_WITH_RELAX)
             self.play(Create(code_block.code))
+        if create_graph:
+            x_offset, y_offset = graph_position
+            # self.play(FadeIn(graph.graph_mobject.scale(graph_scale).shift(x_offset*RIGHT+y_offset*UP)))
+            self.play(graph.fade_in(graph_scale=graph_scale, x_offset=x_offset, y_offset=y_offset))
         if create_legend:
-            l = Legend({(PINK4, PINK4): "shortest paths", (PINK4, PINK5): "min node v"}, is_horizontal=show_horizontal_legend)
-            l.mobjects.next_to(graph.graph_mobject, UP, buff=0.3)
+            l = Legend({('LINE', PINK4, PINK4): "最短路径", ('LINE', GREEN, GREEN): "当前边", (BACKGROUND, GREEN): "键值降低的点"}, is_horizontal=True)
+            l.mobjects.next_to(graph.graph_mobject, UP, buff=0.5)
             self.play(l.animation)
             self.wait()
-        self.play(code_block.highlight(1), run_time=speed) if animate_code_block else None
-        self.wait() if animate_code_block else None
-        self.play(code_block.highlight(2), run_time=speed) if animate_code_block else None
-        self.wait() if animate_code_block else None
+        self.play(code_block.highlight(1, wait_time_after=2)) if animate_code_block else None
+        self.play(code_block.highlight(2, wait_time_after=2)) if animate_code_block else None
         self.initialize(graph, speed)
+        self.play(code_block.highlight(3, wait_time_after=2)) if animate_code_block else None
+        self.play(code_block.highlight(4, wait_time_after=2)) if animate_code_block else None
+        if not source:
+            source_node = graph.value2node.values()[0]
+        else:
+            source_node = graph.value2node[source]
+        self.play(source_node.update_key(0), run_time=1.5*speed)
+        edges = graph.get_edges()
+        for i in range(graph.n_nodes()):
+            self.play(code_block.highlight(5, wait_time_after=2)) if animate_code_block else None
+            for edge in edges:
+                source_node = edge.start_node
+                dest_node = edge.end_node
+                self.play(code_block.highlight(6, wait_time_after=2)) if animate_code_block else None
+                self.play(edge.highlight(color=GREEN), source_node.fade_in_variable('u', direction='DOWN'), dest_node.fade_in_variable('v', direction='DOWN'))
+                self.play(code_block.highlight(7, wait_time_after=2)) if animate_code_block else None
+                ### RELAX
+                if dest_node.key > source_node.key + edge.weight:
+                    self.play(dest_node.highlight(stroke_color=GREEN, stroke_width=NODE_HIGHLIGHT_STROKE_WIDTH))
+                    self.wait(2)
+                    new_key = source_node.key + edge.weight
+                    self.play(dest_node.update_key(new_key))
+                    self.wait(2)                        
+                    if dest_node.minEdge and dest_node.minEdge != edge:
+                        self.play(dest_node.minEdge.highlight(color=GRAY, width=WIDTH), edge.highlight(color=PINK4), dest_node.dehighlight(), source_node.fade_out_variable(), dest_node.fade_out_variable())
+                    else:
+                        self.play(edge.highlight(color=PINK4), dest_node.dehighlight(), source_node.fade_out_variable(), dest_node.fade_out_variable())
+                    dest_node.minEdge = edge
+                else:
+                    self.play(edge.dehighlight(), source_node.fade_out_variable(), dest_node.fade_out_variable())
+                self.wait(2)
+        ### Check for negative cycle
+        self.play(code_block.highlight(8, wait_time_after=2)) if animate_code_block else None
+        for edge in edges:
+            source_node = edge.start_node
+            dest_node = edge.end_node
+            self.play(code_block.highlight(9, wait_time_after=2)) if animate_code_block else None
+            self.play(edge.highlight(color=GREEN), source_node.fade_in_variable('u', direction='DOWN'), dest_node.fade_in_variable('v', direction='DOWN'))
+            self.wait()
+            self.play(code_block.highlight(10, wait_time_after=2)) if animate_code_block else None
+            if dest_node.key > source_node.key + edge.weight:
+                self.play(code_block.if_true(wait_time=3)) if animate_code_block else None
+                self.play(code_block.highlight(11, wait_time_after=2)) if animate_code_block else None
+                return False
+            else:
+                self.play(code_block.if_true(is_true=False, wait_time=3)) if animate_code_block else None
+            self.play(edge.dehighlight(), source_node.fade_out_variable(), dest_node.fade_out_variable())
+        self.play(code_block.highlight(12, wait_time_after=2)) if animate_code_block else None
+        self.play(code_block.highlight(13, wait_time_after=2)) if animate_code_block else None
+        return True
+
+
 
 
     ##################################
@@ -1103,7 +1150,7 @@ class Show(Scene):
     #     w = watermark()
     #     self.add(w)
         
-    #     graph = GraphObject(self.adjacency_list, self.position, self.is_directed)
+    #     graph = GraphObject(self.adjacency_list, self.position)
     #     if command == "prim":
     #         title_mobject = show_title_for_demo("PRIM'S ALGO FOR MST")
     #         self.add(title_mobject)
@@ -1138,7 +1185,7 @@ class Show(Scene):
         # self.bfs(graph, 'A')
 
         # Comment out DFS code
-        # graph = Graph(MAP_DIRECTED, POSITION2, is_directed=True)
+        # graph = Graph(MAP_DIRECTED, POSITION2)
         # self.add(graph.graph_mobject.shift(3.2 * RIGHT))
         # self.dfs(graph, True)
         
@@ -1155,6 +1202,7 @@ class Show(Scene):
         # self.mst_prim_basic(graph, create_legend=False, animate_code_block=False, code_block=None, speed=2)
         # self.wait(10)
 
+
         # Prim-basic create thumbnail
         # l = Legend({PINK1: "MST so far"})
         # l.mobjects.move_to(1.6*UP+1.7*RIGHT)
@@ -1162,6 +1210,7 @@ class Show(Scene):
         # graph = GraphObject(MAP_MST, POSITION_MST)
         # graph.graph_mobject.scale(0.9).shift(3.7*RIGHT)
         # self.add(l.mobjects, code_block.code, graph.graph_mobject)
+
 
         # Prim-queue
         # title_mobject = show_title_for_demo("PRIM'S ALGO FOR MST")
@@ -1172,6 +1221,7 @@ class Show(Scene):
         # self.play(FadeIn(graph.graph_mobject.scale(0.9).shift(3.3*RIGHT)))
         # self.mst_prim_queue(graph, source='A', code_block=code_block, hide_details=True)
         # self.wait(10)
+
 
         # Prim-queue-no-code
         # title_mobject = show_title_for_demo("PRIM'S ALGO FOR MST")
@@ -1186,6 +1236,7 @@ class Show(Scene):
         # self.mst_prim_queue(graph, source='A', create_legend=False, animate_code_block=False, hide_details=True, speed=2)
         # self.wait(10)
 
+
         # Prim-queue-no-code-Chinese
         # title_mobject = show_title_for_demo("PRIM 算法  ·  最小生成树")
         # self.add(title_mobject)
@@ -1198,6 +1249,7 @@ class Show(Scene):
         # self.play(l.animation)
         # self.mst_prim_queue(graph, source='A', create_legend=False, animate_code_block=False, hide_details=True, speed=2)
         # self.wait(10)
+
 
         # Kruskal-basic
         # title_mobject = show_title_for_demo("KRUSKAL'S ALGO FOR MST")
@@ -1212,6 +1264,7 @@ class Show(Scene):
         # self.mst_kruskal_basic(graph, code_block=code_block, create_legend=False)
         # self.wait(10)
 
+
         # Kruskal-basic-Chinese
         # title_mobject = show_title_for_demo("KRUSKAL 算法  ·  最小生成树")
         # self.add(title_mobject)
@@ -1224,6 +1277,7 @@ class Show(Scene):
         # self.play(l.animation)
         # self.mst_kruskal_basic(graph, code_block=code_block, create_legend=False)
         # self.wait(10)
+
 
         # Kruskal-basic-no-code
         # title_mobject = show_title_for_demo("KRUSKAL'S ALGO FOR MST")
@@ -1238,6 +1292,7 @@ class Show(Scene):
         # self.mst_kruskal_basic(graph, create_legend=False, animate_code_block=False, speed=2)
         # self.wait(10)
 
+
         # Kruskal-basic-no-code-Chinese
         # title_mobject = show_title_for_demo("KRUSKAL 算法  ·  最小生成树")
         # self.add(title_mobject)
@@ -1250,6 +1305,7 @@ class Show(Scene):
         # self.play(l.animation)
         # self.mst_kruskal_basic(graph, create_legend=False, animate_code_block=False, speed=2)
         # self.wait(10)
+
 
         # Kruskal-union-find
         # title_mobject = show_title_for_demo("KRUSKAL'S ALGO FOR MST")
@@ -1264,6 +1320,7 @@ class Show(Scene):
         # self.mst_kruskal_union_find(graph, code_block=code_block, create_legend=False)
         # self.wait(15)
 
+
         # Kruskal-union-find-Chinese
         # title_mobject = show_title_for_demo("KRUSKAL 算法  ·  最小生成树")
         # self.add(title_mobject)
@@ -1276,6 +1333,7 @@ class Show(Scene):
         # self.play(l.animation)
         # self.mst_kruskal_union_find(graph, code_block=code_block, create_legend=False)
         # self.wait(15)
+
 
         # Kruskal-union-find-no-code
         # title_mobject = show_title_for_demo("KRUSKAL'S ALGO FOR MST")
@@ -1290,6 +1348,7 @@ class Show(Scene):
         # self.mst_kruskal_union_find(graph, create_legend=False, animate_code_block=False, speed=2)
         # self.wait(15)
 
+
         # Kruskal-union-find-no-code-Chinese
         # title_mobject = show_title_for_demo("KRUSKAL 算法  ·  最小生成树")
         # self.add(title_mobject)
@@ -1303,13 +1362,14 @@ class Show(Scene):
         # self.mst_kruskal_union_find(graph, create_legend=False, animate_code_block=False, speed=2)
         # self.wait(15)
 
+
         # Dijkastra
         # title_mobject = show_title_for_demo("DIJKSTRA'S ALGO FOR SINGLE-SOURCE SHORTEST PATHS")
         # self.add(title_mobject)
         # code_block = CodeBlock(CODE_FOR_DIJKASTRA_WITHOUT_RELAX)
         # self.play(Create(code_block.code))
         # new_position = scale_position(DIPOSITION_DIJKASTRA_CLRS, 1.8, 2)
-        # graph = GraphObject(DIMAP_DIJKASTRA_CLRS, new_position, is_directed=True)
+        # graph = GraphObject(DIMAP_DIJKASTRA_CLRS, new_position)
         # self.play(FadeIn(graph.graph_mobject.scale(0.9).shift(3.5*RIGHT+0.4*DOWN)))
         # l = Legend({(PINK4, PINK4): "shortest paths", (PINK4, PINK5): "v", (BACKGROUND, GREEN): "u"}, is_horizontal=True)
         # l.mobjects.next_to(graph.graph_mobject, UP, buff=0.5)
@@ -1317,19 +1377,21 @@ class Show(Scene):
         # self.shortest_paths_dijkstra(graph, source='A', code_block=code_block, create_legend=False, hide_details=False)
         # self.wait(15)
 
+
         # Dijkastra-Chinese
         # title_mobject = show_title_for_demo("DIJKSTRA 算法  ·  单源最短路径")
         # self.add(title_mobject)
         # code_block = CodeBlock(CODE_FOR_DIJKASTRA_WITHOUT_RELAX)
         # self.play(Create(code_block.code))
         # new_position = scale_position(DIPOSITION_DIJKASTRA_CLRS, 1.8, 2)
-        # graph = GraphObject(DIMAP_DIJKASTRA_CLRS, new_position, is_directed=True)
+        # graph = GraphObject(DIMAP_DIJKASTRA_CLRS, new_position)
         # self.play(FadeIn(graph.graph_mobject.scale(0.9).shift(3.5*RIGHT+0.4*DOWN)))
         # l = Legend({(PINK4, PINK4): "最短路径", (PINK4, PINK5): "v", (BACKGROUND, GREEN): "u"}, is_horizontal=True)
         # l.mobjects.next_to(graph.graph_mobject, UP, buff=0.5)
         # self.play(l.animation)
         # self.shortest_paths_dijkstra(graph, source='A', code_block=code_block, create_legend=False, hide_details=False)
         # self.wait(15)
+
 
         # Dijkastra-no-code
         # title_mobject = show_title_for_demo("DIJKSTRA'S ALGO")
@@ -1345,6 +1407,7 @@ class Show(Scene):
         # self.shortest_paths_dijkstra(graph, source='Src', create_legend=False, animate_code_block=False, speed=2, hide_details=True)
         # self.wait(15)
 
+
         # Dijkastra-no-code-Chinese
         # title_mobject = show_title_for_demo("DIJKSTRA 算法  ·  单源最短路径")
         # self.add(title_mobject)
@@ -1357,6 +1420,7 @@ class Show(Scene):
         # self.wait()
         # self.shortest_paths_dijkstra(graph, source='A', create_legend=False, animate_code_block=False, speed=2, hide_details=True)
         # self.wait(15)
+
 
         # Dijkastra-negative-edge-Chinese
         # self.add(watermark_ch)
@@ -1391,6 +1455,7 @@ class Show(Scene):
         # self.shortest_paths_dijkstra(graph, source='始', code_block=code_block, create_legend=False, hide_details=True)
         # self.wait(15)
 
+
         # Dijkastra-negative-edge
         # self.add(watermark_en)
         # title_mobject = show_title_for_demo("DIJKSTRA'S ALGO")
@@ -1423,6 +1488,7 @@ class Show(Scene):
         # self.wait()
         # self.shortest_paths_dijkstra(graph, source='Src', code_block=code_block, create_legend=False, hide_details=True)
         # self.wait(15)
+
 
         # Compare Prim vs. Dijkstra (CH)
         # def title_group(title_text, legend_text):
@@ -1473,28 +1539,29 @@ class Show(Scene):
         # self.play(*fadeout_remain)
         # self.wait()
 
+
         # Compare Prim vs. Dijkstra (EN)
-        def title_group(title_text, legend_text):
-            name = Text(title_text, color=GRAY, font=FONT, weight=SEMIBOLD, font_size=SMALL_FONT_SIZE*2).scale(0.5)
-            l = Legend({(PINK4, PINK4): legend_text}, is_horizontal=True)
-            l.mobjects.next_to(name, RIGHT, buff=0.3)
-            return VGroup(name, l.mobjects)
-        title_mobject = show_title_for_demo("PRIM'S VS. DIJKSTRA'S")
+        # def title_group(title_text, legend_text):
+        #     name = Text(title_text, color=GRAY, font=FONT, weight=SEMIBOLD, font_size=SMALL_FONT_SIZE*2).scale(0.5)
+        #     l = Legend({(PINK4, PINK4): legend_text}, is_horizontal=True)
+        #     l.mobjects.next_to(name, RIGHT, buff=0.3)
+        #     return VGroup(name, l.mobjects)
+        # title_mobject = show_title_for_demo("PRIM'S VS. DIJKSTRA'S")
         # self.add(title_mobject)  
-        top_l = Legend({(PINK4, PINK5): "nearest node", (BACKGROUND, GREEN): "node needs relaxation"}, is_horizontal=True)
-        top_l.mobjects.move_to(ORIGIN).to_edge(UP, buff=0.6)
+        # top_l = Legend({(PINK4, PINK5): "nearest node", (BACKGROUND, GREEN): "node needs relaxation"}, is_horizontal=True)
+        # top_l.mobjects.move_to(ORIGIN).to_edge(UP, buff=0.6)
         # self.play(top_l.animation)
-        prim_title = title_group("Prim's", "MST")
-        prim_title.shift(LEFT * 4.1 + UP * 1.9)
-        dij_title = title_group("Dijkstra's", "shortest paths")
-        dij_title.shift(RIGHT * 1.9 + UP * 1.9)
+        # prim_title = title_group("Prim's", "MST")
+        # prim_title.shift(LEFT * 4.1 + UP * 1.9)
+        # dij_title = title_group("Dijkstra's", "shortest paths")
+        # dij_title.shift(RIGHT * 1.9 + UP * 1.9)
         # self.play(FadeIn(prim_title))
         # self.play(FadeIn(dij_title))
         # self.wait()
         ## Prim
         # self.wait()
-        new_position = scale_position(POSITION_SQUARE, 1.8, 1.8)
-        graph = GraphObject(MAP_SQUARE_1, new_position)
+        # new_position = scale_position(POSITION_SQUARE, 1.8, 1.8)
+        # graph = GraphObject(MAP_SQUARE_1, new_position)
         # graph = GraphObject(MAP_SQUARE_2, new_position)
         # graph = GraphObject(MAP_SQUARE_3, new_position)
         # graph.graph_mobject.scale(0.9).next_to(prim_title, DOWN, buff=0.5)
@@ -1522,14 +1589,39 @@ class Show(Scene):
         # self.play(*fadeout_remain)
         # self.wait()
 
-        # Relax
+
+        # Relaxation (CH)
         # self.add(watermark_ch)
-        title_mobject = show_title_for_demo("放松一条边 ")
+        # title_mobject = show_title_for_demo("放松一条边 ")
+        # self.add(title_mobject)
+        # self.wait()
+        # new_position = scale_position(POSITION_RELAX, 2.8, 1)
+        # graph_1 = GraphObject(MAP_RELAX, new_position)
+        # graph_2 = GraphObject(MAP_RELAX, new_position)
+        # self.add_sound('Firefly - Chris Haugen.mp3')
+        # self.relax_for_video_only(graph_1, graph_2, source='u', dest='v', first=(1, 100), second=(1, 3), texts=('例子1: v 的键值降低', '例子2: v 的键值不变', '键值降低的点'), create_legend=True)
+        # self.wait(4)
+        # self.clear()
+        # self.play(endding())
+        # self.wait(15)
+
+
+        # Bellman-Ford (CH)
+        self.add(watermark_ch)
+        title_mobject = show_title_for_demo("BELLMAN-FORD 算法  ·  单源最短路径")
         self.add(title_mobject)
         self.wait()
-        new_position = scale_position(POSITION_RELAX, 2.8, 1)
-        graph_1 = GraphObject(MAP_RELAX, new_position)
-        graph_2 = GraphObject(MAP_RELAX, new_position)
-        self.add_sound('Firefly - Chris Haugen.mp3')
-        self.relax_for_video_only(graph_1, graph_2, source='u', dest='v', first=(1, 100), second=(1, 3), texts=('例子1: v 的键值降低', '例子2: v 的键值不变', '键值降低的点'), create_legend=True)
+
+        # new_position = scale_position(DIPOSITION_DIJKASTRA_CLRS, 1.8, 2)
+        # graph = GraphObject(DIMAP_DIJKASTRA_CLRS, new_position)
+        # self.play(graph.fade_in())
+        # for node in graph.get_nodes():
+        #     self.play(node.fade_in_variable('u', show_background=True, direction='DOWN'))
+        
+        new_position = scale_position(POSITION_DIJKSTRA_NEGATIVE_EN, 1.3, 1.3)
+        graph = GraphObject(MAP_DIJKSTRA_NEGATIVE_EN, new_position)
+        self.bellman_ford(graph, graph_position=(3.5, -0.9), source='Src', create_graph=True, hide_details=False)
         self.wait(15)
+
+
+
