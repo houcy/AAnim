@@ -29,7 +29,7 @@ class CodeBlock():
         self.title = Text(title, color=LINE_COLOR, font="Karla").scale(TITLE_SIZE).set_z_index(2).next_to(self.code, UP, buff=0.5)
         return self.title
 
-    def highlight(self, line_number, n_lines=1):
+    def highlight(self, line_number, n_lines=1, wait_time_before=1, wait_time_after=1):
         """
         To highlight line 3 for example: self.play(code_instance.highlight(3))
         """
@@ -42,17 +42,17 @@ class CodeBlock():
             self.highlight_rect = RoundedRectangle(corner_radius=0.05, width=self.width+CODE_BLOCK_WIDTH_PADDING, height=self.line_height_include_spacing*n_lines+CODE_BLOCK_HEIGHT_PADDING).set_stroke(color=GRAY, width=BOX_STROKE_WIDTH).shift(SHIFT_LEFT_UNIT * LEFT + UP * (y_position))
             self.last_n_lines = n_lines
             self.code = VGroup(self.code, self.highlight_rect)
-            return AnimationGroup(FadeIn(self.highlight_rect), Wait(), lag_ratio=1)
+            return Succession(Wait(wait_time_before), FadeIn(self.highlight_rect), Wait(wait_time_after), lag_ratio=1)
         else:
             if self.last_n_lines == n_lines:
-                return AnimationGroup(Wait(), self.highlight_rect.animate.move_to(SHIFT_LEFT_UNIT * LEFT + UP * (y_position)), Wait(), lag_ratio=1)
+                return Succession(Wait(wait_time_before), self.highlight_rect.animate.move_to(SHIFT_LEFT_UNIT * LEFT + UP * (y_position)), Wait(wait_time_after), lag_ratio=1)
             else:
                 self.last_n_lines = n_lines
                 last_highlight_rect = self.highlight_rect
                 self.highlight_rect = RoundedRectangle(corner_radius=0.05, width=self.width+CODE_BLOCK_WIDTH_PADDING, height=self.line_height_include_spacing*n_lines+CODE_BLOCK_HEIGHT_PADDING).set_stroke(color=GRAY, width=BOX_STROKE_WIDTH).shift(SHIFT_LEFT_UNIT * LEFT + UP * (y_position))
-                return AnimationGroup(Wait(), ReplacementTransform(last_highlight_rect, self.highlight_rect), Wait(), lag_ratio=1)
+                return Succession(Wait(wait_time_before), ReplacementTransform(last_highlight_rect, self.highlight_rect), Wait(wait_time_after), lag_ratio=1)
 
-    def if_condition(self, is_true=True, wait_time=1):
+    def if_true(self, is_true=True, wait_time=1):
         mark = None
         if is_true:
             mark = SVGMobject("check.svg", height=0.2).set_fill(color=GREEN).next_to(self.highlight_rect, RIGHT, buff=0.2)

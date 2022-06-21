@@ -34,6 +34,8 @@ MAP_DIJKSTRA_NEGATIVE_CH = {'始': {'B': 2, 'C': 1}, 'B': {'C': -100}}
 POSITION_DIJKSTRA_NEGATIVE_CH = {'始': (0, 1.73), 'B': (-1, 0), 'C': (1, 0)}
 MAP_DIJKSTRA_NEGATIVE_EN = {'Src': {'B': 2, 'C': 1}, 'B': {'C': -100}}
 POSITION_DIJKSTRA_NEGATIVE_EN = {'Src': (0, 1.73), 'B': (-1, 0), 'C': (1, 0)}
+MAP_TRIANGLE_NEGATIVE_CYCLE = {'Src': {'B': 2}, 'B': {'C': -100}, 'C': {'Src': 1}}
+POSITION_TRIANGLE_NEGATIVE_CYCLE = {'Src': (0, 1.73), 'B': (-1, 0), 'C': (1, 0)}
 
 # RELAX - SIMPLE
 MAP_RELAX = {'u': {'v': 2}}
@@ -988,9 +990,9 @@ class Show(Scene):
         if not code_block:
             code_block = CodeBlock(CODE_FOR_RELAX)
             self.play(Create(code_block.code))
-            self.wait(5)
-        self.play(FadeIn(graph.fade_in()), FadeIn(title))
-        self.wait(4)
+            self.wait(2)
+        self.play(graph.fade_in(), FadeIn(title))
+        self.wait(3)
         self.play(source_node.initialize_key(source_key, show_value='TOP'), dest_node.initialize_key(dest_key, show_value='TOP'))
         self.wait(3)
         if create_legend:
@@ -998,21 +1000,17 @@ class Show(Scene):
             l.mobjects.next_to(graph.graph_mobject, UP, buff=0.8)
             self.play(l.animation)
             self.wait(2)
-        self.play(code_block.highlight(1), run_time=speed) if animate_code_block else None
-        self.wait(2) if animate_code_block else None
-        self.play(code_block.highlight(2), run_time=speed) if animate_code_block else None
-        self.wait(2) if animate_code_block else None
+        self.play(code_block.highlight(1, wait_time_after=2)) if animate_code_block else None
+        self.play(code_block.highlight(2, wait_time_after=2)) if animate_code_block else None
         if dest_node.key > source_node.key + edge.weight:
             self.play(code_block.if_true(wait_time=4)) if animate_code_block else None
-            self.play(code_block.highlight(3), run_time=speed) if animate_code_block else None
-            self.wait(2) if animate_code_block else None
+            self.play(code_block.highlight(3, wait_time_after=2)) if animate_code_block else None
             self.play(dest_node.highlight(stroke_color=GREEN, stroke_width=NODE_HIGHLIGHT_STROKE_WIDTH))
             self.wait(2) if animate_code_block else None
             new_key = source_node.key + edge.weight
             self.play(dest_node.update_key(new_key), run_time=2)
             self.wait(2) if animate_code_block else None
-            self.play(code_block.highlight(4), run_time=speed) if animate_code_block else None
-            self.wait(2) if animate_code_block else None
+            self.play(code_block.highlight(4, wait_time_after=2)) if animate_code_block else None
             dest_node.minEdge = edge
             string = 'prev: '
             string += source
@@ -1021,8 +1019,7 @@ class Show(Scene):
             self.wait(2) if animate_code_block else None 
         else:
             self.play(code_block.if_true(is_true=False, wait_time=4))
-        self.play(code_block.highlight(5), run_time=speed) if animate_code_block else None
-        self.wait(3)
+        self.play(code_block.highlight(5, wait_time_after=2)) if animate_code_block else None
         self.play(graph.fade_out(), FadeOut(new_text), FadeOut(title))
         self.wait()
         
@@ -1034,24 +1031,20 @@ class Show(Scene):
         graph.graph_mobject.shift(3.5*RIGHT)
         title = Text(title2, color=GRAY, font=FONT, weight=BOLD, font_size=SMALL_FONT_SIZE).next_to(graph.graph_mobject, DOWN, buff=1)
         self.play(FadeIn(graph.graph_mobject), FadeIn(title))
-        self.wait(4)
+        self.wait(3)
         self.play(source_node.initialize_key(source_key, show_value='TOP'), dest_node.initialize_key(dest_key, show_value='TOP'))
         self.wait(3)
-        self.play(code_block.highlight(1), run_time=speed) if animate_code_block else None
-        self.wait(2) if animate_code_block else None
-        self.play(code_block.highlight(2), run_time=speed) if animate_code_block else None
-        self.wait(3) if animate_code_block else None
+        self.play(code_block.highlight(1, wait_time_after=2)) if animate_code_block else None
+        self.play(code_block.highlight(2, wait_time_after=2)) if animate_code_block else None
         if dest_node.key > source_node.key + edge.weight:
             self.play(code_block.if_true(wait_time=3)) if animate_code_block else None
-            self.play(code_block.highlight(3), run_time=speed) if animate_code_block else None
-            self.wait(2) if animate_code_block else None
+            self.play(code_block.highlight(3, wait_time_after=2)) if animate_code_block else None
             self.play(dest_node.highlight(stroke_color=GREEN, stroke_width=NODE_HIGHLIGHT_STROKE_WIDTH))
             self.wait(2) if animate_code_block else None
             new_key = source_node.key + edge.weight
             self.play(dest_node.update_key(new_key), run_time=2)
             self.wait(2) if animate_code_block else None
-            self.play(code_block.highlight(4), run_time=speed) if animate_code_block else None
-            self.wait(2) if animate_code_block else None
+            self.play(code_block.highlight(4, wait_time_after=2)) if animate_code_block else None
             dest_node.minEdge = edge
             string = 'prev: '
             string += source
@@ -1061,7 +1054,7 @@ class Show(Scene):
             self.play(dest_node.dehighlight())
         else:
             self.play(code_block.if_true(is_true=False, wait_time=3))
-        self.play(code_block.highlight(5), run_time=speed) if animate_code_block else None
+        self.play(code_block.highlight(5, wait_time_after=2)) if animate_code_block else None
 
 
     ##################################
@@ -1083,6 +1076,7 @@ class Show(Scene):
             l.mobjects.next_to(graph.graph_mobject, UP, buff=0.5)
             self.play(l.animation)
             self.wait()
+        # self.add_sound('August23.mp3')
         self.play(code_block.highlight(1, wait_time_after=2)) if animate_code_block else None
         self.play(code_block.highlight(2, wait_time_after=2)) if animate_code_block else None
         self.initialize(graph, speed)
@@ -1606,22 +1600,42 @@ class Show(Scene):
         # self.wait(15)
 
 
-        # Bellman-Ford (CH)
-        self.add(watermark_ch)
-        title_mobject = show_title_for_demo("BELLMAN-FORD 算法  ·  单源最短路径")
+        # Relaxation (EN)
+        self.add(watermark_en)
+        title_mobject = show_title_for_demo("Relaxation")
         self.add(title_mobject)
-        self.wait()
+        new_position = scale_position(POSITION_RELAX, 2.8, 1)
+        graph_1 = GraphObject(MAP_RELAX, new_position)
+        graph_2 = GraphObject(MAP_RELAX, new_position)
+        self.add_sound('Firefly - Chris Haugen.mp3')
+        self.relax_for_video_only(graph_1, graph_2, source='u', dest='v', first=(1, 100), second=(1, 3), texts=('E.g.1: v.key decreased', 'E.g.2: v.key unchanged', 'node needs decrease-key'), create_legend=True)
+        # self.wait(2)
+        # self.clear()
+        # self.play(endding(is_chinese=False))
+        self.wait(15)
 
+
+        # Bellman-Ford (CH)
+        # self.add(watermark_ch)
+        # title_mobject = show_title_for_demo("BELLMAN-FORD 算法  ·  单源最短路径")
+        # self.add(title_mobject)
+        # self.wait()
+        # new_position = scale_position(POSITION_DIJKSTRA_NEGATIVE_EN, 1.3, 1.3)
+        # graph = GraphObject(MAP_DIJKSTRA_NEGATIVE_EN, new_position)
+        ### Negative cycle
+        # new_position = scale_position(POSITION_TRIANGLE_NEGATIVE_CYCLE, 1.3, 1.3)
+        # graph = GraphObject(MAP_TRIANGLE_NEGATIVE_CYCLE, new_position)
+        # self.bellman_ford(graph, graph_position=(3.5, -0.6), source='Src', create_graph=True, hide_details=False)
+        # self.wait(4)
+        # self.clear()
+        # self.play(endding())
+        # self.wait(15)
+        ## For testing the tag only
         # new_position = scale_position(DIPOSITION_DIJKASTRA_CLRS, 1.8, 2)
         # graph = GraphObject(DIMAP_DIJKASTRA_CLRS, new_position)
         # self.play(graph.fade_in())
         # for node in graph.get_nodes():
         #     self.play(node.fade_in_variable('u', show_background=True, direction='DOWN'))
-        
-        new_position = scale_position(POSITION_DIJKSTRA_NEGATIVE_EN, 1.3, 1.3)
-        graph = GraphObject(MAP_DIJKSTRA_NEGATIVE_EN, new_position)
-        self.bellman_ford(graph, graph_position=(3.5, -0.9), source='Src', create_graph=True, hide_details=False)
-        self.wait(15)
 
 
 

@@ -22,7 +22,7 @@ POSITION_CYCLE3 = {'A': (-2, -2), 'B': (2, 2)}
 MAP_CYCLE = {'A': {'B': 3}, 'B': {'A': 2}}
 
 class GraphObject:
-    def __init__(self, adjacency_list, position, is_topological_graph=False, edge_radius=RADIUS):
+    def __init__(self, adjacency_list, position, is_topological_graph=False, edge_radius=RADIUS, node_radius=RADIUS, is_cyclic=False):
         self.graph_mobject = VGroup()
         self.value2node = {}
         visited_edge = set()
@@ -33,11 +33,11 @@ class GraphObject:
         for start in self.adjacency_list:
             if start not in self.value2node:
                 position_x, position_y = position[start]
-                self._create_node(start, position_x, position_y)
+                self._create_node(start, position_x, position_y, node_radius)
             for end in self.adjacency_list[start]:
                 if end not in self.value2node:
                     position_x, position_y = position[end]
-                    self._create_node(end, position_x, position_y)
+                    self._create_node(end, position_x, position_y, node_radius)
                 is_directed = True
                 not_created = True
                 # Not directed
@@ -46,7 +46,7 @@ class GraphObject:
                     if (end, start) in visited_edge:
                         not_created = False
                 if is_directed or (not is_directed and not_created):
-                    self._create_edge(start, end, is_directed, is_topological_graph, edge_radius)
+                    self._create_edge(start, end, is_directed, is_topological_graph, edge_radius, is_cyclic=is_cyclic)
                     visited_edge.add((start, end))
         self.graph_mobject = self.graph_mobject.move_to(ORIGIN)
 
@@ -62,6 +62,9 @@ class GraphObject:
     def get_nodes(self):
         return list(self.value2node.values())
 
+    def fade_in(self, graph_scale=1, x_offset=0, y_offset=0):
+        return FadeIn(self.graph_mobject.scale(graph_scale).shift(x_offset*RIGHT+y_offset*UP))
+
     def fade_out(self):
         return AnimationGroup(*[e.fade_out() for e in self.get_nodes() + self.get_edges()])
     
@@ -71,8 +74,8 @@ class GraphObject:
     def n_edges(self):
         return len(self.edges)
                 
-    def _create_node(self, value, position_x, position_y):
-        node = GraphNode(value, position_x, position_y)
+    def _create_node(self, value, position_x, position_y, node_radius):
+        node = GraphNode(value, position_x, position_y, node_radius=node_radius)
         self.value2node[value] = node
         self.graph_mobject += node.mobject
 
@@ -82,11 +85,10 @@ class GraphObject:
     def get_edge_from_value(self, start_value, end_value):
         return self.nodes2edge[(self.value2node[start_value], self.value2node[end_value])]
 
-    def _create_edge(self, start, end, is_directed, is_topological_graph, edge_radius):
+    def _create_edge(self, start, end, is_directed, is_topological_graph, edge_radius, is_cyclic=False):
         start_node = self.value2node[start]
         end_node = self.value2node[end]
         weight = self.adjacency_list[start][end]
-        is_cyclic = False
         # if start -> end && end -> strt, we need to use curved edges
         if end in self.adjacency_list and start in self.adjacency_list[end]:
             is_cyclic = True

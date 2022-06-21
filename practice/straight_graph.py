@@ -6,7 +6,7 @@ from graph_node import GraphNode
 from graph_edge import GraphEdge
 
 class StraightGraph:
-    def __init__(self, adjacency_list, values, is_music_note=False):
+    def __init__(self, adjacency_list, values, is_music_note=False, edge_radius=EDGE_RADIUS, node_radius=RADIUS):
         self.node_mobject = VGroup()
         self.edge_mobject = VGroup()
         self.value2node = {}
@@ -23,31 +23,32 @@ class StraightGraph:
         positions = generate_positions(values)
         for node_value in values:
             position_x, position_y = positions[node_value]
-            self._create_node(node_value, position_x, position_y, is_music_note=is_music_note)
+            self._create_node(node_value, position_x, position_y, is_music_note=is_music_note, node_radius=node_radius)
         self.curr_center_index = (self.n_nodes() - 1) // 2
         # for n in self.nodes2edge:
         #     print(n.get_center())
         for start in self.adjacency_list:
             for end in self.adjacency_list[start]:
                 if (start, end) not in visited_edge:
-                    self._create_edge(start, end)
+                    self._create_edge(start, end, edge_radius=edge_radius)
                     visited_edge.add((start, end))
                     start_node = self.value2node[start]
                     end_node = self.value2node[end]
                     start_node.is_isolated = False
                     end_node.is_isolated = False
 
-    def _create_node(self, value, position_x, position_y, is_music_note=False):
-        node = GraphNode(value, position_x, position_y, is_music_note=is_music_note)
+    def _create_node(self, value, position_x, position_y, is_music_note=False, node_radius=RADIUS):
+        print(is_music_note, node_radius)
+        node = GraphNode(value, position_x, position_y, is_music_note=is_music_note, node_radius=node_radius)
         self.value2node[value] = node
         self.node_mobject += node.mobject
         
-    def _create_edge(self, start, end):
+    def _create_edge(self, start, end, edge_radius):
         # new
         start_node = self.value2node[start]
         end_node = self.value2node[end]
         weight = self.adjacency_list[start][end]
-        edge_object = GraphEdge(start_node, end_node, weight, is_cyclic=True, is_directed=True, is_straight_graph=True)
+        edge_object = GraphEdge(start_node, end_node, weight, is_cyclic=True, is_directed=True, is_straight_graph=True, edge_radius=edge_radius)
         start_node.neighbor2edge[end_node] = edge_object
         start_node.neighbors.append(end_node)
         start_node.edges.append(edge_object)
