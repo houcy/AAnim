@@ -25,7 +25,7 @@ class GraphNode:
         self.is_isolated = True
         self.is_showing = False
         self.variable_name = None
-        self.minEdge = None
+        self.min_edge = None
     
     def _create_mobject(self, is_music_note, node_radius):
         """
@@ -35,8 +35,8 @@ class GraphNode:
         if not is_music_note:
             count_digit = len(str(self.value))
             font_size = VALUE_SIZE
-            if count_digit >= 3:
-                font_size = font_size - (count_digit - 2) * 5
+            # if count_digit >= 3:
+            #     font_size = font_size - (count_digit - 2) * 5
             self.text_mobject = Text(str(self.value), color=LINE_COLOR, font=FONT, weight=BOLD, font_size=font_size).set_z_index(3).shift(self.circle_mobject.get_center())
 
         else:
@@ -189,7 +189,7 @@ class GraphNode:
         elif direction == 'DOWN':
             text.move_to(self.circle_mobject.get_bottom()).shift(DOWN * 0.22)
         side_length = VARIABLE_SQUARE_SIZE
-        text_background = Square(side_length=side_length).set_stroke(color=GRAY, width=2).set_fill(BACKGROUND, opacity=1.0).set_z_index(9).move_to(text.get_center())
+        text_background = RoundedRectangle(corner_radius=0.05, width=side_length, height=side_length).set_stroke(color=GRAY, width=2).set_fill(BACKGROUND, opacity=1.0).set_z_index(9).move_to(text.get_center())
         self.variable_name = variable_name
         if show_background:
             self.variable_mobject = VDict([("text", text), ("text_background", text_background)])

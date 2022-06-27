@@ -35,7 +35,7 @@ class Legend:
                         inside += text
             elif feature[0] == "LINE":
                 _, fill_color, stroke_color = feature
-                line = Line(start=[0, 0.12, 0], end=[0, -0.12, 0]).set_fill(fill_color, 1).set_stroke(stroke_color, width=10)
+                line = Line(start=[0, 0, 0], end=[0.21, 0, 0]).set_fill(fill_color, 1).set_stroke(stroke_color, width=10)
                 text = Text(str(explanation), color=LINE_COLOR, font=FONT, font_size=LEGEND_SIZE*2).scale(0.5).next_to(line, RIGHT, buff=2)
                 if is_horizontal or save_space:
                     row = VGroup(line, text).arrange_in_grid(rows=1, buff=LEGEND_BUFF_MICRO)
