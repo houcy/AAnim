@@ -35,8 +35,8 @@ class GraphNode:
         if not is_music_note:
             count_digit = len(str(self.value))
             font_size = VALUE_SIZE
-            # if count_digit >= 3:
-            #     font_size = font_size - (count_digit - 2) * 5
+            if count_digit >= 3:
+                font_size = font_size - (count_digit - 2) * 5
             self.text_mobject = Text(str(self.value), color=LINE_COLOR, font=FONT, weight=BOLD, font_size=font_size).set_z_index(3).shift(self.circle_mobject.get_center())
 
         else:

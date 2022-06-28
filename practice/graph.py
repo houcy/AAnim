@@ -56,8 +56,12 @@ class GraphObject:
     def get_node_names(self):
         return list(self.value2node.keys())
 
-    def get_edges(self):
+    def get_edges_no_duplicate(self):
         return self.edges
+
+    def get_edges_duplicate(self):
+        # For an undirected eedge, count it twice: start -> end, end -> start
+        pass
 
     def get_nodes(self):
         return list(self.value2node.values())

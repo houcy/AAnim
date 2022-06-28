@@ -21,10 +21,10 @@ BFS_POSITION = {'A': (1.2692307692307692, 3.0), 'B': (0.8076923076923077, 2.0769
 MAP_MST = {'A': {'B': 4, 'H': 8}, 'B': {'A': 4, 'C': 8, 'H': 11}, 'H': {'A': 8, 'B': 11, 'G': 1, 'I': 7}, 'C': {'B': 8, 'D': 7, 'I': 2, 'F': 4}, 'D': {'C': 7, 'F': 14, 'E': 9}, 'I': {'C': 2, 'G': 6, 'H': 7}, 'F': {'C': 4, 'G': 2, 'D': 14, 'E': 10}, 'G': {'I': 6, 'F': 2, 'H': 1}, 'E': {'D': 9, 'F': 10}}
 POSITION_MST = {'A': (0.7, 0.6), 'B': (1.4402327576560112, 2.1393785668991754), 'H': (2.5, -0.1), 'C': (2.9889216307956286, 3.1086575403782315), 'D': (4.368905964414935, 4.2), 'I': (3.082024693200045, 1.457062926629117), 'F': (4.744899101048156, 2.3), 'G': (4.4, 0.5), 'E': (6.0, 3.649819090603902)}
 
-MAP_HARD = {'A': {'B': 7, 'D': 8, 'G': 8}, 'B': {'A': 7, 'C': 5, 'D': 6}, 'C': {'B': 5, 'D': 5, 'E': 7}, 'D': {'C': 5, 'E': 3, 'A': 8, 'B': 6, 'F': 5, 'G': 9}, 'E': {'D': 3, 'F': 2, 'C': 7, 'N': 8, 'M': 6}, 'F': {'E': 2, 'G': 5, 'D': 5, 'M': 7}, 'G': {'F': 5, 'H': 5, 'A': 8, 'D': 9, 'M': 6}, 'H': {'G': 5, 'I': 5, 'M': 9}, 'P': {'Q': 5, 'O': 5, 'K': 8}, 'Q': {'P': 5, 'R': 5, 'K': 6, 'T': 7}, 'I': {'H': 5, 'J': 3, 'M': 6, 'L': 6, 'K': 9}, 'J': {'I': 3, 'K': 5, 'U': 6, 'T': 6}, 'K': {'J': 5, 'L': 3, 'P': 8, 'O': 5, 'I': 9, 'Q': 6, 'T': 9, 'U': 6}, 'L': {'K': 3, 'M': 3, 'O': 9, 'I': 6}, 'M': {'L': 3, 'N': 3, 'E': 6, 'F': 7, 'G': 6, 'O': 8, 'H': 9, 'I': 6}, 'N': {'M': 3, 'O': 2, 'E': 8}, 'O': {'N': 2, 'P': 5, 'L': 9, 'M': 8, 'K': 5}, 'R': {'Q': 5, 'S': 2, 'T': 5}, 'S': {'R': 2, 'T': 6}, 'T': {'R': 5, 'U': 3, 'K': 9, 'J': 6, 'S': 6, 'Q': 7}, 'U': {'T': 3, 'K': 6, 'J': 6}}
-POSITION_HARD = {'A': (-4, -1), 'B': (-4, 0), 'C': (-4, 1), 'D': (-3, 0), 'E': (-2, 1), 'F': (-2, 0), 'G': (-2, -1), 'H': (-1, -1), 'I': (0, -1), 'J': (1, -1), 'K': (1, 0), 'L': (0, 0), 'M': (-1, 0), 'N': (-1, 1), 'O': (0, 1), 'P': (1, 1), 'Q': (2, 1), 'R': (3, 1), 'S': (4, 1), 'T': (3, 0), 'U': (3, -1)}
+MAP_HARD = {'Src': {'B': 7, 'D': 8, 'G': 8}, 'B': {'Src': 7, 'C': 5, 'D': 6}, 'C': {'B': 5, 'D': 5, 'E': 7}, 'D': {'C': 5, 'E': 3, 'Src': 8, 'B': 6, 'F': 5, 'G': 9}, 'E': {'D': 3, 'F': 2, 'C': 7, 'N': 8, 'M': 6}, 'F': {'E': 2, 'G': 5, 'D': 5, 'M': 7}, 'G': {'F': 5, 'H': 5, 'Src': 8, 'D': 9, 'M': 6}, 'H': {'G': 5, 'I': 5, 'M': 9}, 'P': {'Q': 5, 'O': 5, 'K': 8}, 'Q': {'P': 5, 'R': 5, 'K': 6, 'T': 7}, 'I': {'H': 5, 'J': 3, 'M': 6, 'L': 6, 'K': 9}, 'J': {'I': 3, 'K': 5, 'U': 6, 'T': 6}, 'K': {'J': 5, 'L': 3, 'P': 8, 'O': 5, 'I': 9, 'Q': 6, 'T': 9, 'U': 6}, 'L': {'K': 3, 'M': 3, 'O': 9, 'I': 6}, 'M': {'L': 3, 'N': 3, 'E': 6, 'F': 7, 'G': 6, 'O': 8, 'H': 9, 'I': 6}, 'N': {'M': 3, 'O': 2, 'E': 8}, 'O': {'N': 2, 'P': 5, 'L': 9, 'M': 8, 'K': 5}, 'R': {'Q': 5, 'S': 2, 'T': 5}, 'S': {'R': 2, 'T': 6}, 'T': {'R': 5, 'U': 3, 'K': 9, 'J': 6, 'S': 6, 'Q': 7}, 'U': {'T': 3, 'K': 6, 'J': 6}}
+POSITION_HARD = {'Src': (-4, -1), 'B': (-4, 0), 'C': (-4, 1), 'D': (-3, 0), 'E': (-2, 1), 'F': (-2, 0), 'G': (-2, -1), 'H': (-1, -1), 'I': (0, -1), 'J': (1, -1), 'K': (1, 0), 'L': (0, 0), 'M': (-1, 0), 'N': (-1, 1), 'O': (0, 1), 'P': (1, 1), 'Q': (2, 1), 'R': (3, 1), 'S': (4, 1), 'T': (3, 0), 'U': (3, -1)}
 
-# DIJKSTRA
+# DIJKSTRSA
 DIMAP_DIJKASTRA_CLRS = {'Src': {'B': 10, 'E': 5}, 'B': {'C': 1, 'E': 2}, 'C': {'D': 4}, 'D': {'C': 6}, 'E': {'C': 9, 'D': 2, 'B': 3}}
 DIPOSITION_DIJKASTRA_CLRS = {'Src': (1, 2), 'B': (2, 1), 'E': (0, 1), 'C': (2, 0), 'D': (0, 0)}
 MAP_HARD_DIJKSTRA = {'Src': {'B': 7, 'D': 8, 'G': 8}, 'B': {'Src': 7, 'C': 5, 'D': 6}, 'C': {'B': 5, 'D': 5, 'E': 7}, 'D': {'C': 5, 'E': 3, 'Src': 8, 'B': 6, 'F': 5, 'G': 9}, 'E': {'D': 3, 'F': 2, 'C': 7, 'N': 8, 'M': 6}, 'F': {'E': 2, 'G': 5, 'D': 5, 'M': 7}, 'G': {'F': 5, 'H': 5, 'Src': 8, 'D': 9, 'M': 6}, 'H': {'G': 5, 'I': 5, 'M': 9}, 'P': {'Q': 5, 'O': 5, 'K': 8}, 'Q': {'P': 5, 'R': 5, 'K': 6, 'T': 7}, 'I': {'H': 5, 'J': 3, 'M': 6, 'L': 6, 'K': 9}, 'J': {'I': 3, 'K': 5, 'U': 6, 'T': 6}, 'K': {'J': 5, 'L': 3, 'P': 8, 'O': 5, 'I': 9, 'Q': 6, 'T': 9, 'U': 6}, 'L': {'K': 3, 'M': 3, 'O': 9, 'I': 6}, 'M': {'L': 3, 'N': 3, 'E': 6, 'F': 7, 'G': 6, 'O': 8, 'H': 9, 'I': 6}, 'N': {'M': 3, 'O': 2, 'E': 8}, 'O': {'N': 2, 'P': 5, 'L': 9, 'M': 8, 'K': 5}, 'R': {'Q': 5, 'S': 2, 'T': 5}, 'S': {'R': 2, 'T': 6}, 'T': {'R': 5, 'U': 3, 'K': 9, 'J': 6, 'S': 6, 'Q': 7}, 'U': {'T': 3, 'K': 6, 'J': 6}}
@@ -545,7 +545,7 @@ class Show(Scene):
                 nodes_to_keep.append(v)
                 edges_to_keep = list(v.neighbor2edge.values())
                 nodes_to_disappear = [n for n in graph.get_nodes() if n not in nodes_to_keep]
-                edges_to_disappear = [e for e in graph.get_edges() if e not in edges_to_keep]
+                edges_to_disappear = [e for e in graph.get_edges_no_duplicate() if e not in edges_to_keep]
                 nodes_to_disappear_group = GraphNodesGroup(nodes_to_disappear)
                 edges_to_disappear_group = GraphEdgesGroup(edges_to_disappear)
                 self.play(edges_to_disappear_group.disappear(include_label=True), nodes_to_disappear_group.disappear(), run_time=0.8*speed)
@@ -589,7 +589,7 @@ class Show(Scene):
                 nodes_to_keep.append(v)
                 edges_to_keep = list(v.neighbor2edge.values())
                 nodes_to_disappear = [n for n in graph.get_nodes() if n not in nodes_to_keep]
-                edges_to_disappear = [e for e in graph.get_edges() if e not in edges_to_keep]
+                edges_to_disappear = [e for e in graph.get_edges_no_duplicate() if e not in edges_to_keep]
                 nodes_to_disappear_group = GraphNodesGroup(nodes_to_disappear)
                 edges_to_disappear_group = GraphEdgesGroup(edges_to_disappear)
                 self.play(edges_to_disappear_group.disappear(include_label=True), nodes_to_disappear_group.disappear(), run_time=0.8*speed)
@@ -734,7 +734,7 @@ class Show(Scene):
             parent_of_end = union_find.find(end_node)
             remain_nodes = list(union_find.all_descendants(parent_of_start)) + list(union_find.all_descendants(parent_of_end))
             remain_edges = list(union_find.all_edges_under_root(parent_of_start)) + list(union_find.all_edges_under_root(parent_of_end))
-            disappear_edges = [e for e in graph.get_edges() if not (e == min_edge or e in remain_edges)]
+            disappear_edges = [e for e in graph.get_edges_no_duplicate() if not (e == min_edge or e in remain_edges)]
             disappear_nodes = [n for n in all_nodes if n not in remain_nodes]
             disappear_edges_group = GraphEdgesGroup(disappear_edges)
             disappear_nodes_group = GraphNodesGroup(disappear_nodes)
@@ -852,7 +852,7 @@ class Show(Scene):
                 nodes_to_keep.append(v)
                 edges_to_keep = list(v.neighbor2edge.values())
                 nodes_to_disappear = [n for n in graph.get_nodes() if n not in nodes_to_keep]
-                edges_to_disappear = [e for e in graph.get_edges() if e not in edges_to_keep]
+                edges_to_disappear = [e for e in graph.get_edges_no_duplicate() if e not in edges_to_keep]
                 nodes_to_disappear_group = GraphNodesGroup(nodes_to_disappear)
                 edges_to_disappear_group = GraphEdgesGroup(edges_to_disappear)
                 self.play(edges_to_disappear_group.disappear(include_label=True), nodes_to_disappear_group.disappear(), run_time=0.8*speed)
@@ -896,7 +896,7 @@ class Show(Scene):
                 nodes_to_keep.append(v)
                 edges_to_keep = list(v.neighbor2edge.values())
                 nodes_to_disappear = [n for n in graph.get_nodes() if n not in nodes_to_keep]
-                edges_to_disappear = [e for e in graph.get_edges() if e not in edges_to_keep]
+                edges_to_disappear = [e for e in graph.get_edges_no_duplicate() if e not in edges_to_keep]
                 nodes_to_disappear_group = GraphNodesGroup(nodes_to_disappear)
                 edges_to_disappear_group = GraphEdgesGroup(edges_to_disappear)
                 self.play(edges_to_disappear_group.disappear(include_label=True), nodes_to_disappear_group.disappear(), run_time=0.8*speed)
@@ -1060,6 +1060,33 @@ class Show(Scene):
     # Shortest paths: Bellman-Ford
     ##################################
 
+    def relax_helper(self, source_node, dest_node, edge, speed, animate_code_block=True):
+        edge_relaxed = False
+        if dest_node.key > source_node.key + edge.weight:
+            edge_relaxed = True
+            self.play(dest_node.highlight(stroke_color=GREEN, stroke_width=NODE_HIGHLIGHT_STROKE_WIDTH))
+            self.wait(speed)
+            new_key = source_node.key + edge.weight
+            self.play(dest_node.update_key(new_key))
+            self.wait(speed) if animate_code_block else None               
+            if dest_node.min_edge and dest_node.min_edge != edge:
+                if animate_code_block:
+                    self.play(dest_node.min_edge.highlight(color=GRAY, width=WIDTH), edge.highlight(color=PINK4), dest_node.dehighlight(), source_node.fade_out_variable(), dest_node.fade_out_variable())
+                else:
+                    self.play(dest_node.min_edge.highlight(color=GRAY, width=WIDTH), edge.highlight(color=PINK4), dest_node.dehighlight())
+            else:
+                if animate_code_block:
+                    self.play(edge.highlight(color=PINK4), dest_node.dehighlight(), source_node.fade_out_variable(), dest_node.fade_out_variable())
+                else:
+                    self.play(edge.highlight(color=PINK4), dest_node.dehighlight())
+            dest_node.min_edge = edge
+        else:
+            if animate_code_block:
+                self.play(edge.dehighlight(), source_node.fade_out_variable(), dest_node.fade_out_variable())
+            else:
+                self.play(edge.dehighlight())
+        return edge_relaxed
+
 
     def bellman_ford(self, graph, graph_position=(3.5, 0), graph_scale=1, source=None, create_graph=True, create_legend=True, show_horizontal_legend=False, animate_code_block=True, code_block=None, speed=1, hide_details=False, language='EN'):
         speed = 1 / speed
@@ -1075,65 +1102,100 @@ class Show(Scene):
                 l = Legend({('LINE', PINK4, PINK4): "最短路径", ('LINE', GREEN, GREEN): "当前边", (BACKGROUND, GREEN): "键值降低的点"}, is_horizontal=show_horizontal_legend)
             elif language == 'EN':
                 l = Legend({('LINE', PINK4, PINK4): "shortest paths", ('LINE', GREEN, GREEN): "current edge", (BACKGROUND, GREEN): "node needs decrease-key"}, is_horizontal=show_horizontal_legend)
-            l.mobjects.next_to(graph.graph_mobject, UP, buff=0.5)
+            l.mobjects.next_to(graph.graph_mobject, UP, buff=0.5).align_to(graph.graph_mobject, RIGHT)
             self.play(l.animation)
-            self.wait()
-        self.add_sound('August23.mp3')
+        # self.add_sound('August23.mp3')
+        subtitle_mobject = get_subtitle_mobject(graph, english_string='Initialize', chinese_string='初始化', language=language)
+        self.play(FadeIn(subtitle_mobject)) if not animate_code_block else None
+        self.wait() if not animate_code_block else None
         self.play(code_block.highlight(1, wait_time_after=1)) if animate_code_block else None
         self.play(code_block.highlight(2, wait_time_after=2)) if animate_code_block else None
-        self.initialize(graph, speed)
+        self.initialize(graph)
+        self.wait() if not animate_code_block else None
         self.play(code_block.highlight(3, wait_time_after=2)) if animate_code_block else None
         self.play(code_block.highlight(4, wait_time_after=2)) if animate_code_block else None
         if not source:
             source_node = graph.value2node.values()[0]
         else:
             source_node = graph.value2node[source]
-        self.play(source_node.update_key(0), run_time=1.5*speed)
-        edges = graph.get_edges()
-        for _ in range(graph.n_nodes()):
+        self.play(source_node.update_key(0), run_time=1.5)
+        edges = graph.get_edges_no_duplicate()
+        self.play(FadeOut(subtitle_mobject)) if not animate_code_block else None
+        is_converged = False
+        for i in range(graph.n_nodes()-1):
+            if not animate_code_block:
+                if is_converged:
+                    # Don't have to animate more if all edges remain unchanged
+                    english_string = 'Relax all edges (' + str(i+1) + 'time)'
+                    chinese_string = '放松所有的边（第n次）'
+                    subtitle_mobject = get_subtitle_mobject(graph, english_string=english_string, chinese_string=chinese_string, language=language)
+                    self.play(FadeIn(subtitle_mobject)) if not animate_code_block else None
+                else:
+                    english_string = 'Relax all edges (' + str(i+1) + 'time)'
+                    chinese_string = '放松所有的边（第' + str(i+1) + '次）'
+                    subtitle_mobject = get_subtitle_mobject(graph, english_string=english_string, chinese_string=chinese_string, language=language)
+                    self.play(FadeIn(subtitle_mobject)) if not animate_code_block else None
+                    self.wait() if not animate_code_block else None
             self.play(code_block.highlight(5, wait_time_after=2)) if animate_code_block else None
+            edge_relaxed = False
             for edge in edges:
                 source_node = edge.start_node
                 dest_node = edge.end_node
                 self.play(code_block.highlight(6, wait_time_after=2)) if animate_code_block else None
-                self.play(edge.highlight(color=GREEN), source_node.fade_in_variable('u', direction='DOWN'), dest_node.fade_in_variable('v', direction='DOWN'))
+                if animate_code_block:
+                    self.play(edge.highlight(color=GREEN), source_node.fade_in_variable('u', direction='DOWN'), dest_node.fade_in_variable('v', direction='DOWN'))
+                else:
+                    self.play(edge.highlight(color=GREEN))
                 self.play(code_block.highlight(7, wait_time_after=2)) if animate_code_block else None
                 ### RELAX
-                if dest_node.key > source_node.key + edge.weight:
-                    self.play(dest_node.highlight(stroke_color=GREEN, stroke_width=NODE_HIGHLIGHT_STROKE_WIDTH))
-                    self.wait(2)
-                    new_key = source_node.key + edge.weight
-                    self.play(dest_node.update_key(new_key))
-                    self.wait(2)                        
-                    if dest_node.min_edge and dest_node.min_edge != edge:
-                        self.play(dest_node.min_edge.highlight(color=GRAY, width=WIDTH), edge.highlight(color=PINK4), dest_node.dehighlight(), source_node.fade_out_variable(), dest_node.fade_out_variable())
-                    else:
-                        self.play(edge.highlight(color=PINK4), dest_node.dehighlight(), source_node.fade_out_variable(), dest_node.fade_out_variable())
-                    dest_node.min_edge = edge
-                else:
-                    self.play(edge.dehighlight(), source_node.fade_out_variable(), dest_node.fade_out_variable())
-                self.wait(2)
+                edge_relaxed = self.relax_helper(source_node, dest_node, edge, speed, animate_code_block)
+                self.wait(speed)
+            self.play(FadeOut(subtitle_mobject)) if not animate_code_block else None
+            self.wait() if not animate_code_block else None
+            if not animate_code_block and is_converged:
+                break
+            if not edge_relaxed:
+                is_converged = True # If no edge decreased the key, it will break in the next round to save time
         ### Check for negative cycle
         self.play(code_block.highlight(8, wait_time_after=2)) if animate_code_block else None
+        if not animate_code_block:
+            subtitle_mobject = get_subtitle_mobject(graph, english_string='Check for a negative cycle', chinese_string='检查是否存在负环', language=language)
+            self.play(FadeIn(subtitle_mobject))
+            self.wait()
         for edge in edges:
             source_node = edge.start_node
             dest_node = edge.end_node
             self.play(code_block.highlight(9, wait_time_after=2)) if animate_code_block else None
-            self.play(edge.highlight(color=GREEN), source_node.fade_in_variable('u', direction='DOWN'), dest_node.fade_in_variable('v', direction='DOWN'))
-            self.wait()
+            if animate_code_block:
+                self.play(edge.highlight(color=GREEN), source_node.fade_in_variable('u', direction='DOWN'), dest_node.fade_in_variable('v', direction='DOWN'))
+            else:
+                self.play(edge.highlight(color=GREEN))
+            self.wait(speed) if animate_code_block else None
             self.play(code_block.highlight(10, wait_time_after=2)) if animate_code_block else None
             if dest_node.key > source_node.key + edge.weight:
                 self.play(code_block.if_true(wait_time=3)) if animate_code_block else None
                 self.play(code_block.highlight(11, wait_time_after=1)) if animate_code_block else None
-                all_edges = GraphEdgesGroup(graph.get_edges())
-                self.play(source_node.fade_out_variable(), dest_node.fade_out_variable(), all_edges.highlight(color=RED))
+                all_edges = GraphEdgesGroup(graph.get_edges_no_duplicate())
+                if animate_code_block:
+                    self.play(all_edges.highlight(color=RED), source_node.fade_out_variable(), dest_node.fade_out_variable())
+                else:
+                    self.play(all_edges.highlight(color=RED))
                 self.play(code_block.highlight(13, wait_time_after=2)) if animate_code_block else None
                 return False
             else:
                 self.play(code_block.if_true(is_true=False, wait_time=3)) if animate_code_block else None
-            self.play(edge.dehighlight(), source_node.fade_out_variable(), dest_node.fade_out_variable())
+            if animate_code_block:
+                self.play(edge.dehighlight(), source_node.fade_out_variable(), dest_node.fade_out_variable())
+            else:
+                self.play(edge.dehighlight())
+            self.wait(speed)
         self.play(code_block.highlight(12, wait_time_after=2)) if animate_code_block else None
         self.play(code_block.highlight(13, wait_time_after=2)) if animate_code_block else None
+        self.play(FadeOut(subtitle_mobject)) if not animate_code_block else None
+        self.wait() if not animate_code_block else None
+        subtitle_mobject = get_subtitle_mobject(graph, english_string='Get shortest paths', chinese_string='生成最短路径', language=language)
+        self.play(FadeIn(subtitle_mobject))
+        self.wait() if not animate_code_block else None
         path_edges = []
         for node in graph.get_nodes():
             if node.min_edge:
@@ -1662,5 +1724,13 @@ class Show(Scene):
         # self.wait(15)
 
 
-
+        ### Bellman-Ford-no-code (CH)
+        title_mobject = show_title_for_demo("BELLMAN-FORD 算法")
+        self.add(title_mobject)
+        # new_position = scale_position(POSITION_HARD, 1.4, 1.8)
+        # graph = GraphObject(MAP_HARD, new_position)
+        new_position = scale_position(POSITION_DIJKSTRA_NEGATIVE_EN, 1.3, 1.3)
+        graph = GraphObject(MAP_DIJKSTRA_NEGATIVE_EN, new_position)
+        self.bellman_ford(graph, source='Src', graph_position=(0, -0.5), create_legend=True, animate_code_block=False, show_horizontal_legend=True, speed=2, hide_details=True, language='CH')
+        # self.wait(15)
 
