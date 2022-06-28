@@ -39,6 +39,7 @@ POSITION_TRIANGLE_NEGATIVE_CYCLE = {'Src': (0, 1.73), 'B': (-1, 0), 'C': (1, 0)}
 
 # RELAX - SIMPLE
 MAP_RELAX = {'u': {'v': 2}}
+MAP_RELAX_UNDIRECTED = {'u': {'v': 2}, 'v': {'u': 2}}
 POSITION_RELAX = {'u': (0, 0), 'v': (1, 0)}
 
 # Square for comparing Prim and Dijkstra
@@ -1104,83 +1105,101 @@ class Show(Scene):
                 l = Legend({('LINE', PINK4, PINK4): "shortest paths", ('LINE', GREEN, GREEN): "current edge", (BACKGROUND, GREEN): "node needs decrease-key"}, is_horizontal=show_horizontal_legend)
             l.mobjects.next_to(graph.graph_mobject, UP, buff=0.5).align_to(graph.graph_mobject, RIGHT)
             self.play(l.animation)
-        # self.add_sound('August23.mp3')
+        self.add_sound('Lifting Dreams - Aakash Gandhi.mp3')
         subtitle_mobject = get_subtitle_mobject(graph, english_string='Initialize', chinese_string='初始化', language=language)
-        self.play(FadeIn(subtitle_mobject)) if not animate_code_block else None
-        self.wait() if not animate_code_block else None
-        self.play(code_block.highlight(1, wait_time_after=1)) if animate_code_block else None
-        self.play(code_block.highlight(2, wait_time_after=2)) if animate_code_block else None
+        if animate_code_block:
+            self.play(code_block.highlight(1, wait_time_after=1))
+            self.play(code_block.highlight(2, wait_time_after=2))
+        else:
+            self.play(FadeIn(subtitle_mobject))
+            self.wait()
         self.initialize(graph)
-        self.wait() if not animate_code_block else None
-        self.play(code_block.highlight(3, wait_time_after=2)) if animate_code_block else None
-        self.play(code_block.highlight(4, wait_time_after=2)) if animate_code_block else None
+        if animate_code_block:
+            self.play(code_block.highlight(3, wait_time_after=2))
+            self.play(code_block.highlight(4, wait_time_after=2))
+        else:
+            self.wait()
         if not source:
             source_node = graph.value2node.values()[0]
         else:
             source_node = graph.value2node[source]
         self.play(source_node.update_key(0), run_time=1.5)
-        edges = graph.get_edges_no_duplicate()
         self.play(FadeOut(subtitle_mobject)) if not animate_code_block else None
         is_converged = False
         for i in range(graph.n_nodes()-1):
-            if not animate_code_block:
+            # For no code version
+            if animate_code_block:
+                self.play(code_block.highlight(5, wait_time_after=2))
+            else:
                 if is_converged:
                     # Don't have to animate more if all edges remain unchanged
                     english_string = 'Relax all edges (' + str(i+1) + 'time)'
                     chinese_string = '放松所有的边（第n次）'
                     subtitle_mobject = get_subtitle_mobject(graph, english_string=english_string, chinese_string=chinese_string, language=language)
-                    self.play(FadeIn(subtitle_mobject)) if not animate_code_block else None
+                    self.play(FadeIn(subtitle_mobject))
                 else:
                     english_string = 'Relax all edges (' + str(i+1) + 'time)'
                     chinese_string = '放松所有的边（第' + str(i+1) + '次）'
                     subtitle_mobject = get_subtitle_mobject(graph, english_string=english_string, chinese_string=chinese_string, language=language)
-                    self.play(FadeIn(subtitle_mobject)) if not animate_code_block else None
-                    self.wait() if not animate_code_block else None
-            self.play(code_block.highlight(5, wait_time_after=2)) if animate_code_block else None
+                    self.play(FadeIn(subtitle_mobject))
+                    self.wait()                
             edge_relaxed = False
+            edges = graph.get_edges_duplicate()
             for edge in edges:
                 source_node = edge.start_node
                 dest_node = edge.end_node
-                self.play(code_block.highlight(6, wait_time_after=2)) if animate_code_block else None
                 if animate_code_block:
+                    self.play(code_block.highlight(6, wait_time_after=2))
                     self.play(edge.highlight(color=GREEN), source_node.fade_in_variable('u', direction='DOWN'), dest_node.fade_in_variable('v', direction='DOWN'))
+                    self.play(code_block.highlight(7, wait_time_after=2))
                 else:
                     self.play(edge.highlight(color=GREEN))
-                self.play(code_block.highlight(7, wait_time_after=2)) if animate_code_block else None
                 ### RELAX
                 edge_relaxed = self.relax_helper(source_node, dest_node, edge, speed, animate_code_block)
                 self.wait(speed)
-            self.play(FadeOut(subtitle_mobject)) if not animate_code_block else None
-            self.wait() if not animate_code_block else None
+                # # If it's bi-directional, we should relax the edge one more time in the opposite direction
+                # if not edge.is_directed:
+                #     if animate_code_block:
+                #         self.play(code_block.highlight(6, wait_time_after=2))
+                #         self.play(edge.highlight(color=GREEN), dest_node.fade_in_variable('u', direction='DOWN'), source_node.fade_in_variable('v', direction='DOWN'))
+                #         self.play(code_block.highlight(7, wait_time_after=2))
+                #     else:
+                #         self.play(edge.highlight(color=GREEN))
+                #     edge_relaxed = self.relax_helper(dest_node, source_node, edge, speed, animate_code_block)
+                #     self.wait(speed)
+            if not animate_code_block:
+                self.play(FadeOut(subtitle_mobject))
+                self.wait()
             if not animate_code_block and is_converged:
                 break
             if not edge_relaxed:
                 is_converged = True # If no edge decreased the key, it will break in the next round to save time
         ### Check for negative cycle
-        self.play(code_block.highlight(8, wait_time_after=2)) if animate_code_block else None
-        if not animate_code_block:
+        if animate_code_block:
+            self.play(code_block.highlight(8, wait_time_after=2))
+        else:
             subtitle_mobject = get_subtitle_mobject(graph, english_string='Check for a negative cycle', chinese_string='检查是否存在负环', language=language)
             self.play(FadeIn(subtitle_mobject))
             self.wait()
         for edge in edges:
             source_node = edge.start_node
             dest_node = edge.end_node
-            self.play(code_block.highlight(9, wait_time_after=2)) if animate_code_block else None
             if animate_code_block:
+                self.play(code_block.highlight(9, wait_time_after=2)) 
                 self.play(edge.highlight(color=GREEN), source_node.fade_in_variable('u', direction='DOWN'), dest_node.fade_in_variable('v', direction='DOWN'))
+                self.wait(speed)
+                self.play(code_block.highlight(10, wait_time_after=2))
             else:
                 self.play(edge.highlight(color=GREEN))
-            self.wait(speed) if animate_code_block else None
-            self.play(code_block.highlight(10, wait_time_after=2)) if animate_code_block else None
             if dest_node.key > source_node.key + edge.weight:
-                self.play(code_block.if_true(wait_time=3)) if animate_code_block else None
-                self.play(code_block.highlight(11, wait_time_after=1)) if animate_code_block else None
                 all_edges = GraphEdgesGroup(graph.get_edges_no_duplicate())
                 if animate_code_block:
+                    self.play(code_block.if_true(wait_time=3))
+                    self.play(code_block.highlight(11, wait_time_after=1))
                     self.play(all_edges.highlight(color=RED), source_node.fade_out_variable(), dest_node.fade_out_variable())
+                    self.play(code_block.highlight(13, wait_time_after=2))
                 else:
                     self.play(all_edges.highlight(color=RED))
-                self.play(code_block.highlight(13, wait_time_after=2)) if animate_code_block else None
                 return False
             else:
                 self.play(code_block.if_true(is_true=False, wait_time=3)) if animate_code_block else None
@@ -1189,22 +1208,100 @@ class Show(Scene):
             else:
                 self.play(edge.dehighlight())
             self.wait(speed)
-        self.play(code_block.highlight(12, wait_time_after=2)) if animate_code_block else None
-        self.play(code_block.highlight(13, wait_time_after=2)) if animate_code_block else None
-        self.play(FadeOut(subtitle_mobject)) if not animate_code_block else None
-        self.wait() if not animate_code_block else None
-        subtitle_mobject = get_subtitle_mobject(graph, english_string='Get shortest paths', chinese_string='生成最短路径', language=language)
-        self.play(FadeIn(subtitle_mobject))
-        self.wait() if not animate_code_block else None
-        path_edges = []
-        for node in graph.get_nodes():
-            if node.min_edge:
-                path_edges.append(node.min_edge)
-        path_edges = set(path_edges)
+        if animate_code_block:
+            self.play(code_block.highlight(12, wait_time_after=2))
+            self.play(code_block.highlight(13, wait_time_after=2))
+        else:
+            self.play(FadeOut(subtitle_mobject))
+            self.wait()
+            subtitle_mobject = get_subtitle_mobject(graph, english_string='Get shortest paths', chinese_string='生成最短路径', language=language)
+            self.play(FadeIn(subtitle_mobject))
+            self.wait()
+        path_edges = graph.get_shortest_paths()
         self._remove_edges(graph, path_edges, speed=0.5)
         return True
 
 
+    # Comment out an old code for videos generation only
+    # def bellman_ford(self, graph, graph_position=(3.5, 0), graph_scale=1, source=None, create_graph=True, create_legend=True, show_horizontal_legend=False, animate_code_block=True, code_block=None, speed=1, hide_details=False, language='EN'):
+    #     speed = 1 / speed
+    #     if animate_code_block and not code_block:
+    #         code_block = CodeBlock(CODE_FOR_BELLMAN_FORD_WITH_RELAX)
+    #         self.play(Create(code_block.code))
+    #     if create_graph:
+    #         x_offset, y_offset = graph_position
+    #         # self.play(FadeIn(graph.graph_mobject.scale(graph_scale).shift(x_offset*RIGHT+y_offset*UP)))
+    #         self.play(graph.fade_in(graph_scale=graph_scale, x_offset=x_offset, y_offset=y_offset))
+    #     if create_legend:
+    #         l = None
+    #         if language == 'CH':
+    #             l = Legend({('LINE', PINK4, PINK4): "最短路径", ('LINE', GREEN, GREEN): "当前边", (BACKGROUND, GREEN): "键值降低的点"}, is_horizontal=show_horizontal_legend)
+    #         elif language == 'EN':
+    #             l = Legend({('LINE', PINK4, PINK4): "shortest paths", ('LINE', GREEN, GREEN): "current edge", (BACKGROUND, GREEN): "node needs decrease-key"}, is_horizontal=show_horizontal_legend)
+    #         l.mobjects.next_to(graph.graph_mobject, UP, buff=0.5).align_to(graph.graph_mobject, RIGHT)
+    #         self.play(l.animation)
+    #     self.add_sound('Lifting Dreams - Aakash Gandhi.mp3')
+    #     self.play(code_block.highlight(1, wait_time_after=2)) if animate_code_block else None
+    #     self.play(code_block.highlight(2, wait_time_after=2)) if animate_code_block else None
+    #     self.initialize(graph, speed)
+    #     self.play(code_block.highlight(3, wait_time_after=2)) if animate_code_block else None
+    #     self.play(code_block.highlight(4, wait_time_after=2)) if animate_code_block else None
+    #     if not source:
+    #         source_node = graph.value2node.values()[0]
+    #     else:
+    #         source_node = graph.value2node[source]
+    #     self.play(source_node.update_key(0), run_time=1.5*speed)
+    #     edges = graph.get_edges_no_duplicate()
+    #     for i in range(graph.n_nodes()-1):
+    #         self.play(code_block.highlight(5, wait_time_after=2)) if animate_code_block else None
+    #         for edge in edges:
+    #             source_node = edge.start_node
+    #             dest_node = edge.end_node
+    #             self.play(code_block.highlight(6, wait_time_after=2)) if animate_code_block else None
+    #             self.play(edge.highlight(color=GREEN), source_node.fade_in_variable('u', direction='DOWN'), dest_node.fade_in_variable('v', direction='DOWN'))
+    #             self.play(code_block.highlight(7, wait_time_after=2)) if animate_code_block else None
+    #             ### RELAX
+    #             if dest_node.key > source_node.key + edge.weight:
+    #                 self.play(dest_node.highlight(stroke_color=GREEN, stroke_width=NODE_HIGHLIGHT_STROKE_WIDTH))
+    #                 self.wait(2)
+    #                 new_key = source_node.key + edge.weight
+    #                 self.play(dest_node.update_key(new_key))
+    #                 self.wait(2)                        
+    #                 if dest_node.min_edge and dest_node.min_edge != edge:
+    #                     self.play(dest_node.min_edge.highlight(color=GRAY, width=WIDTH), edge.highlight(color=PINK4), dest_node.dehighlight(), source_node.fade_out_variable(), dest_node.fade_out_variable())
+    #                 else:
+    #                     self.play(edge.highlight(color=PINK4), dest_node.dehighlight(), source_node.fade_out_variable(), dest_node.fade_out_variable())
+    #                 dest_node.min_edge = edge
+    #             else:
+    #                 self.play(edge.dehighlight(), source_node.fade_out_variable(), dest_node.fade_out_variable())
+    #             self.wait(2)
+    #     ### Check for negative cycle
+    #     self.play(code_block.highlight(8, wait_time_after=2)) if animate_code_block else None
+    #     for edge in edges:
+    #         source_node = edge.start_node
+    #         dest_node = edge.end_node
+    #         self.play(code_block.highlight(9, wait_time_after=2)) if animate_code_block else None
+    #         self.play(edge.highlight(color=GREEN), source_node.fade_in_variable('u', direction='DOWN'), dest_node.fade_in_variable('v', direction='DOWN'))
+    #         self.wait()
+    #         self.play(code_block.highlight(10, wait_time_after=2)) if animate_code_block else None
+    #         if dest_node.key > source_node.key + edge.weight:
+    #             self.play(code_block.if_true(wait_time=3)) if animate_code_block else None
+    #             self.play(code_block.highlight(11, wait_time_after=2)) if animate_code_block else None
+    #             all_edges = GraphEdgesGroup(graph.get_edges_no_duplicate())
+    #             if animate_code_block:
+    #                 self.play(all_edges.highlight(color=RED), source_node.fade_out_variable(), dest_node.fade_out_variable())
+    #             else:
+    #                 self.play(all_edges.highlight(color=RED))
+    #             self.play(code_block.highlight(13, wait_time_after=2)) if animate_code_block else None
+    #             return False
+    #         else:
+    #             self.play(code_block.if_true(is_true=False, wait_time=3)) if animate_code_block else None
+    #         self.play(edge.dehighlight(), source_node.fade_out_variable(), dest_node.fade_out_variable())
+    #     self.play(code_block.highlight(12, wait_time_after=2)) if animate_code_block else None
+    #     self.play(code_block.highlight(13, wait_time_after=2)) if animate_code_block else None
+    #     path_edges = graph.get_shortest_paths()
+    #     self._remove_edges(graph, path_edges, speed=1)
+    #     return True
 
 
     ##################################
@@ -1690,7 +1787,7 @@ class Show(Scene):
 
         ### Bellman-Ford (CH)
         # self.add(watermark_ch)
-        # title_mobject = show_title_for_demo("BELLMAN-FORD 算法  ·  单源最短路径")
+        # title_mobject = show_title_for_demo("BELLMAN-FORD 算法")
         # self.add(title_mobject)
         # self.wait()
         ## Positive cycle
@@ -1699,8 +1796,8 @@ class Show(Scene):
         ## Negative cycle
         # new_position = scale_position(POSITION_TRIANGLE_NEGATIVE_CYCLE, 1.3, 1.3)
         # graph = GraphObject(MAP_TRIANGLE_NEGATIVE_CYCLE, new_position)
-        # self.bellman_ford(graph, graph_position=(3.5, -0.6), source='Src', create_graph=True, hide_details=False)
-        # self.wait(3)
+        # self.bellman_ford(graph, graph_position=(3.5, -0.5), source='Src', create_graph=True, hide_details=False)
+        # self.wait(4)
         # self.clear()
         # self.play(endding())
         # self.wait(15)
@@ -1711,26 +1808,28 @@ class Show(Scene):
         # title_mobject = show_title_for_demo("BELLMAN-FORD ALGO")
         # self.add(title_mobject)
         # self.wait()
-        # ## Positive cycle
-        # # new_position = scale_position(POSITION_DIJKSTRA_NEGATIVE_EN, 1.3, 1.3)
-        # # graph = GraphObject(MAP_DIJKSTRA_NEGATIVE_EN, new_position)
-        # ## Negative cycle
+        ## Positive cycle
+        # new_position = scale_position(POSITION_DIJKSTRA_NEGATIVE_EN, 1.3, 1.3)
+        # graph = GraphObject(MAP_DIJKSTRA_NEGATIVE_EN, new_position)
+        ## Negative cycle
         # new_position = scale_position(POSITION_TRIANGLE_NEGATIVE_CYCLE, 1.3, 1.3)
         # graph = GraphObject(MAP_TRIANGLE_NEGATIVE_CYCLE, new_position)
-        # self.bellman_ford(graph, graph_position=(3.5, -1), source='Src', create_graph=True, hide_details=False, show_horizontal_legend=False)
-        # self.wait(3)
+        # self.bellman_ford(graph, graph_position=(3.5, -0.8), source='Src', create_graph=True, hide_details=False, show_horizontal_legend=False, language='EN')
+        # self.wait(4)
         # self.clear()
-        # self.play(endding())
+        # self.play(endding(language='EN'))
         # self.wait(15)
 
 
         ### Bellman-Ford-no-code (CH)
         title_mobject = show_title_for_demo("BELLMAN-FORD 算法")
         self.add(title_mobject)
-        # new_position = scale_position(POSITION_HARD, 1.4, 1.8)
-        # graph = GraphObject(MAP_HARD, new_position)
+        new_position = scale_position(POSITION_HARD, 1.4, 1.8)
+        graph = GraphObject(MAP_HARD, new_position)
         new_position = scale_position(POSITION_DIJKSTRA_NEGATIVE_EN, 1.3, 1.3)
-        graph = GraphObject(MAP_DIJKSTRA_NEGATIVE_EN, new_position)
-        self.bellman_ford(graph, source='Src', graph_position=(0, -0.5), create_legend=True, animate_code_block=False, show_horizontal_legend=True, speed=2, hide_details=True, language='CH')
-        # self.wait(15)
+        # graph = GraphObject(MAP_DIJKSTRA_NEGATIVE_EN, new_position)
+        new_position = scale_position(POSITION_RELAX, 2, 2)
+        graph = GraphObject(MAP_RELAX_UNDIRECTED, new_position)
+        self.bellman_ford(graph, source='u', graph_position=(0, -0.5), create_legend=True, animate_code_block=False, show_horizontal_legend=True, speed=2, hide_details=True, language='CH')
+        self.wait(15)
 

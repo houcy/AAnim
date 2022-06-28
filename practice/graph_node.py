@@ -5,7 +5,7 @@ from util import *
 
 # z_index: edge: 0, circle: 1, text: 3, key: 5
 class GraphNode:
-    def __init__(self, value, position_x, position_y, is_music_note=False, node_radius=RADIUS):
+    def __init__(self, value, position_x, position_y, is_music_note=False, node_radius=RADIUS, font_color=GRAY, font_size=VALUE_SIZE):
         self.value = value
         self.neighbor2edge = {}
         self.neighbors = []
@@ -15,7 +15,7 @@ class GraphNode:
         self.mobject = None
         self.text_mobject = None
         self.circle_mobject = None
-        self._create_mobject(is_music_note=is_music_note, node_radius=node_radius)
+        self._create_mobject(is_music_note=is_music_note, node_radius=node_radius, font_color=font_color, font_size=font_size)
         self.key = None
         self.key_mobject = None
         self.animations = None
@@ -27,17 +27,16 @@ class GraphNode:
         self.variable_name = None
         self.min_edge = None
     
-    def _create_mobject(self, is_music_note, node_radius):
+    def _create_mobject(self, is_music_note, node_radius, font_color, font_size):
         """
         Convert a node to an MObject so that it shows on the canvas
         """
         self.circle_mobject = Circle(radius=node_radius).set_stroke(color=LINE_COLOR, width=WIDTH).set_fill(BACKGROUND, opacity=1.0).set_z_index(1).shift(RIGHT * self.position_x + UP * self.position_y)
         if not is_music_note:
             count_digit = len(str(self.value))
-            font_size = VALUE_SIZE
             if count_digit >= 3:
                 font_size = font_size - (count_digit - 2) * 5
-            self.text_mobject = Text(str(self.value), color=LINE_COLOR, font=FONT, weight=BOLD, font_size=font_size).set_z_index(3).shift(self.circle_mobject.get_center())
+            self.text_mobject = Text(str(self.value), color=font_color, font=FONT, weight=BOLD, font_size=font_size).set_z_index(3).shift(self.circle_mobject.get_center())
 
         else:
             # for music note

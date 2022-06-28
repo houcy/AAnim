@@ -15,12 +15,75 @@ from code_constant import *
 SANLIAN_MAP_2 = {'赞': {'币': None}, '币': {'藏': None}}
 SANLIAN_POSITION_2 = {'赞': (0, 0), '币': (1, 0), '藏': (2, 0)}
 
-EN_ENDING_MAP = {'like': {'comment': None}, 'comment': {'sub': None}}
-EN_ENDING_POSITION = {'like': (0, 0), 'com"t': (1, 0), 'sub': (2, 0)}
+EN_ENDING_MAP = {
+    'A': {'B': None}, 
+    'B': {'A': None, 'C': None}, 
+    'C': {'B': None, 'D': None}, 
+    'D': {'C': None, 'E': None},
+    'E': {'D': None, 'F': None},
+    'F': {'E': None},
+    'G': {'H': None},
+    'H': {'G': None, 'I': None},
+    'I': {'H': None, 'J': None},
+    'J': {'I': None},
+    'K': {'M': None, 'L': None},
+    'L': {'K': None, 'N': None},
+    'M': {'K': None, 'N': None, 'O': None},
+    'N': {'L': None, 'M': None, 'P': None},
+    'O': {'M': None, 'P': None},
+    'P': {'N': None, 'O': None},
+    'Q': {'R': None, 'S': None},
+    'R': {'Q': None},
+    'S': {'Q': None, 'T': None},
+    'T': {'S': None, 'V': None},
+    'U': {'V': None},
+    'V': {'T': None, 'U': None},
+    'W': {'X': None, 'Y': None},
+    'X': {'W': None},
+    'Y': {'W': None, 'Z': None},
+    'Z': {'Y': None},
+    'AA': {'AB': None, 'AC': None},
+    'AB': {'AA': None, 'AD': None},
+    'AC': {'AA': None, 'AD': None, 'AE': None, 'AF': None},
+    'AD': {'AB': None, 'AC': None},
+    'AE': {'AC': None},
+    'AF': {'AC': None},
+    'AG': {'AH': None},
+    'AH': {'AI': None, 'AG': None, 'AK': None},
+    'AI': {'AH': None},
+    'AJ': {'AK': None},
+    'AK': {'AJ': None, 'AL': None, 'AH': None},
+    'AL': {'AK': None},
+    'AM': {'AN': None, 'AO': None},
+    'AN': {'AM': None, 'AP': None},
+    'AO': {'AM': None, 'AP': None, 'AQ': None},
+    'AP': {'AN': None, 'AO': None, 'AR': None},
+    'AQ': {'AO': None, 'AR': None},
+    'AR': {'AP': None, 'AQ': None},
+    'AS': {'AT': None, 'AU': None},
+    'AT': {'AS': None},
+    'AU': {'AS': None, 'AV': None, 'AW': None},
+    'AV': {'AU': None},
+    'AW': {'AX': None, 'AU': None},
+    'AX': {'AW': None},
+}
+EN_ENDING_POSITION = {
+    'A': (0,0), 'B': (2,0), 'C': (2,2), 'D': (0,2), 'E': (0,4), 'F': (2,4), 
+    'G': (3,4), 'H': (3,0), 'I': (5,0), 'J': (5,4), 'K': (6,4), 'L': (8,4), 
+    'M': (6,2), 'N': (8,2), 'O': (6,0), 'P': (8,0), 'Q': (9,4), 'R': (11,4), 
+    'S': (9,2), 'T': (11,2), 'U': (9,0), 'V': (11,0), 'W': (12,4), 'X': (14,4), 
+    'Y': (12,0), 'Z': (14,0), 'AA': (15,4), 'AB': (17,4), 'AC': (15,2), 'AD': (17,2), 
+    'AE': (15,0), 'AF': (17,0), 'AG': (18,4), 'AH': (19,4), 'AI': (20,4), 'AJ': (18,0), 
+    'AK': (19,0), 'AL': (20,0), 'AM': (21,4), 'AN': (23,4), 'AO': (21,2), 'AP': (23,2), 
+    'AQ': (21,0), 'AR': (23,0), 'AS': (24,4), 'AT': (26,4), 'AU': (24,2), 'AV': (26,2), 
+    'AW': (24,0), 'AX': (26,0)
+}
 
 def watermark(is_chinese=False):
     if not is_chinese:
-        return Text("Compsyc", color=GRAY, weight=BOLD, font=FONT, font_size=160).set_fill(opacity=WATERMARK_OPACITY).set_z_index(100)
+        t1 = Text("computer", color=GRAY, weight=BOLD, font=FONT, font_size=110).set_fill(opacity=WATERMARK_OPACITY).set_z_index(100)
+        t2 = Text("psycology", color=GRAY, weight=BOLD, font=FONT, font_size=110).set_fill(opacity=WATERMARK_OPACITY).set_z_index(100).next_to(t1, DOWN, buff=0.3)
+        return VGroup(t1, t2).move_to(ORIGIN)
     else:
         t1 = Text("计算之心", color=GRAY, weight=ULTRAHEAVY, font=FONT, font_size=130).set_fill(opacity=WATERMARK_OPACITY).set_z_index(100)
         t2 = Text("b i l i b i l i", color=GRAY, weight=ULTRAHEAVY, font=FONT, font_size=90, width=6.5).set_fill(opacity=WATERMARK_OPACITY).set_z_index(100).next_to(t1, DOWN, buff=0.3)
@@ -65,9 +128,10 @@ def extract_min_node(list):
     list.remove(min_node)
     return min_node
 
-def endding(is_chinese=True):
+def endding(language='EN'):
     from straight_graph import StraightGraph
-    if is_chinese:
+    from graph import GraphObject
+    if language == 'CH':
         new_position_2 = scale_position(SANLIAN_POSITION_2, 2, 2)
         graph = StraightGraph(SANLIAN_MAP_2, new_position_2, edge_radius=1.5, node_radius=SMALL_RADIUS)
         animations = []
@@ -83,21 +147,23 @@ def endding(is_chinese=True):
         animations.append(bi2cang.highlight(color=PINK2, change_tip_width=False))
         animations.append(cang.color(fill_color='#FDF8CA', stroke_color=GRAY, stroke_width=WIDTH))
         return Succession(*animations, lag_ratio=1)
-    else:
-        new_position = scale_position(EN_ENDING_POSITION, 2, 2)
-        graph = StraightGraph(EN_ENDING_MAP, new_position, edge_radius=1.5, node_radius=RADIUS)
+    elif language == 'EN':
+        new_position = scale_position(EN_ENDING_POSITION, 0.35, 0.4)
+        graph = GraphObject(EN_ENDING_MAP, new_position, edge_radius=1.5, node_radius=0.08, font_color=BACKGROUND, font_size=0)
         animations = []
-        animations.append(FadeIn(graph.mobject()))
-        like = graph.value2node['like']
-        comment = graph.value2node['comment']
-        subscribe = graph.value2node['sub']
-        like2comment = graph.get_edge(like, comment)
-        comment2subscribe = graph.get_edge(comment, subscribe)
-        animations.append(like.color(fill_color=PINK2, stroke_color=GRAY, stroke_width=WIDTH))
-        animations.append(like2comment.highlight(color=PINK2, change_tip_width=False))
-        animations.append(comment.color(fill_color=GRAY, stroke_color=GRAY, stroke_width=WIDTH))
-        animations.append(comment2subscribe.highlight(color=PINK2, change_tip_width=False))
-        animations.append(subscribe.color(fill_color='#FDF8CA', stroke_color=GRAY, stroke_width=WIDTH))
-        return Succession(*animations, lag_ratio=1)
+        animations.append(graph.fade_in())
+        for node in graph.get_nodes():
+            animations.append(node.color(stroke_color='#FF0000', fill_color='#FF0000'))
+        for edge in graph.get_edges_no_duplicate():
+            animations.append(edge.highlight(color='#FF0000', width=WIDTH))
+        return Succession(*animations, lag_ratio=0.08)
 
 
+def get_subtitle_mobject(graph, english_string='', chinese_string='', language='EN'):
+    text = None
+    if language == 'CH':
+        text = chinese_string
+    elif language == 'EN':
+        text = english_string
+    text_check_mobject = get_text(text, font_size=SMALL_FONT_SIZE, weight=ULTRAHEAVY).next_to(graph.graph_mobject, UP, buff=0.5).align_to(graph.graph_mobject, LEFT)
+    return text_check_mobject
