@@ -22,7 +22,7 @@ POSITION_CYCLE3 = {'A': (-2, -2), 'B': (2, 2)}
 MAP_CYCLE = {'A': {'B': 3}, 'B': {'A': 2}}
 
 class GraphObject:
-    def __init__(self, adjacency_list, position, is_topological_graph=False, edge_radius=RADIUS, node_radius=RADIUS, is_cyclic=False):
+    def __init__(self, adjacency_list, position, is_topological_graph=False, edge_radius=RADIUS, node_radius=RADIUS, is_cyclic=False, font_color=GRAY, font_size=VALUE_SIZE):
         self.graph_mobject = VGroup()
         self.value2node = {}
         visited_edge = set()
@@ -33,11 +33,11 @@ class GraphObject:
         for start in self.adjacency_list:
             if start not in self.value2node:
                 position_x, position_y = position[start]
-                self._create_node(start, position_x, position_y, node_radius)
+                self._create_node(start, position_x, position_y, node_radius, font_color=font_color, font_size=font_size)
             for end in self.adjacency_list[start]:
                 if end not in self.value2node:
                     position_x, position_y = position[end]
-                    self._create_node(end, position_x, position_y, node_radius)
+                    self._create_node(end, position_x, position_y, node_radius, font_color=font_color, font_size=font_size)
                 is_directed = True
                 not_created = True
                 # Not directed
@@ -61,7 +61,13 @@ class GraphObject:
 
     def get_edges_duplicate(self):
         # For an undirected eedge, count it twice: start -> end, end -> start
-        pass
+        edges = self.get_edges_no_duplicate()
+        edges_with_duplicate = edges[:]
+        for edge in edges:
+            if not edge.is_directed:
+                edge_object = GraphEdge(start_node=edge.end_node, end_node=edge.start_node, line_mobject=edge.mobject['line'], weight=edge.weight, is_directed=edge.is_directed)
+                edges_with_duplicate.append(edge_object)
+        return edges_with_duplicate
 
     def get_nodes(self):
         return list(self.value2node.values())
@@ -78,8 +84,8 @@ class GraphObject:
     def n_edges(self):
         return len(self.edges)
                 
-    def _create_node(self, value, position_x, position_y, node_radius):
-        node = GraphNode(value, position_x, position_y, node_radius=node_radius)
+    def _create_node(self, value, position_x, position_y, node_radius, font_color, font_size):
+        node = GraphNode(value, position_x, position_y, node_radius=node_radius, font_color=font_color, font_size=font_size)
         self.value2node[value] = node
         self.graph_mobject += node.mobject
 
@@ -129,6 +135,13 @@ class GraphObject:
         visited = set()
         helper(start, end, path, visited, 0)
         return path
+
+    def get_shortest_paths(self):
+        path_edges = []
+        for node in self.get_nodes():
+            if node.min_edge:
+                path_edges.append(node.min_edge)
+        return set(path_edges)
     
     def highlight(self, node_name, fill_color=PINK2, stroke_color=PINK3,  stroke_width=WIDTH, text_color=BACKGROUND):
         node = self.value2node[node_name]        

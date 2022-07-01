@@ -5,8 +5,7 @@ from curved_arrow import Curved_Arrow
 
 
 class GraphEdge:
-    def __init__(self, start_node, end_node, weight=None, is_cyclic=False, is_directed=False, is_topological_graph=False, is_straight_graph=False, edge_radius=EDGE_RADIUS, color=GRAY):
-        line = None
+    def __init__(self, start_node, end_node, weight=None, line_mobject=None, is_cyclic=False, is_directed=False, is_topological_graph=False, is_straight_graph=False, edge_radius=EDGE_RADIUS, color=GRAY):
         self.weight = weight
         self.start_node = start_node
         self.end_node = end_node
@@ -15,33 +14,34 @@ class GraphEdge:
         self.save_state = False
         self.visit_count = 0
         self.is_showing = False
-        if not is_directed:
-            line = Line(start_node.mobject.get_center(), end_node.mobject.get_center()).set_stroke(color=color, width=WIDTH).set_z_index(0)
-        else:
-            if is_straight_graph:
-                start_position = start_node.position_x
-                end_position = end_node.position_x
-                if start_position < end_position:
-                    line = Curved_Arrow(start_node.mobject.get_bottom(), end_node.mobject.get_bottom(), color=color, stroke_width=WIDTH, edge_radius=edge_radius).mobject.set_z_index(0)
-                    self.is_curvy = True
-                else:
-                    line = Curved_Arrow(start_node.mobject.get_top(), end_node.mobject.get_top(), color=color, stroke_width=WIDTH, edge_radius=edge_radius).mobject.set_z_index(0)
-                    self.is_curvy = True
-            elif is_topological_graph:
-                line = Curved_Arrow(start_node.mobject.get_bottom(), end_node.mobject.get_bottom(), color=color, stroke_width=WIDTH, edge_radius=edge_radius).mobject.set_z_index(0)
-                self.is_curvy = True
+        if not line_mobject:
+            if not is_directed:
+                line_mobject = Line(start_node.mobject.get_center(), end_node.mobject.get_center()).set_stroke(color=color, width=WIDTH).set_z_index(0)
             else:
-                if is_cyclic:
-                    line = Curved_Arrow(start_node.mobject.get_center(), end_node.mobject.get_center(), color=color, stroke_width=WIDTH, edge_radius=edge_radius).mobject.scale(0.78).set_z_index(0)
+                if is_straight_graph:
+                    start_position = start_node.position_x
+                    end_position = end_node.position_x
+                    if start_position < end_position:
+                        line_mobject = Curved_Arrow(start_node.mobject.get_bottom(), end_node.mobject.get_bottom(), color=color, stroke_width=WIDTH, edge_radius=edge_radius).mobject.set_z_index(0)
+                        self.is_curvy = True
+                    else:
+                        line_mobject = Curved_Arrow(start_node.mobject.get_top(), end_node.mobject.get_top(), color=color, stroke_width=WIDTH, edge_radius=edge_radius).mobject.set_z_index(0)
+                        self.is_curvy = True
+                elif is_topological_graph:
+                    line_mobject = Curved_Arrow(start_node.mobject.get_bottom(), end_node.mobject.get_bottom(), color=color, stroke_width=WIDTH, edge_radius=edge_radius).mobject.set_z_index(0)
                     self.is_curvy = True
                 else:
-                    # normal
-                    line = Line(start_node.mobject.get_center(), end_node.mobject.get_center(), buff=0.4, stroke_width=WIDTH).add_tip(tip_length=TIP_LENGTH_FOR_STRAIGHT_LINE).set_stroke(color=color, width=WIDTH).set_z_index(0)
-        self.mobject = VDict([("line", line)])
+                    if is_cyclic:
+                        line_mobject = Curved_Arrow(start_node.mobject.get_center(), end_node.mobject.get_center(), color=color, stroke_width=WIDTH, edge_radius=edge_radius).mobject.scale(0.78).set_z_index(0)
+                        self.is_curvy = True
+                    else:
+                        # normal
+                        line_mobject = Line(start_node.mobject.get_center(), end_node.mobject.get_center(), buff=0.4, stroke_width=WIDTH).add_tip(tip_length=TIP_LENGTH_FOR_STRAIGHT_LINE).set_stroke(color=color, width=WIDTH).set_z_index(0)
+        self.mobject = VDict([("line", line_mobject)])
 
         # for weighted edge
         if self.weight:
-            text = Text(str(weight), color=EDGE_COLOR, font=FONT, weight=WEIGHT_WEIGHT, font_size=WEIGHT_SIZE).move_to(line.get_center()).set_z_index(10).set_stroke(color=EDGE_STROKE_COLOR, width=EDGE_STROKE_WIDTH)
+            text = Text(str(weight), color=EDGE_COLOR, font=FONT, weight=WEIGHT_WEIGHT, font_size=WEIGHT_SIZE).move_to(line_mobject.get_center()).set_z_index(10).set_stroke(color=EDGE_STROKE_COLOR, width=EDGE_STROKE_WIDTH)
             circle_radius = WEIGHT_CIRCLE_RADIUS
             count_digit = len(str(weight))
             if count_digit > 2:
@@ -66,11 +66,11 @@ class GraphEdge:
         #         width = EDGE_HIGHLIGHT_STROKE_WIDTH_FOR_DIGRAPH
         self.mobject["line"].save_state()
         self.save_state = True
-        if change_tip_width:
+        if self.is_directed and change_tip_width:
             return AnimationGroup(self.mobject["line"].animate.set_stroke(width=width).set_color(color=color))
         else:
             if self.weight:
-                return AnimationGroup(self.mobject["line"].animate.set_color(color=color), self.mobject["text"]["text"].set_color(color=color))
+                return AnimationGroup(self.mobject["line"].animate.set_color(color=color), self.mobject["text"]["text"].animate.set_color(color=color))
             else:
                 return AnimationGroup(self.mobject["line"].animate.set_color(color=color))
 
