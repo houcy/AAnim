@@ -159,11 +159,11 @@ def endding(language='EN'):
         return Succession(*animations, lag_ratio=0.08)
 
 
-def get_subtitle_mobject(graph, english_string='', chinese_string='', language='EN'):
+def get_subtitle_mobject(graph, english_string='', chinese_string='', language='EN', legend_graph_buff=0.5):
     text = None
     if language == 'CH':
         text = chinese_string
     elif language == 'EN':
         text = english_string
-    text_check_mobject = get_text(text, font_size=SMALL_FONT_SIZE, weight=ULTRAHEAVY).next_to(graph.graph_mobject, UP, buff=0.5).align_to(graph.graph_mobject, LEFT)
+    text_check_mobject = get_text(text, font_size=SMALL_FONT_SIZE, weight=ULTRAHEAVY).next_to(graph.graph_mobject, UP, buff=legend_graph_buff).align_to(graph.graph_mobject, LEFT)
     return text_check_mobject
