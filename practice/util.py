@@ -133,7 +133,7 @@ def endding(language='EN'):
     from graph import GraphObject
     if language == 'CH':
         new_position_2 = scale_position(SANLIAN_POSITION_2, 2, 2)
-        graph = StraightGraph(SANLIAN_MAP_2, new_position_2, edge_radius=1.5, node_radius=SMALL_RADIUS)
+        graph = StraightGraph(SANLIAN_MAP_2, new_position_2, edge_radius=1.5, node_radius=SMALL_RADIUS, tip_length=TIP_LENGTH_FOR_CURVED_LINE-0.05, tip_width=TIP_LENGTH_FOR_CURVED_LINE-0.05)
         animations = []
         animations.append(FadeIn(graph.mobject()))
         zan = graph.value2node['赞']
@@ -142,9 +142,9 @@ def endding(language='EN'):
         zan2bi = graph.get_edge(zan, bi)
         bi2cang = graph.get_edge(bi, cang)
         animations.append(zan.color(fill_color=PINK2, stroke_color=GRAY, stroke_width=WIDTH))
-        animations.append(zan2bi.highlight(color=PINK2, change_tip_width=False))
+        animations.append(zan2bi.highlight(color=PINK2, change_tip_width=False, width=WIDTH))
         animations.append(bi.color(fill_color=GRAY, stroke_color=GRAY, stroke_width=WIDTH))
-        animations.append(bi2cang.highlight(color=PINK2, change_tip_width=False))
+        animations.append(bi2cang.highlight(color=PINK2, change_tip_width=False, width=WIDTH))
         animations.append(cang.color(fill_color='#FDF8CA', stroke_color=GRAY, stroke_width=WIDTH))
         return Succession(*animations, lag_ratio=1)
     elif language == 'EN':
@@ -159,11 +159,19 @@ def endding(language='EN'):
         return Succession(*animations, lag_ratio=0.08)
 
 
-def get_subtitle_mobject(graph, english_string='', chinese_string='', language='EN', legend_graph_buff=0.5):
+def get_subtitle_mobject(graph, english_string='', chinese_string='', language='EN', legend_graph_buff=0.5, subtitle_alignment=None, subtitle_position='TOP'):
     text = None
     if language == 'CH':
         text = chinese_string
     elif language == 'EN':
         text = english_string
-    text_check_mobject = get_text(text, font_size=SMALL_FONT_SIZE, weight=ULTRAHEAVY).next_to(graph.graph_mobject, UP, buff=legend_graph_buff).align_to(graph.graph_mobject, LEFT)
+    text_check_mobject = get_text(text, font_size=SMALL_FONT_SIZE, weight=ULTRAHEAVY)
+    # Place the subtitle on TOP/DOWN to the graph
+    if subtitle_position == 'UP':
+        text_check_mobject = text_check_mobject.next_to(graph.graph_mobject, UP, buff=legend_graph_buff)
+    elif subtitle_position == 'DOWN':
+        text_check_mobject = text_check_mobject.next_to(graph.graph_mobject, DOWN, buff=legend_graph_buff)
+    # Aligh the subtitle on LEFT/RIGHT/CENTER to the graph
+    if subtitle_alignment:
+        text_check_mobject = text_check_mobject.align_to(graph.graph_mobject, alignment)
     return text_check_mobject

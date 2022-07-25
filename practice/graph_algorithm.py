@@ -564,7 +564,7 @@ class Show(Scene):
                 nodes_to_keep.append(v)
                 edges_to_keep = list(v.neighbor2edge.values())
                 nodes_to_disappear = [n for n in graph.get_nodes() if n not in nodes_to_keep]
-                edges_to_disappear = [e for e in graph.get_edges_no_duplicate() if e not in edges_to_keep]
+                edges_to_disappear = [e for e in graph.get_edges() if e not in edges_to_keep]
                 nodes_to_disappear_group = GraphNodesGroup(nodes_to_disappear)
                 edges_to_disappear_group = GraphEdgesGroup(edges_to_disappear)
                 self.play(edges_to_disappear_group.disappear(include_label=True), nodes_to_disappear_group.disappear(), run_time=0.8*speed)
@@ -608,7 +608,7 @@ class Show(Scene):
                 nodes_to_keep.append(v)
                 edges_to_keep = list(v.neighbor2edge.values())
                 nodes_to_disappear = [n for n in graph.get_nodes() if n not in nodes_to_keep]
-                edges_to_disappear = [e for e in graph.get_edges_no_duplicate() if e not in edges_to_keep]
+                edges_to_disappear = [e for e in graph.get_edges() if e not in edges_to_keep]
                 nodes_to_disappear_group = GraphNodesGroup(nodes_to_disappear)
                 edges_to_disappear_group = GraphEdgesGroup(edges_to_disappear)
                 self.play(edges_to_disappear_group.disappear(include_label=True), nodes_to_disappear_group.disappear(), run_time=0.8*speed)
@@ -753,7 +753,7 @@ class Show(Scene):
             parent_of_end = union_find.find(end_node)
             remain_nodes = list(union_find.all_descendants(parent_of_start)) + list(union_find.all_descendants(parent_of_end))
             remain_edges = list(union_find.all_edges_under_root(parent_of_start)) + list(union_find.all_edges_under_root(parent_of_end))
-            disappear_edges = [e for e in graph.get_edges_no_duplicate() if not (e == min_edge or e in remain_edges)]
+            disappear_edges = [e for e in graph.get_edges() if not (e == min_edge or e in remain_edges)]
             disappear_nodes = [n for n in all_nodes if n not in remain_nodes]
             disappear_edges_group = GraphEdgesGroup(disappear_edges)
             disappear_nodes_group = GraphNodesGroup(disappear_nodes)
@@ -793,7 +793,7 @@ class Show(Scene):
         self.play(*transforms, run_time=1.5*speed)
 
     # the new version
-    def shortest_paths_dijkstra(self, graph, source=None, create_legend=True, show_horizontal_legend=False, animate_code_block=True, code_block=None, speed=1, hide_details=False):
+    def shortest_paths_dijkstra(self, graph, source=None, create_legend=True, show_horizontal_legend=False, animate_code_block=True, code_block=None, speed=1, hide_details=False, language='EN', legend_graph_buff=0.5, subtitle_alignment=None, subtitle_position='TOP'):
         speed = 1 / speed
         def extract_min_node(list):
             min_so_far = float('inf')
@@ -813,32 +813,52 @@ class Show(Scene):
         if animate_code_block and not code_block:
             code_block = CodeBlock(CODE_FOR_DIJKASTRA_WITHOUT_RELAX)
             self.play(Create(code_block.code))
+        subtitle_mobject = get_subtitle_mobject(graph, english_string='Initialize', chinese_string='初始化', language=language, legend_graph_buff=legend_graph_buff, subtitle_alignment=subtitle_alignment, subtitle_position=subtitle_position)
         edges = []
         unreach = list(graph.value2node.values())
         min_edge = {}
-        self.play(code_block.highlight(1), run_time=speed) if animate_code_block else None
-        self.wait() if animate_code_block else None
-        self.play(code_block.highlight(2), run_time=speed) if animate_code_block else None
-        self.wait() if animate_code_block else None
-        self.play(code_block.highlight(3), run_time=speed) if animate_code_block else None
-        self.wait() if animate_code_block else None
+        if animate_code_block:
+            self.play(code_block.highlight(1), run_time=speed)
+            self.wait()
+            self.play(code_block.highlight(2), run_time=speed)
+            self.wait()
+            self.play(code_block.highlight(3), run_time=speed)
+            self.wait()
+        else:
+            self.wait()
+            self.play(FadeIn(subtitle_mobject))
+            self.wait()
         # Accumulate animations for all nodes and show them at once
         self.initialize(graph, speed)
-        self.play(code_block.highlight(4), run_time=speed) if animate_code_block else None
-        self.wait() if animate_code_block else None
-        self.play(code_block.highlight(5), run_time=speed) if animate_code_block else None
-        self.wait() if animate_code_block else None
+        if animate_code_block:
+            self.play(code_block.highlight(4), run_time=speed)
+            self.wait()
+            self.play(code_block.highlight(5), run_time=speed)
+            self.wait()
+        else:
+            self.wait()
         if not source:
             source_node = graph.value2node.values()[0]
         else:
             source_node = graph.value2node[source]
         self.play(source_node.update_key(0), run_time=1.5*speed)
+        if not animate_code_block:
+            self.play(FadeOut(subtitle_mobject))
+            self.wait()
         prev_v = None
         while unreach:
             # Show group of unreached nodes
-            self.play(code_block.highlight(6), run_time=speed) if animate_code_block else None
-            self.wait() if animate_code_block else None
-            self.play(code_block.highlight(7), run_time=speed) if animate_code_block else None
+            if animate_code_block:
+                self.wait()
+                self.play(code_block.highlight(6), run_time=speed)
+                self.wait()
+                self.play(code_block.highlight(7), run_time=speed)
+            else:
+                english_string = 'Find the nearest node'
+                chinese_string = """找到最近的点, 放松由此点出发的边"""
+                subtitle_mobject = get_subtitle_mobject(graph, english_string=english_string, chinese_string=chinese_string, language=language, legend_graph_buff=legend_graph_buff, subtitle_alignment=subtitle_alignment, subtitle_position=subtitle_position)
+                self.play(FadeIn(subtitle_mobject))
+                self.wait()
             # Color the min node
             v = extract_min_node(unreach)
             self.wait()
@@ -871,7 +891,7 @@ class Show(Scene):
                 nodes_to_keep.append(v)
                 edges_to_keep = list(v.neighbor2edge.values())
                 nodes_to_disappear = [n for n in graph.get_nodes() if n not in nodes_to_keep]
-                edges_to_disappear = [e for e in graph.get_edges_no_duplicate() if e not in edges_to_keep]
+                edges_to_disappear = [e for e in graph.get_edges() if e not in edges_to_keep]
                 nodes_to_disappear_group = GraphNodesGroup(nodes_to_disappear)
                 edges_to_disappear_group = GraphEdgesGroup(edges_to_disappear)
                 self.play(edges_to_disappear_group.disappear(include_label=True), nodes_to_disappear_group.disappear(), run_time=0.8*speed)
@@ -907,18 +927,18 @@ class Show(Scene):
 
             # Shortened version - playing all for loops at the same time
             else:
-                # self.play(code_block.highlight(8, 5), run_time=speed) if animate_code_block else None
                 # Accumulate animations for all qualified nodes and show them at once
-                self.play(code_block.highlight(8, 5), run_time=speed) if animate_code_block else None
-                self.wait(2) if animate_code_block else None
+                if animate_code_block:
+                    self.play(code_block.highlight(8, 5), run_time=speed)
+                    self.wait(2)
                 nodes_to_keep = [u for u in v.neighbors]
                 nodes_to_keep.append(v)
                 edges_to_keep = list(v.neighbor2edge.values())
                 nodes_to_disappear = [n for n in graph.get_nodes() if n not in nodes_to_keep]
-                edges_to_disappear = [e for e in graph.get_edges_no_duplicate() if e not in edges_to_keep]
+                edges_to_disappear = [e for e in graph.get_edges() if e not in edges_to_keep]
                 nodes_to_disappear_group = GraphNodesGroup(nodes_to_disappear)
                 edges_to_disappear_group = GraphEdgesGroup(edges_to_disappear)
-                self.play(edges_to_disappear_group.disappear(include_label=True), nodes_to_disappear_group.disappear(), run_time=0.8*speed)
+                self.play(edges_to_disappear_group.disappear(include_label=True), nodes_to_disappear_group.disappear())
                 highlight_animations = []
                 relax_animations = []
                 dehighlight_animations = []
@@ -945,12 +965,22 @@ class Show(Scene):
                 if not highlight_animations and not relax_animations and not dehighlight_animations:
                     self.wait(1.5*speed)
                 self.wait(1.2*speed)
-                self.play(edges_to_disappear_group.appear(include_label=True), nodes_to_disappear_group.appear(), run_time=0.8*speed)
+                self.play(edges_to_disappear_group.appear(include_label=True), nodes_to_disappear_group.appear())
+            if not animate_code_block:
+                self.play(FadeOut(subtitle_mobject))
+                self.wait()
+
         self.play(prev_v.color(fill_color=PINK4, stroke_color=PINK3, stroke_width=WIDTH, has_key=True))
-        self.play(code_block.highlight(6), run_time=speed) if animate_code_block else None
-        self.wait() if animate_code_block else None
-        self.play(code_block.highlight(13), run_time=speed) if animate_code_block else None
-        self.wait() if animate_code_block else None
+        if animate_code_block:
+            self.play(code_block.highlight(6), run_time=speed)
+            self.wait()
+            self.play(code_block.highlight(13), run_time=speed)
+            self.wait()
+        else:
+            subtitle_mobject = get_subtitle_mobject(graph, english_string='Get shortest paths', chinese_string='生成最短路径', language=language, legend_graph_buff=legend_graph_buff, subtitle_alignment=subtitle_alignment, subtitle_position=subtitle_position)
+            self.play(FadeIn(subtitle_mobject))
+            self.wait()
+        self._remove_edges(graph, edges, speed=0.5)
         return edges
 
 
@@ -1107,7 +1137,7 @@ class Show(Scene):
         return edge_relaxed
 
 
-    def bellman_ford(self, graph, graph_position=(3.5, 0), graph_scale=1, source=None, create_graph=True, create_legend=True, show_horizontal_legend=False, animate_code_block=True, code_block=None, speed=1, hide_details=False, language='EN', music=None, show_graph_only=False, legend_graph_buff=0.5):
+    def bellman_ford(self, graph, graph_position=(3.5, 0), graph_scale=1, source=None, create_graph=True, create_legend=True, show_horizontal_legend=False, animate_code_block=True, subtitle_alignment=None, subtitle_position='TOP', code_block=None, speed=1, hide_details=False, language='EN', music=None, show_graph_only=False, legend_graph_buff=0.5):
         speed = 1 / speed
         if animate_code_block and not code_block:
             code_block = CodeBlock(CODE_FOR_BELLMAN_FORD_WITH_RELAX)
@@ -1126,13 +1156,13 @@ class Show(Scene):
         if not show_graph_only:
             if music:
                 self.add_sound(music)
-            self.wait()
-            subtitle_mobject = get_subtitle_mobject(graph, english_string='Initialize', chinese_string='初始化', language=language, legend_graph_buff=legend_graph_buff)
-            self.wait()
+            subtitle_mobject = get_subtitle_mobject(graph, english_string='Initialize', chinese_string='初始化', language=language, legend_graph_buff=legend_graph_buff, subtitle_alignment=subtitle_alignment, subtitle_position=subtitle_position)
             if animate_code_block:
+                self.wait()
                 self.play(code_block.highlight(1, wait_time_after=1))
                 self.play(code_block.highlight(2, wait_time_after=2))
             else:
+                self.wait()
                 self.play(FadeIn(subtitle_mobject))
                 self.wait()
             self.initialize(graph)
@@ -1146,9 +1176,9 @@ class Show(Scene):
             else:
                 source_node = graph.value2node[source]
             self.play(source_node.update_key(0), run_time=1.5)
-            self.wait()
-            self.play(FadeOut(subtitle_mobject)) if not animate_code_block else None
-            self.wait()
+            if not animate_code_block:
+                self.play(FadeOut(subtitle_mobject))
+                self.wait()
             is_converged = False
             for i in range(graph.n_nodes()-1):
                 # For no code version
@@ -1164,7 +1194,7 @@ class Show(Scene):
                     # else:
                     english_string = 'Relax all edges (' + str(i+1) + 'time)'
                     chinese_string = '放松每条边 ~ 第' + str(i+1) + '/' + str(graph.n_nodes()-1) + '次'
-                    subtitle_mobject = get_subtitle_mobject(graph, english_string=english_string, chinese_string=chinese_string, language=language, legend_graph_buff=legend_graph_buff)
+                    subtitle_mobject = get_subtitle_mobject(graph, english_string=english_string, chinese_string=chinese_string, language=language, legend_graph_buff=legend_graph_buff, subtitle_alignment=subtitle_alignment, subtitle_position=subtitle_position)
                     self.play(FadeIn(subtitle_mobject))
                     self.wait()                
                 key_decreased = []
@@ -1193,7 +1223,7 @@ class Show(Scene):
             if animate_code_block:
                 self.play(code_block.highlight(8, wait_time_after=2))
             else:
-                subtitle_mobject = get_subtitle_mobject(graph, english_string='Check for a negative cycle', chinese_string='检查每条边, 看是否存在负环', language=language, legend_graph_buff=legend_graph_buff)
+                subtitle_mobject = get_subtitle_mobject(graph, english_string='Check for a negative cycle', chinese_string='检查每条边, 看是否存在负环', language=language, legend_graph_buff=legend_graph_buff, subtitle_alignment=subtitle_alignment, subtitle_position=subtitle_position)
                 self.play(FadeIn(subtitle_mobject))
                 self.wait()
             for edge in edges:
@@ -1207,7 +1237,7 @@ class Show(Scene):
                 else:
                     self.play(edge.highlight(color=GREEN))
                 if dest_node.key > source_node.key + edge.weight:
-                    all_edges = GraphEdgesGroup(graph.get_edges_no_duplicate())
+                    all_edges = GraphEdgesGroup(graph.get_edges())
                     if animate_code_block:
                         self.play(code_block.if_true(wait_time=3))
                         self.play(code_block.highlight(11, wait_time_after=1))
@@ -1229,7 +1259,7 @@ class Show(Scene):
                 self.wait()
                 self.play(FadeOut(subtitle_mobject))
                 self.wait()
-                subtitle_mobject = get_subtitle_mobject(graph, english_string='Get shortest paths', chinese_string='生成最短路径', language=language, legend_graph_buff=legend_graph_buff)
+                subtitle_mobject = get_subtitle_mobject(graph, english_string='Get shortest paths', chinese_string='生成最短路径', language=language, legend_graph_buff=legend_graph_buff, subtitle_alignment=subtitle_alignment, subtitle_position=subtitle_position)
                 self.play(FadeIn(subtitle_mobject))
                 self.wait()
             path_edges = graph.get_shortest_paths()
@@ -1266,7 +1296,7 @@ class Show(Scene):
     #     else:
     #         source_node = graph.value2node[source]
     #     self.play(source_node.update_key(0), run_time=1.5*speed)
-    #     edges = graph.get_edges_no_duplicate()
+    #     edges = graph.get_edges()
     #     for i in range(graph.n_nodes()-1):
     #         self.play(code_block.highlight(5, wait_time_after=2)) if animate_code_block else None
     #         for edge in edges:
@@ -1302,7 +1332,7 @@ class Show(Scene):
     #         if dest_node.key > source_node.key + edge.weight:
     #             self.play(code_block.if_true(wait_time=3)) if animate_code_block else None
     #             self.play(code_block.highlight(11, wait_time_after=2)) if animate_code_block else None
-    #             all_edges = GraphEdgesGroup(graph.get_edges_no_duplicate())
+    #             all_edges = GraphEdgesGroup(graph.get_edges())
     #             if animate_code_block:
     #                 self.play(all_edges.highlight(color=RED), source_node.fade_out_variable(), dest_node.fade_out_variable())
     #             else:
@@ -1860,4 +1890,86 @@ class Show(Scene):
         # self.clear()
         # self.play(endding(language='CH'))
         # self.wait(10)
+
+
+        ### Compare Bellman-ford vs. Dijkstra (CH)
+        # self.add(watermark_ch)
+        # title_mobject = show_title_for_demo("DIJKSTRA'S VS. BELLMAN-FORD")
+        # self.add(title_mobject)  
+        # top_l = Legend({('LINE', PINK4, PINK4): "最短路径", (BACKGROUND, GREEN): "键值降低的点"}, is_horizontal=True)
+        # top_l.mobjects.move_to(ORIGIN).to_edge(UP, buff=1)
+        # self.play(top_l.animation)
+
+        # dij_title = Text("Dijkstra's 迪杰斯特拉算法", color=GRAY, font=FONT, weight=SEMIBOLD, font_size=SMALL_FONT_SIZE*2).scale(0.5)
+        # dij_title.next_to(top_l.mobjects, DOWN, buff=0.5).shift(LEFT * 3.2)
+        # bell_title = Text("Bellman-Ford 贝尔曼福特算法", color=GRAY, font=FONT, weight=SEMIBOLD, font_size=SMALL_FONT_SIZE*2).scale(0.5)
+        # bell_title.next_to(top_l.mobjects, DOWN, buff=0.5).shift(RIGHT * 3.1)
+        # self.play(FadeIn(dij_title))
+        # self.play(FadeIn(bell_title))
+        # self.wait(240)
+        # new_position = scale_position(POSITION_DOUBLE_SQUARE, 2, 3)
+        # graph_left = GraphObject(MAP_DOUBLE_SQUARE, new_position)
+        # graph_left.graph_mobject.scale(0.9).shift(LEFT * 3.2 + DOWN * 0.4)
+        # graph_right = GraphObject(MAP_DOUBLE_SQUARE, new_position)
+        # graph_right.graph_mobject.scale(0.9).shift(RIGHT * 3.1 + DOWN * 0.4)
+
+        # ## Dijkstra
+        # self.play(FadeIn(graph_left.graph_mobject))
+        # self.wait(3)
+        # self.shortest_paths_dijkstra(graph_left, source='Src', create_legend=False, animate_code_block=False, subtitle_position='DOWN', hide_details=True, speed=1, language='CH')
+
+        # ## Bellman-Ford
+        # self.play(FadeIn(graph_right.graph_mobject))
+        # self.wait(3)
+        # self.bellman_ford(graph_right, create_graph=False, source='Src', create_legend=False, animate_code_block=False, subtitle_position='DOWN', hide_details=True, speed=1, language='CH')
+        # self.wait(5)
+
+        ## Generate dialogues
+        # le = Ellipse(width=1.5, height=0.8)
+        # ll = Line((0,0.15,0), (0.15,0,0)).shift(0.4*UP+0.6*LEFT)
+        # ldialogue = VGroup(le, ll).set_stroke(color=PINK5)
+        # ltext1 = get_text('我好了', color=PINK5, font_size=SMALL_FONT_SIZE, weight=ULTRAHEAVY).move_to(le)
+        # ldialogue += ltext1
+        # self.play(Write(ldialogue.shift(0.2*LEFT+0.1*UP)))
+        # self.wait(4)
+        # ltext2 = get_text('等你', color=PINK5, font_size=SMALL_FONT_SIZE, weight=ULTRAHEAVY).move_to(le)
+        # self.play(Unwrite(ltext1))
+        # ldialogue += ltext2
+        # self.play(Write(ltext2))
+        # self.wait(4)
+
+        # re = Ellipse(width=1.5, height=0.8)
+        # rl = Line((0,0,0), (0.15,0.15,0)).shift(0.35*UP+0.6*RIGHT)
+        # rdialogue = VGroup(re, rl).set_stroke(color=BLUE1).shift(1.3*DOWN)
+        # rtext1 = get_text('来了', color=BLUE1, font_size=SMALL_FONT_SIZE, weight=ULTRAHEAVY).move_to(re)
+        # rdialogue += rtext1
+        # self.play(Write(rdialogue.shift(0)))
+        # self.wait(4)
+        # self.play(Unwrite(ldialogue))
+        # self.play(Unwrite(rdialogue))
+        # self.wait(1)
+
+        # re = Ellipse(width=1.5, height=0.8)
+        # rl = Line((0,0,0), (0.15,0.15,0)).shift(0.35*UP+0.55*RIGHT)
+        # rtext1 = get_text('我也好了', color=BLUE1, font_size=SMALL_FONT_SIZE, weight=ULTRAHEAVY).move_to(re)
+        # rdialogue = VGroup(re, rl).set_stroke(color=BLUE1)
+        # rdialogue += rtext1
+        # rdialogue.shift(1.3*DOWN)
+        # self.play(Write(rdialogue))
+        # self.wait(4)
+
+        # rtext2 = get_text('在擦汗呢', color=BLUE1, font_size=SMALL_FONT_SIZE, weight=ULTRAHEAVY).move_to(re)
+        # self.play(Unwrite(rtext1))
+        # self.play(Write(rtext2))
+        # self.wait()
+
+        ## Generate endding
+        # self.wait(0.3)
+        # self.play(endding(language='CH'))
+        # self.wait(10)
+        
+
+        
+
+        
 

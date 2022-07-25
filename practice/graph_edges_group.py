@@ -38,12 +38,12 @@ class GraphEdgesGroup:
         # self.line_mobject.save_state()
         if include_label:
             self.text_mobject.save_state()
-            return AnimationGroup(FadeOut(self.line_mobject), FadeOut(self.text_mobject), Wait(), lag_ratio=1)
+            return AnimationGroup(AnimationGroup(FadeOut(self.line_mobject), FadeOut(self.text_mobject)), Wait(), lag_ratio=1)
         else:
             return AnimationGroup(self.line_mobject.animate.set_color(color=BACKGROUND), Wait(), lag_ratio=1)
 
     def appear(self, include_label=False):
         if include_label:
-            return AnimationGroup(FadeIn(self.line_mobject), FadeIn(self.text_mobject), Wait(), lag_ratio=1)
+            return AnimationGroup(AnimationGroup(FadeIn(self.line_mobject), FadeIn(self.text_mobject)), Wait(), lag_ratio=1)
         else:
             return AnimationGroup(Restore(self.line_mobject), Wait(), lag_ratio=1)

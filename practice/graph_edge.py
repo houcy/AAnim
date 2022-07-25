@@ -5,7 +5,7 @@ from curved_arrow import Curved_Arrow
 
 
 class GraphEdge:
-    def __init__(self, start_node, end_node, weight=None, line_mobject=None, is_cyclic=False, is_directed=False, is_topological_graph=False, is_straight_graph=False, edge_radius=EDGE_RADIUS, color=GRAY):
+    def __init__(self, start_node, end_node, weight=None, line_mobject=None, is_cyclic=False, is_directed=False, is_topological_graph=False, is_straight_graph=False, edge_radius=EDGE_RADIUS, color=GRAY, tip_length=TIP_LENGTH_FOR_CURVED_LINE, tip_width=TIP_LENGTH_FOR_CURVED_LINE):
         self.weight = weight
         self.start_node = start_node
         self.end_node = end_node
@@ -22,7 +22,7 @@ class GraphEdge:
                     start_position = start_node.position_x
                     end_position = end_node.position_x
                     if start_position < end_position:
-                        line_mobject = Curved_Arrow(start_node.mobject.get_bottom(), end_node.mobject.get_bottom(), color=color, stroke_width=WIDTH, edge_radius=edge_radius).mobject.set_z_index(0)
+                        line_mobject = Curved_Arrow(start_node.mobject.get_bottom(), end_node.mobject.get_bottom(), color=color, stroke_width=WIDTH, edge_radius=edge_radius, tip_length=tip_length, tip_width=tip_width).mobject.set_z_index(0)
                         self.is_curvy = True
                     else:
                         line_mobject = Curved_Arrow(start_node.mobject.get_top(), end_node.mobject.get_top(), color=color, stroke_width=WIDTH, edge_radius=edge_radius).mobject.set_z_index(0)
@@ -36,7 +36,7 @@ class GraphEdge:
                         self.is_curvy = True
                     else:
                         # normal
-                        line_mobject = Line(start_node.mobject.get_center(), end_node.mobject.get_center(), buff=0.4, stroke_width=WIDTH).add_tip(tip_length=TIP_LENGTH_FOR_STRAIGHT_LINE).set_stroke(color=color, width=WIDTH).set_z_index(0)
+                        line_mobject = Line(start_node.mobject.get_center(), end_node.mobject.get_center(), buff=0.4, stroke_width=WIDTH).add_tip(tip_length=TIP_LENGTH_FOR_STRAIGHT_LINE, tip_width=TIP_LENGTH_FOR_STRAIGHT_LINE).set_stroke(color=color, width=WIDTH).set_z_index(0)
         self.mobject = VDict([("line", line_mobject)])
 
         # for weighted edge
@@ -64,14 +64,16 @@ class GraphEdge:
         #         width = EDGE_HIGHLIGHT_STROKE_WIDTH_FOR_DIGRAPH_CURVY
         #     else:
         #         width = EDGE_HIGHLIGHT_STROKE_WIDTH_FOR_DIGRAPH
+        print(EDGE_HIGHLIGHT_STROKE_WIDTH)
         self.mobject["line"].save_state()
         self.save_state = True
         if self.is_directed and change_tip_width:
             return AnimationGroup(self.mobject["line"].animate.set_stroke(width=width).set_color(color=color))
         else:
             if self.weight:
-                return AnimationGroup(self.mobject["line"].animate.set_color(color=color), self.mobject["text"]["text"].animate.set_color(color=color))
+                return AnimationGroup(self.mobject["line"].animate.set_color(color=color).set_stroke(width=width), self.mobject["text"]["text"].animate.set_color(color=color))
             else:
+                print("ere")
                 return AnimationGroup(self.mobject["line"].animate.set_color(color=color))
 
 
