@@ -154,9 +154,9 @@ def endding(language='EN'):
         animations.append(graph.fade_in())
         for node in graph.get_nodes():
             animations.append(node.color(stroke_color='#FF0000', fill_color='#FF0000'))
-        for edge in graph.get_edges_no_duplicate():
+        for edge in graph.get_edges():
             animations.append(edge.highlight(color='#FF0000', width=WIDTH))
-        return Succession(*animations, lag_ratio=0.08)
+        return Succession(*animations, lag_ratio=0.1)
 
 
 def get_subtitle_mobject(graph, english_string='', chinese_string='', language='EN', legend_graph_buff=0.5, subtitle_alignment=None, subtitle_position='TOP'):
@@ -165,7 +165,7 @@ def get_subtitle_mobject(graph, english_string='', chinese_string='', language='
         text = chinese_string
     elif language == 'EN':
         text = english_string
-    text_check_mobject = get_text(text, font_size=SMALL_FONT_SIZE, weight=ULTRAHEAVY)
+    text_check_mobject = get_text(text, font_size=SMALL_FONT_SIZE*2, weight=ULTRAHEAVY).scale(0.5)
     # Place the subtitle on TOP/DOWN to the graph
     if subtitle_position == 'UP':
         text_check_mobject = text_check_mobject.next_to(graph.graph_mobject, UP, buff=legend_graph_buff)

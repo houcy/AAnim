@@ -1156,7 +1156,7 @@ class Show(Scene):
         if not show_graph_only:
             if music:
                 self.add_sound(music)
-            subtitle_mobject = get_subtitle_mobject(graph, english_string='Initialize', chinese_string='初始化', language=language, legend_graph_buff=legend_graph_buff, subtitle_alignment=subtitle_alignment, subtitle_position=subtitle_position)
+            subtitle_mobject = get_subtitle_mobject(graph, english_string='Initialize keys', chinese_string='初始化', language=language, legend_graph_buff=legend_graph_buff, subtitle_alignment=subtitle_alignment, subtitle_position=subtitle_position)
             if animate_code_block:
                 self.wait()
                 self.play(code_block.highlight(1, wait_time_after=1))
@@ -1192,7 +1192,7 @@ class Show(Scene):
                     #     subtitle_mobject = get_subtitle_mobject(graph, english_string=english_string, chinese_string=chinese_string, language=language)
                     #     self.play(FadeIn(subtitle_mobject))
                     # else:
-                    english_string = 'Relax all edges (' + str(i+1) + 'time)'
+                    english_string = 'Relax all edges (' + str(i+1) + ' / ' + str(graph.n_nodes()-1) + ')'
                     chinese_string = '放松每条边 ~ 第' + str(i+1) + '/' + str(graph.n_nodes()-1) + '次'
                     subtitle_mobject = get_subtitle_mobject(graph, english_string=english_string, chinese_string=chinese_string, language=language, legend_graph_buff=legend_graph_buff, subtitle_alignment=subtitle_alignment, subtitle_position=subtitle_position)
                     self.play(FadeIn(subtitle_mobject))
@@ -1223,7 +1223,7 @@ class Show(Scene):
             if animate_code_block:
                 self.play(code_block.highlight(8, wait_time_after=2))
             else:
-                subtitle_mobject = get_subtitle_mobject(graph, english_string='Check for a negative cycle', chinese_string='检查每条边, 看是否存在负环', language=language, legend_graph_buff=legend_graph_buff, subtitle_alignment=subtitle_alignment, subtitle_position=subtitle_position)
+                subtitle_mobject = get_subtitle_mobject(graph, english_string='Check for any negative cycles', chinese_string='检查每条边, 看是否存在负环', language=language, legend_graph_buff=legend_graph_buff, subtitle_alignment=subtitle_alignment, subtitle_position=subtitle_position)
                 self.play(FadeIn(subtitle_mobject))
                 self.wait()
             for edge in edges:
@@ -1259,7 +1259,7 @@ class Show(Scene):
                 self.wait()
                 self.play(FadeOut(subtitle_mobject))
                 self.wait()
-                subtitle_mobject = get_subtitle_mobject(graph, english_string='Get shortest paths', chinese_string='生成最短路径', language=language, legend_graph_buff=legend_graph_buff, subtitle_alignment=subtitle_alignment, subtitle_position=subtitle_position)
+                subtitle_mobject = get_subtitle_mobject(graph, english_string='Return shortest paths', chinese_string='生成最短路径', language=language, legend_graph_buff=legend_graph_buff, subtitle_alignment=subtitle_alignment, subtitle_position=subtitle_position)
                 self.play(FadeIn(subtitle_mobject))
                 self.wait()
             path_edges = graph.get_shortest_paths()
@@ -1878,6 +1878,19 @@ class Show(Scene):
         # self.play(endding(language='CH'))
         # self.wait(10)
 
+    
+        ### Bellman-Ford-no-code (EN)
+        # self.add(watermark_en)
+        # title_mobject = show_title_for_demo("BELLMAN-FORD ALGO")
+        # self.add(title_mobject)
+        # new_position = scale_position(POSITION_DOUBLE_SQUARE, 4.8, 3)
+        # graph = GraphObject(MAP_DOUBLE_SQUARE, new_position)
+        # self.bellman_ford(graph, music='Facile - Kevin MacLeod.mp3', source='Src', graph_position=(0, 0), create_legend=True, animate_code_block=False, show_horizontal_legend=True, speed=2, hide_details=True, language='EN', subtitle_position='DOWN')
+        # self.wait(5)
+        # self.clear()
+        # self.play(endding(language='EN'))
+        # self.wait(10)
+
 
         ### Bellman-Ford-why-n-1-iteration (CH)
         # self.add(watermark_ch)
@@ -1892,6 +1905,19 @@ class Show(Scene):
         # self.wait(10)
 
 
+        ### Bellman-Ford-why-n-1-iteration (EN)
+        # self.add(watermark_en)
+        # title_mobject = show_title_for_demo("BELLMAN-FORD ALGO")
+        # self.add(title_mobject)
+        # new_position = scale_position(POSITION_6_NODES_HORIZONTAL, 2, 1)
+        # graph = GraphObject(MAP_6_NODES_HORIZONTAL, new_position)
+        # self.bellman_ford(graph, music='人海如潮.mp3', source='Src', graph_position=(0, -0.3), create_legend=True, animate_code_block=False, show_horizontal_legend=True, speed=2, hide_details=True, language='EN', show_graph_only=False, legend_graph_buff=1, subtitle_position='DOWN')
+        # self.wait(5)
+        # self.clear()
+        # self.play(endding(language='EN'))
+        # self.wait(10)
+
+
         ### Compare Bellman-ford vs. Dijkstra (CH)
         # self.add(watermark_ch)
         # title_mobject = show_title_for_demo("DIJKSTRA'S VS. BELLMAN-FORD")
@@ -1899,7 +1925,6 @@ class Show(Scene):
         # top_l = Legend({('LINE', PINK4, PINK4): "最短路径", (BACKGROUND, GREEN): "键值降低的点"}, is_horizontal=True)
         # top_l.mobjects.move_to(ORIGIN).to_edge(UP, buff=1)
         # self.play(top_l.animation)
-
         # dij_title = Text("Dijkstra's 迪杰斯特拉算法", color=GRAY, font=FONT, weight=SEMIBOLD, font_size=SMALL_FONT_SIZE*2).scale(0.5)
         # dij_title.next_to(top_l.mobjects, DOWN, buff=0.5).shift(LEFT * 3.2)
         # bell_title = Text("Bellman-Ford 贝尔曼福特算法", color=GRAY, font=FONT, weight=SEMIBOLD, font_size=SMALL_FONT_SIZE*2).scale(0.5)
@@ -1912,18 +1937,15 @@ class Show(Scene):
         # graph_left.graph_mobject.scale(0.9).shift(LEFT * 3.2 + DOWN * 0.4)
         # graph_right = GraphObject(MAP_DOUBLE_SQUARE, new_position)
         # graph_right.graph_mobject.scale(0.9).shift(RIGHT * 3.1 + DOWN * 0.4)
-
         # ## Dijkstra
         # self.play(FadeIn(graph_left.graph_mobject))
         # self.wait(3)
         # self.shortest_paths_dijkstra(graph_left, source='Src', create_legend=False, animate_code_block=False, subtitle_position='DOWN', hide_details=True, speed=1, language='CH')
-
         # ## Bellman-Ford
         # self.play(FadeIn(graph_right.graph_mobject))
         # self.wait(3)
         # self.bellman_ford(graph_right, create_graph=False, source='Src', create_legend=False, animate_code_block=False, subtitle_position='DOWN', hide_details=True, speed=1, language='CH')
         # self.wait(5)
-
         ## Generate dialogues
         # le = Ellipse(width=1.5, height=0.8)
         # ll = Line((0,0.15,0), (0.15,0,0)).shift(0.4*UP+0.6*LEFT)
@@ -1937,7 +1959,6 @@ class Show(Scene):
         # ldialogue += ltext2
         # self.play(Write(ltext2))
         # self.wait(4)
-
         # re = Ellipse(width=1.5, height=0.8)
         # rl = Line((0,0,0), (0.15,0.15,0)).shift(0.35*UP+0.6*RIGHT)
         # rdialogue = VGroup(re, rl).set_stroke(color=BLUE1).shift(1.3*DOWN)
@@ -1948,7 +1969,6 @@ class Show(Scene):
         # self.play(Unwrite(ldialogue))
         # self.play(Unwrite(rdialogue))
         # self.wait(1)
-
         # re = Ellipse(width=1.5, height=0.8)
         # rl = Line((0,0,0), (0.15,0.15,0)).shift(0.35*UP+0.55*RIGHT)
         # rtext1 = get_text('我也好了', color=BLUE1, font_size=SMALL_FONT_SIZE, weight=ULTRAHEAVY).move_to(re)
@@ -1957,7 +1977,6 @@ class Show(Scene):
         # rdialogue.shift(1.3*DOWN)
         # self.play(Write(rdialogue))
         # self.wait(4)
-
         # rtext2 = get_text('在擦汗呢', color=BLUE1, font_size=SMALL_FONT_SIZE, weight=ULTRAHEAVY).move_to(re)
         # self.play(Unwrite(rtext1))
         # self.play(Write(rtext2))
@@ -1967,6 +1986,11 @@ class Show(Scene):
         # self.wait(0.3)
         # self.play(endding(language='CH'))
         # self.wait(10)
+
+
+        ### 算法童话系列 ###
+        self.add(watermark_ch)
+        title_mobject = show_title_for_demo("算法童话：Kruskal")
         
 
         
