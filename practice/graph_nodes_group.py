@@ -72,7 +72,25 @@ class GraphNodesGroup:
             text_mobject = self.get_text_mobject()
             return AnimationGroup(circle_mobject.animate.set_stroke(color=stroke_color, width=stroke_width).set_fill(color=fill_color), text_mobject.animate.set_color(color=text_color).set_stroke(width=key_width))     
 
+    def highlight(self, text_color=BACKGROUND, fill_color=PINK4, stroke_color=PINK5, stroke_width=NODE_HIGHLIGHT_STROKE_WIDTH, has_key=False):
+        return self.color(text_color=text_color, fill_color=fill_color, stroke_color=stroke_color, stroke_width=stroke_width, has_key=has_key)
+
+    def fill(self, fill_color=PINK4, stroke_color=PINK3):
+        return self.highlight(fill_color=fill_color, stroke_color=stroke_color, stroke_width=WIDTH)
+
     def flash_keys(self, color=BACKGROUND):
         key_mobject = self.key_mobject()
         animations = [key_mobject.animate.set_color(color), key_mobject.animate.set_color(GRAY)]
         return animations
+
+    def initialize_keys(self, key, show_value=False, color=GRAY):
+        animations = []
+        for node in self.list_nodes:
+            animations.append(node.initialize_key(key, show_value, color))
+        return AnimationGroup(*animations)
+
+    def delete_keys(self):
+        animations = []
+        for node in self.list_nodes:
+            animations.append(node.delete_key())
+        return AnimationGroup(*animations)

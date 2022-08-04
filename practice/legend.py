@@ -1,6 +1,7 @@
 from manim import *
 from style import *
 
+LINE_WIDTH = 7
 
 class Legend:
     def __init__(self, dict, is_horizontal=False, save_space=False):
@@ -9,6 +10,7 @@ class Legend:
         """
         self.animation = None
         inside = VGroup()
+        self.box = None
         for feature, explanation in dict.items():
             if feature[0] == "HIGHLIGHT_ROUNDED_RECTANGLE":
                 command, fill_color, stroke_color = feature
@@ -22,20 +24,24 @@ class Legend:
                         inside += rect
                         inside += text
             elif feature[0] == "MULTICOLORS":
+                legend = VGroup()
                 if feature[1] == "CIRCLE":
-                    circles = VGroup()
                     for i, color in enumerate(MULTI_COLORS):
-                        circles += Circle(radius=SM_RADIUS).set_fill(color, 1).set_stroke(color).shift((i * SM_RADIUS*1.5) * RIGHT)
-                    text = Text(str(explanation), color=LINE_COLOR, font=FONT, font_size=LEGEND_SIZE).next_to(circles, RIGHT, buff=2)
-                    if is_horizontal or save_space:
-                        row = VGroup(circles, text).arrange_in_grid(rows=1, buff=LEGEND_BUFF_MICRO)
-                        inside += row
-                    else:
-                        inside += circles
-                        inside += text
+                        legend += Circle(radius=SM_RADIUS).set_fill(color, 1).set_stroke(color).shift((i * SM_RADIUS*1.5) * RIGHT)
+                elif feature[1] == "LINE":
+                    for i, color in enumerate(MULTI_COLORS):
+                        legend += Line(start=[0, 0, 0], end=[0.21, 0, 0]).set_fill(color, 1).set_stroke(color, width=LINE_WIDTH).shift((i * 0.1) * DOWN)
+                text = Text(str(explanation), color=LINE_COLOR, font=FONT, font_size=LEGEND_SIZE).next_to(legend, RIGHT, buff=2)
+                if is_horizontal or save_space:
+                    row = VGroup(legend, text).arrange_in_grid(rows=1, buff=LEGEND_BUFF_MICRO)
+                    inside += row
+                else:
+                    inside += legend
+                    inside += text
+
             elif feature[0] == "LINE":
                 _, fill_color, stroke_color = feature
-                line = Line(start=[0, 0, 0], end=[0.21, 0, 0]).set_fill(fill_color, 1).set_stroke(stroke_color, width=10)
+                line = Line(start=[0, 0, 0], end=[0.21, 0, 0]).set_fill(fill_color, 1).set_stroke(stroke_color, width=LINE_WIDTH)
                 text = Text(str(explanation), color=LINE_COLOR, font=FONT, font_size=LEGEND_SIZE*2).scale(0.5).next_to(line, RIGHT, buff=2)
                 if is_horizontal or save_space:
                     row = VGroup(line, text).arrange_in_grid(rows=1, buff=LEGEND_BUFF_MICRO)
@@ -60,8 +66,16 @@ class Legend:
         else:
             inside = inside.arrange_in_grid(cols=2, col_alignments=["l", "l"], buff=LEGEND_BUFF_MACRO)
         box = SurroundingRectangle(inside, corner_radius=0, color=LINE_COLOR, stroke_width=LEGEND_STROKE_WIDTH, buff=0.2)
-        self.animation = AnimationGroup(FadeIn(inside), Create(box), Wait())
+        self.animation = AnimationGroup(FadeIn(inside), Create(box))
         self.mobjects = VGroup(inside, box)
+        self.inside = inside
+        self.box = box
+
+    def fade_in(self):
+        return AnimationGroup(FadeIn(self.inside), Create(self.box))
+
+    def fade_out(self):
+        return FadeOut(self.mobjects)
 
 class Test(Scene):
     def construct(self):
