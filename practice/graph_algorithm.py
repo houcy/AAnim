@@ -9,6 +9,9 @@ from graph_nodes_group import GraphNodesGroup
 from util import *
 from union_find import UnionFind
 from color_generator import ColorGenerator
+from left_side_outline import LeftSideOutline
+from character import Character
+from concepts_map import ConceptsMap
 import copy
 
 MAP_DIRECTED = {'A': {'B': None, 'C': None}, 'B': {'D': None, 'E': None}, 'D': {'F': None}, 'E': {'F': None}}
@@ -131,21 +134,77 @@ POSITION_DOUBLE_SQUARE = {
 MAP_6_NODES_HORIZONTAL = {'E': {'F': 1}, 'D': {'E': 1}, 'C': {'D': 1}, 'B': {'C': 1}, 'Src': {'B': 1}, }
 POSITION_6_NODES_HORIZONTAL = {'Src': (0, 0), 'B': (1, 0), 'C': (2, 0), 'D': (3, 0), 'E': (4, 0), 'F': (5, 0)}
 
-class Show(Scene):
+FAIRYTALE_POSITION = {'A': (0, 0), 'B': (1, 1), 'C': (2, 0), 'D': (1, -1), 'E': (3, 1), 'F': (3, -1), 'G': (4, 0)}
+FAIRYTALE_MAP = {
+    'A': {'B': 4, 'D': 8}, 
+    'B': {'A': 4, 'C': 7, 'D': 9, 'E': 10}, 
+    'C': {'B': 7, 'E': 7, 'D': 2, 'F': 10},
+    'D': {'A': 8, 'B': 9, 'C': 2, 'F': 1},
+    'E': {'B': 10, 'C': 7, 'F': 5, 'G': 6},
+    'F': {'C': 10, 'D': 1, 'E': 5, 'G': 2},
+    'G': {'E': 6, 'F': 2}
+}
+
+FAIRYTALE_POSITION = {'E': (0, 0), 'B': (0, 1), 'C': (1, 1), 'F': (1, 0), 'A': (1, 2), 'D': (2, 1), 'G': (2, 0)}
+FAIRYTALE_MAP = {
+    'E': {'B': 4, 'F': 8}, 
+    'B': {'E': 4, 'C': 7, 'F': 9, 'A': 10}, 
+    'C': {'B': 7, 'A': 7, 'F': 2, 'D': 10},
+    'F': {'E': 8, 'B': 9, 'C': 2, 'D': 1, 'G': 6},
+    'A': {'B': 10, 'C': 7, 'D': 5},
+    'D': {'C': 10, 'F': 1, 'A': 5, 'G': 2},
+    'G': {'F': 6, 'D': 2}
+}
+
+
+class Show(MovingCameraScene):
     # def __init__(self, adjacency_list, position, is_directed):
     #     self.adjacency_list = adjacency_list
     #     self.position = position
     #     self.is_directed = is_directed
     #     super().__init__()
 
-    def _remove_edges(self, graph, selected_edges, speed=1):
+    def _remove_edges(self, graph, selected_edges, speed=0.5, is_sync=False):
+        animations = []
+
         for edge in graph.edges:
             if edge not in selected_edges:
-                self.play(edge.fade_out(), run_time=speed)
+                if not is_sync:
+                    self.play(edge.fade_out(), run_time=speed)
+                else:
+                    animations.append(edge.fade_out())
+        if is_sync:
+            self.play(*animations)
+
+    def _restore_edges(self, graph, selected_edges, speed=1, is_sync=False):
+        animations = []
+        for edge in graph.edges:
+            if edge not in selected_edges:
+                if not is_sync:
+                    self.play(edge.fade_in(), run_time=speed)
+                else:
+                    animations.append(edge.fade_in())
+        if is_sync:
+            self.play(*animations)
 
     def flash(self, temp_group):
         self.play(*[m.animate.set_color(BACKGROUND) for m in temp_group])
         self.play(*[m.animate.set_color(GRAY) for m in temp_group])
+
+    def show_only(self, concepts_map, mobject_to_keep):
+        # all is a list of mobjects
+        animations = []
+        for e in concepts_map:
+            if e not in mobject_to_keep:
+                animations.append(FadeOut(e))
+        return AnimationGroup(*animations)
+    def show_all(self, concepts_map, mobject_to_keep):
+        # all is a list of mobjects
+        animations = []
+        for e in concepts_map:
+            if e not in mobject_to_keep:
+                animations.append(FadeIn(e))
+        return AnimationGroup(*animations)   
     
     ##################################
     # DFS
@@ -583,7 +642,7 @@ class Show(Scene):
                     self.wait()
                     self.play(code_block.highlight(10), run_time=speed) if animate_code_block else None
                     self.wait(1.7)
-                    if edge_v_u.weight + v.key < u.key:
+                    if edge_v_u.weight < u.key:
                         self.play(code_block.highlight(11), run_time=1.5*speed) if animate_code_block else None
                         self.wait()
                         u.key = edge_v_u.weight + v.key
@@ -662,8 +721,8 @@ class Show(Scene):
         if animate_code_block and not code_block:
             code_block = CodeBlock(CODE_FOR_KRUSKAL)
             self.play(Create(code_block.code))
-        self.play(code_block.highlight(1), run_time=speed) if animate_code_block else None
-        self.play(code_block.highlight(2), run_time=speed) if animate_code_block else None
+        self.play(code_block.highlight(1, wait_time_after=2)) if animate_code_block else None
+        self.play(code_block.highlight(2, wait_time_after=2)) if animate_code_block else None
         mst_edges = []
         mst_nodes = []
         all_edges = graph.edges
@@ -671,20 +730,19 @@ class Show(Scene):
         union_find = UnionFind(graph.get_nodes())
         for i in range(0, graph.n_edges()):
             # self.wait(speed)
-            self.play(code_block.highlight(3), run_time=speed) if animate_code_block else None
+            self.play(code_block.highlight(3, wait_time_after=2)) if animate_code_block else None
             min_edge = all_edges[i]
             self.wait(speed)
-            self.play(min_edge.highlight(color=GREEN), run_time=0.6*speed)
-            self.play(min_edge.dehighlight(), run_time=0.6*speed)
-            self.play(min_edge.highlight(color=GREEN), run_time=0.6*speed)
+            # self.play(min_edge.highlight(color=GREEN), run_time=0.6*speed)
+            # self.play(min_edge.dehighlight(), run_time=0.6*speed)
+            self.play(min_edge.highlight(color=GREEN))
             start_node = min_edge.start_node
             end_node = min_edge.end_node
             parent_of_start = union_find.find(start_node)
             parent_of_end = union_find.find(end_node)
-            self.play(code_block.highlight(4, 2), run_time=speed) if animate_code_block else None
-            # self.wait(1.5*speed)
+            self.play(code_block.highlight(4, 2, wait_time_after=2)) if animate_code_block else None
             if parent_of_start != parent_of_end:
-                self.play(code_block.highlight(6), run_time=speed) if animate_code_block else None
+                self.play(code_block.highlight(6, wait_time_after=2)) if animate_code_block else None
                 animations = []
                 if start_node not in mst_nodes:
                     mst_nodes.append(start_node)
@@ -693,9 +751,9 @@ class Show(Scene):
                     mst_nodes.append(end_node)
                     animations.append(end_node.color(fill_color=PINK4, stroke_color=PINK3))
                 if animations:
-                    self.play(min_edge.highlight(color=PINK4), *animations, run_time=speed)
+                    self.play(min_edge.highlight(color=PINK4), *animations)
                 else:
-                    self.play(min_edge.highlight(color=PINK4), run_time=speed)
+                    self.play(min_edge.highlight(color=PINK4))
                 union_find.union(start_node, end_node)
                 mst_edges.append(min_edge)
             else:
@@ -703,22 +761,22 @@ class Show(Scene):
                 # edges which are not part of the cycle will disappear, to make the cycle prominent
                 non_cycle_array = [e for e in graph.edges if (e not in cycle_array and e != min_edge)]
                 non_cycle_group = GraphEdgesGroup(non_cycle_array)
-                self.play(non_cycle_group.disappear(include_label=True), run_time=0.8*speed)
+                self.play(non_cycle_group.disappear(include_label=True))
                 self.add_sound("wrong.wav") if add_sound else None
                 self.wait(0.8*speed)
-                self.play(non_cycle_group.appear(include_label=True), run_time=0.8*speed)
-                self.play(min_edge.dehighlight(), run_time=0.8*speed)
+                self.play(non_cycle_group.appear(include_label=True))
+                self.play(min_edge.dehighlight())
             # self.wait(0.5*speed)
-        self.play(code_block.highlight(7), run_time=speed) if animate_code_block else None
-        self._remove_edges(graph, mst_edges)
-        self.play(code_block.highlight(8), run_time=speed) if animate_code_block else None
+        self.play(code_block.highlight(7, wait_time_after=2)) if animate_code_block else None
+        self.play(code_block.highlight(8, wait_time_after=2)) if animate_code_block else None
+        self._remove_edges(graph, mst_edges, speed=0.5)
         return mst_edges
 
 
     def mst_kruskal_union_find(self, graph, create_legend=True, show_horizontal_legend=False, animate_code_block=True, code_block=None, speed=1, add_sound=False):
         speed = 1 / speed
         if create_legend:
-            l = Legend({("MULTICOLORS", "CIRCLE"): "MST so far", (GREEN, GREEN): "curr min edge"}, is_horizontal=show_horizontal_legend)
+            l = Legend({("MULTICOLORS", "CIRCLE"): "MST so far", ('LINE', GREEN, GREEN): "curr min edge"}, is_horizontal=show_horizontal_legend)
             # l.mobjects.move_to(2.1*UP+1.8*RIGHT)
             l.mobjects.next_to(graph.graph_mobject, UP, buff=0.3)
             self.play(l.animation)
@@ -726,12 +784,9 @@ class Show(Scene):
         if animate_code_block and not code_block:
             code_block = CodeBlock(CODE_FOR_KRUSKAL_UNION_FIND)
             self.play(Create(code_block.code))
-        # self.play(code_block.highlight(1), run_time=speed) if animate_code_block else None
-        # self.wait()
-        # self.play(code_block.highlight(2), run_time=speed) if animate_code_block else None
-        # self.wait()
-        # self.play(code_block.highlight(3, 2), run_time=speed) if animate_code_block else None
-        # self.wait()
+        self.play(code_block.highlight(1, wait_time_after=2)) if animate_code_block else None
+        self.play(code_block.highlight(2, wait_time_after=2)) if animate_code_block else None
+        self.play(code_block.highlight(3, 2, wait_time_after=2)) if animate_code_block else None
         mst_edges = []
         all_edges = graph.edges
         all_edges.sort(key=lambda edge: edge.weight)
@@ -739,14 +794,12 @@ class Show(Scene):
         union_find = UnionFind(all_nodes)
         self.play(union_find.show_set())
         for i in range(0, graph.n_edges()):
-            # self.play(code_block.highlight(5, 2), run_time=speed) if animate_code_block else None
-            # self.wait(1.5*speed)
+            self.play(code_block.highlight(5, 2, wait_time_after=2)) if animate_code_block else None
             min_edge = all_edges[i]
-            self.play(min_edge.highlight(color=GREEN), run_time=0.6*speed)
-            self.play(min_edge.dehighlight(), run_time=0.6*speed)
-            self.play(min_edge.highlight(color=GREEN), run_time=0.6*speed)
+            # self.play(min_edge.highlight(color=GREEN), run_time=0.6*speed)
+            # self.play(min_edge.dehighlight(), run_time=0.6*speed)
+            self.play(min_edge.highlight(color=GREEN))
             self.wait(1*speed)
-            self.play(code_block.highlight(7), run_time=speed) if animate_code_block else None
             start_node = min_edge.start_node
             end_node = min_edge.end_node
             parent_of_start = union_find.find(start_node)
@@ -757,12 +810,14 @@ class Show(Scene):
             disappear_nodes = [n for n in all_nodes if n not in remain_nodes]
             disappear_edges_group = GraphEdgesGroup(disappear_edges)
             disappear_nodes_group = GraphNodesGroup(disappear_nodes)
+            self.play(code_block.highlight(7, wait_time_after=2)) if animate_code_block else None
             if parent_of_start != parent_of_end:
                 # self.play(disappear_edges_group.disappear(include_label=True), disappear_nodes_group.disappear(), run_time=0.8*speed)
                 # self.add_sound("correct.wav") if add_sound else None
                 # self.wait(speed)
                 # self.play(disappear_edges_group.appear(include_label=True), disappear_nodes_group.appear(), run_time=0.8*speed)
-                # self.play(code_block.highlight(8, 2), run_time=speed) if animate_code_block else None
+                self.play(code_block.if_true(wait_time=2))
+                self.play(code_block.highlight(8, 2, wait_time_after=2)) if animate_code_block else None
                 # self.wait(speed)
                 self.play(union_find.union(start_node, end_node, min_edge), run_time=1.2)
                 mst_edges.append(min_edge)
@@ -772,11 +827,12 @@ class Show(Scene):
                 # self.add_sound("wrong.wav") if add_sound else None
                 # self.wait(speed)
                 # self.play(disappear_edges_group.appear(include_label=True), disappear_nodes_group.appear(), run_time=0.8*speed)
+                self.play(code_block.if_true(is_true=False, wait_time=2))
                 self.play(min_edge.dehighlight())
             self.wait()
-        self.play(code_block.highlight(10), run_time=speed) if animate_code_block else None
-        self._remove_edges(graph, mst_edges)
-        self.play(code_block.highlight(11), run_time=speed) if animate_code_block else None
+        self.play(code_block.highlight(10, wait_time_after=2)) if animate_code_block else None
+        self.play(code_block.highlight(11, wait_time_after=2)) if animate_code_block else None
+        self._remove_edges(graph, mst_edges, speed=0.5)
         union_find.destroy()
         return mst_edges       
 
@@ -1981,7 +2037,6 @@ class Show(Scene):
         # self.play(Unwrite(rtext1))
         # self.play(Write(rtext2))
         # self.wait()
-
         ## Generate endding
         # self.wait(0.3)
         # self.play(endding(language='CH'))
@@ -1989,8 +2044,137 @@ class Show(Scene):
 
 
         ### 算法童话系列 ###
-        self.add(watermark_ch)
-        title_mobject = show_title_for_demo("算法童话：Kruskal")
+        def fairytale_algorithm():
+            def get_text_below(string, graph):
+                return get_text(string, weight=NORMAL).next_to(graph.graph_mobject, DOWN, buff=0.5)
+            def get_text_left(string):
+                return get_text(string, weight=BOLD, font_size=20).to_edge(LEFT, buff=1)
+            def get_text_left_next(string, mobject_above):
+                return get_text_left(string, graph).next_to(mobject_above, DOWN, buff=0.3).align_to(mobject_above, LEFT)
+            # self.add(watermark_en)
+            # title_mobject = show_title_for_demo("Fairytale of Algorithms")
+            # self.add(title_mobject)
+
+            ### Animation 1: MST ###
+            kruskal = Character("Kruskal", "kruskal.png")
+            self.play(kruskal.fade_in())
+            self.wait()
+            mst_rect = RoundedRectangle(height=2.7, width=2.3, corner_radius=0.2)
+            mst_name = get_text("MST ®", weight=HEAVY, font_size=20).next_to(mst_rect, UP, buff=0.2)
+            mst_company = VGroup(mst_rect, mst_name)
+            # self.play(FadeIn(mst_company))
+
+            # self.wait()
+            concepts_map = ConceptsMap([kruskal.mobject, mst_rect, mst_name])
+            # self.play(concepts_map.show_only([mst_name]))
+            # mst_name.save_state()
+            # self.play(mst_name.animate.to_edge(UR, buff=0.8).shift(0.2 * UP))
+            new_position = scale_position(FAIRYTALE_POSITION, 1.8, 1.8)
+            graph = GraphObject(FAIRYTALE_MAP, new_position)
+            # self.play(graph.fade_in())
+            # mst_edges_group = graph.get_mst_edges('A')
+            # mst_nodes_group = graph.get_mst_nodes()
+            # self.play(mst_edges_group.highlight(width=EDGE_HIGHLIGHT_STROKE_WIDTH+5), mst_nodes_group.highlight(text_color=BACKGROUND))
+            # formula = get_text_below("4 + 7 + 2 + 1 + 5 + 2 = 21", graph)
+            # self.play(Write(formula))
+            # self.wait()
+            # self._remove_edges(graph, mst_edges_group.edges_array, is_sync=True)
+            # self.wait()
+            # mst_title = get_text("Minimum Spanning Tree", weight=ULTRAHEAVY).to_edge(UP, buff=0.7)
+            # self.play(Write(mst_title))
+            # self.wait()
+            # self.play(Unwrite(formula))
+            # self._restore_edges(graph, mst_edges_group.edges_array, is_sync=True)
+            # self.wait()
+            # self.play(graph.shift_graph(2))
+            # outline = LeftSideOutline("1. Cover all nodes")
+            # self.play(outline.show("1. Cover all nodes"))
+            # self.play(mst_edges_group.dehighlight())
+            # self.wait()
+            # self.play(outline.add("""
+            # 2. The sum of edge weights
+            # is minimum
+            # """))
+            # self.play(mst_edges_group.highlight(width=EDGE_HIGHLIGHT_STROKE_WIDTH+5))
+            # self.wait()
+            # self.play(outline.add("4 + 7 + 2 + 1 + 5 + 2 = 21"))
+            # self.wait()
+            # self._remove_edges(graph, mst_edges_group.edges_array, is_sync=True)
+            # self.wait()
+            # self.play(graph.fade_out(), outline.fade_out())
+            # self.play(Restore(mst_name))
+            self.play(concepts_map.show_all([mst_name]))
+
+            ### Animation 2: Kruskal ###
+            self.play(concepts_map.show_only([kruskal.mobject]))
+            new_position = scale_position(FAIRYTALE_POSITION, 2, 2)
+            graph = GraphObject(FAIRYTALE_MAP, new_position)
+            self.play(kruskal.move_to_top_right(scale=0.6))
+            kruskal_code_block = CodeBlock(CODE_FOR_KRUSKAL)
+            l = Legend({('LINE', PINK4, PINK4): "MST so far", ('LINE', GREEN, GREEN): "curr min edge"}, is_horizontal=True)
+            l.mobjects.next_to(kruskal.mobject, LEFT, buff=0.7)
+            # self.play(kruskal_code_block.create(x_offset=-2.7))
+            # self.play(graph.fade_in(scale=0.9, x_offset=3.5, y_offset=-0.3))
+            # self.play(l.fade_in())
+            # self.mst_kruskal_basic(graph, code_block=kruskal_code_block, create_legend=False)
+            # self.wait()
+
+            ### Animation 3: add same label ###
+            # self.play(kruskal_code_block.create(x_offset=-2.7))
+            # self.play(graph.fade_in(scale=0.9, x_offset=3.5, y_offset=-0.3))
+            # self.play(l.fade_in())
+            # self.wait()
+            # self.play(kruskal_code_block.highlight(4, 2))
+            green_edge_1 = graph.get_edge_by_name('B', 'C')
+            green_edge_2 = graph.get_edge_by_name('C', 'D')
+            small_group_edges = GraphEdgesGroup([graph.get_edge_by_name(start, end) for start, end in [('B', 'E')]])
+            large_group_edges = GraphEdgesGroup([graph.get_edge_by_name(start, end) for start, end in [('A', 'D'), ('C', 'F'), ('D', 'F'), ('D', 'G')]])
+            small_group_nodes = GraphNodesGroup([graph.get_node_by_name('B'), graph.get_node_by_name('E')])
+            large_group_nodes = GraphNodesGroup([graph.get_node_by_name('A'), graph.get_node_by_name('C'), graph.get_node_by_name('D'), graph.get_node_by_name('F'), graph.get_node_by_name('G')])
+            # self.play(green_edge_1.highlight(color=GREEN), small_group_edges.highlight(color=PINK4), large_group_edges.highlight(color=PINK4), small_group_nodes.fill(stroke_color=PINK3), large_group_nodes.fill(stroke_color=PINK3))
+            # change name
+            # self.play(small_group_edges.highlight(color='#9BA3EC'), small_group_nodes.fill(fill_color='#9BA3EC'), small_group_nodes.initialize_keys("C", color=BACKGROUND))
+            # self.play(large_group_edges.highlight(color='#FDF8CA'), large_group_nodes.fill(fill_color='#FDF8CA'), large_group_nodes.initialize_keys("P", color=BACKGROUND))
+            # self.wait()
+            # self.play(green_edge_1.dehighlight(), green_edge_2.highlight(color=GREEN))
+            # self.wait()
+            union_find = Character("Union-Find", "union_find.png")
+            self.play(union_find.fade_in(scale=0.6, x_offset=0.7, y_offset=0))
+            # self.wait()
+            self.play(union_find.next_to(kruskal.mobject, DOWN))
+            # self.play(graph.restore_graph(), kruskal_code_block.uncreate(), l.fade_out(), small_group_nodes.delete_keys(), large_group_nodes.delete_keys())
+
+            ### Animation: kruskal 2 (implementation) ###
+            # self.wait()
+            # kruskal_uf_code_block = CodeBlock(CODE_FOR_KRUSKAL_UNION_FIND)
+            # self.play(kruskal_uf_code_block.create(x_offset=-2.9))
+            # l = Legend({("MULTICOLORS", "LINE"): "MST so far", ('LINE', GREEN, GREEN): "curr min edge"}, is_horizontal=True)
+            # l.mobjects.next_to(kruskal.mobject, LEFT, buff=0.7)
+            # self.play(l.fade_in())
+            # self.mst_kruskal_union_find(graph, code_block=kruskal_uf_code_block, create_legend=False)
+            # self.play(kruskal_uf_code_block.fade_out(), l.fade_out(), graph.fade_out())
+
+            ### Animation: map kruskal and union find ###
+            self.wait()
+            temp_group = Group(kruskal.mobject, union_find.mobject)
+            self.play(temp_group.animate.scale(1/0.6).move_to(1.3*DOWN))
+            self.play(concepts_map.show_all([kruskal.mobject]))
+            concepts_map.add(union_find.mobject)
+            self.play(union_find.shift(y_offset=-1.4))
+            self.play(concepts_map.center(scale=0.8))
+            self.wait()
+            self.play(concepts_map.add_line(kruskal, union_find, weight='Collaberation'))
+
+
+
+        fairytale_algorithm()
+        new_position = scale_position(FAIRYTALE_POSITION, 1.6, 1.6)
+        graph = GraphObject(FAIRYTALE_MAP, new_position)
+        # self.play(graph.fade_in())
+        # edges = self.mst_prim_queue(graph, source='A', create_legend=False, animate_code_block=False, hide_details=True, speed=1)
+
+
+
         
 
         
