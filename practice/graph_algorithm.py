@@ -12,6 +12,7 @@ from color_generator import ColorGenerator
 from left_side_outline import LeftSideOutline
 from character import Character
 from concepts_map import ConceptsMap
+from company import Company
 import copy
 
 MAP_DIRECTED = {'A': {'B': None, 'C': None}, 'B': {'D': None, 'E': None}, 'D': {'F': None}, 'E': {'F': None}}
@@ -152,8 +153,8 @@ FAIRYTALE_MAP = {
     'C': {'B': 7, 'A': 7, 'F': 2, 'D': 10},
     'F': {'E': 8, 'B': 9, 'C': 2, 'D': 1, 'G': 6},
     'A': {'B': 10, 'C': 7, 'D': 5},
-    'D': {'C': 10, 'F': 1, 'A': 5, 'G': 2},
-    'G': {'F': 6, 'D': 2}
+    'D': {'C': 10, 'F': 1, 'A': 5, 'G': 3},
+    'G': {'F': 6, 'D': 3}
 }
 
 
@@ -191,20 +192,20 @@ class Show(MovingCameraScene):
         self.play(*[m.animate.set_color(BACKGROUND) for m in temp_group])
         self.play(*[m.animate.set_color(GRAY) for m in temp_group])
 
-    def show_only(self, concepts_map, mobject_to_keep):
-        # all is a list of mobjects
-        animations = []
-        for e in concepts_map:
-            if e not in mobject_to_keep:
-                animations.append(FadeOut(e))
-        return AnimationGroup(*animations)
-    def show_all(self, concepts_map, mobject_to_keep):
-        # all is a list of mobjects
-        animations = []
-        for e in concepts_map:
-            if e not in mobject_to_keep:
-                animations.append(FadeIn(e))
-        return AnimationGroup(*animations)   
+    # def show_only(self, concepts_map, mobject_to_keep):
+    #     # all is a list of mobjects
+    #     animations = []
+    #     for e in concepts_map:
+    #         if e not in mobject_to_keep:
+    #             animations.append(FadeOut(e))
+    #     return AnimationGroup(*animations)
+    # def show_all(self, concepts_map, mobject_to_keep):
+    #     # all is a list of mobjects
+    #     animations = []
+    #     for e in concepts_map:
+    #         if e not in mobject_to_keep:
+    #             animations.append(FadeIn(e))
+    #     return AnimationGroup(*animations)   
     
     ##################################
     # DFS
@@ -386,48 +387,45 @@ class Show(MovingCameraScene):
         if animate_code_block and not code_block:
             code_block = CodeBlock(CODE_FOR_PRIM_BASIC)
             self.play(Create(code_block.code))
-        # self.play(code_block.highlight(1)) if animate_code_block else None
+        self.play(code_block.highlight(1, wait_time_after=2)) if animate_code_block else None
         selected_edges = set()
         selected = set()
         first_node_key = list(graph.adjacency_list.keys())[0]
         first_node = graph.value2node[first_node_key]
-        # self.play(code_block.highlight(2, 3), run_time=speed) if animate_code_block else None
-        # self.play(code_block.highlight(5), run_time=speed) if animate_code_block else None
+        self.play(code_block.highlight(2, 3, wait_time_after=2)) if animate_code_block else None
+        self.play(code_block.highlight(5, wait_time_after=2)) if animate_code_block else None
         selected.add(first_node)
         self.play(first_node.color(fill_color=PINK4), run_time=speed)
         while len(selected) != len(graph.adjacency_list):
-            # self.play(code_block.highlight(6), run_time=speed) if animate_code_block else None
-            # self.wait(0.8)
+            self.play(code_block.highlight(6, wait_time_after=2)) if animate_code_block else None
             minimum = float("inf")
             minimum_node = None
             minimum_edge = None
-            neighbor_edges = GraphEdgesGroup()
+            # neighbor_edges = GraphEdgesGroup()
             for v in selected:
                 for e in v.edges:
                     u = e.get_the_other_end(v)
                     if u not in selected:
-                        neighbor_edges.add(e)
+                        # neighbor_edges.add(e)
                         if graph.adjacency_list[u.value][v.value] < minimum:
                             minimum = graph.adjacency_list[u.value][v.value]
                             minimum_node = u
                             minimum_edge = e
             selected_edges.add(minimum_edge)
             # show all available edges
-            # self.play(code_block.highlight(7, 2), run_time=speed) if animate_code_block else None
-            self.play(neighbor_edges.highlight(BACKGROUND), run_time=1.3*speed)
-            self.wait(speed)
-            self.play(neighbor_edges.dehighlight(), run_time=1.3*speed)
-            # self.play(minimum_edge.highlight(), run_time=0.5*speed)
-            # self.play(minimum_edge.dehighlight(), run_time=0.5*speed)
-            self.play(minimum_edge.highlight(color=PINK4), run_time=0.5*speed)
+            self.play(code_block.highlight(7, 2, wait_time_after=2)) if animate_code_block else None
+            # self.play(neighbor_edges.highlight(BACKGROUND), run_time=1.3*speed)
+            # self.wait(speed)
+            # self.play(neighbor_edges.dehighlight(), run_time=1.3*speed)
+            self.play(minimum_edge.highlight(color=PINK4))
             self.wait()
             # show the shortest edge - the next edge to add
-            # self.play(code_block.highlight(9, 3), run_time=speed) if animate_code_block else None
+            self.play(code_block.highlight(9, 3, wait_time_after=2)) if animate_code_block else None
             selected.add(minimum_node)
             self.play(minimum_node.color(fill_color=PINK4), run_time=speed)
-        # self.play(code_block.highlight(12), run_time=speed) if animate_code_block else None
+        self.play(code_block.highlight(12, wait_time_after=2)) if animate_code_block else None
         self._remove_edges(graph, selected_edges)
-        # self.play(code_block.highlight(13), run_time=speed) if animate_code_block else None
+        self.play(code_block.highlight(13, wait_time_after=2)) if animate_code_block else None
         
 
     def mst_prim_queue0(self, graph, source=None, create_legend=True, show_horizontal_legend=False, animate_code_block=True, code_block=None, speed=1, hide_details=False):
@@ -450,14 +448,14 @@ class Show(MovingCameraScene):
         if animate_code_block and not code_block:
             code_block = CodeBlock(CODE_FOR_PRIM_QUEUE)
             self.play(Create(code_block.code))
-        self.play(code_block.highlight(1), run_time=2*speed) if animate_code_block else None
-        self.play(code_block.highlight(2), run_time=2*speed) if animate_code_block else None
-        self.play(code_block.highlight(3), run_time=2*speed) if animate_code_block else None
-        self.play(code_block.highlight(4), run_time=2*speed) if animate_code_block else None
+        self.play(code_block.highlight(1)) if animate_code_block else None
+        self.play(code_block.highlight(2)) if animate_code_block else None
+        self.play(code_block.highlight(3)) if animate_code_block else None
+        self.play(code_block.highlight(4)) if animate_code_block else None
         edges = []
         unreach = list(graph.value2node.values())
         min_edge = {}
-        self.play(code_block.highlight(5), run_time=speed) if animate_code_block else None
+        self.play(code_block.highlight(5)) if animate_code_block else None
         # Accumulate animations for all nodes and show them at once
         transforms = []
         for node in graph.value2node.values():
@@ -465,7 +463,7 @@ class Show(MovingCameraScene):
             transforms += node.animations
         unreach_nodes_group = GraphNodesGroup(unreach)
         self.play(*transforms)
-        self.play(code_block.highlight(6), run_time=speed) if animate_code_block else None
+        self.play(code_block.highlight(6)) if animate_code_block else None
         if not source:
             source_node = graph.value2node.values()[0]
         else:
@@ -473,8 +471,8 @@ class Show(MovingCameraScene):
         self.play(source_node.update_key(0), run_time=1.5*speed)
         while unreach:
             # Show group of unreached nodes
-            self.play(code_block.highlight(7), run_time=speed) if animate_code_block else None
-            self.play(code_block.highlight(8), run_time=speed) if animate_code_block else None
+            self.play(code_block.highlight(7)) if animate_code_block else None
+            self.play(code_block.highlight(8)) if animate_code_block else None
             # Flash candidates
             self.wait()
             self.play(unreach_nodes_group.color(stroke_color=GRAY, key_color=BACKGROUND, has_key=True), run_time=1.2*speed)
@@ -483,10 +481,10 @@ class Show(MovingCameraScene):
             v = extract_min_node(unreach)
             self.play(v.color(fill_color=PINK4, stroke_color=PINK5, stroke_width=NODE_HIGHLIGHT_STROKE_WIDTH, has_key=True))
             # Get the min edge
-            self.play(code_block.highlight(9), run_time=speed) if animate_code_block else None
+            self.play(code_block.highlight(9)) if animate_code_block else None
             if v in min_edge:
                 edges.append(min_edge[v])
-                self.play(code_block.highlight(10), run_time=speed) if animate_code_block else None
+                self.play(code_block.highlight(10)) if animate_code_block else None
                 self.wait(speed)
                 self.play(min_edge[v].highlight(color=PINK4), run_time=0.5*speed)
                 self.play(min_edge[v].dehighlight(), run_time=0.5*speed)
@@ -497,19 +495,19 @@ class Show(MovingCameraScene):
             if not hide_details:
                 for u in v.neighbors:
                     if u in unreach:
-                        self.play(code_block.highlight(11), run_time=speed) if animate_code_block else None
-                        self.play(code_block.highlight(12, 2), run_time=speed) if animate_code_block else None
+                        self.play(code_block.highlight(11)) if animate_code_block else None
+                        self.play(code_block.highlight(12, 2)) if animate_code_block else None
                         edge_v_u = v.neighbor2edge[u]
                         # Flash edge_v_u.weight and u.key
                         temp_group = [edge_v_u.mobject, u.key_mobject]
                         self.play(*[m.animate.set_color(BACKGROUND) for m in temp_group], run_time=speed)
                         self.play(*[m.animate.set_color(GRAY) for m in temp_group], run_time=speed)
                         if edge_v_u.weight < u.key:
-                            self.play(code_block.highlight(14), run_time=speed) if animate_code_block else None
+                            self.play(code_block.highlight(14)) if animate_code_block else None
                             self.play(u.update_key(edge_v_u.weight), run_time=speed)
                             u.key = edge_v_u.weight
                             min_edge[u] = edge_v_u
-                            self.play(code_block.highlight(15), run_time=speed) if animate_code_block else None
+                            self.play(code_block.highlight(15)) if animate_code_block else None
             # Shortened version - playing all for loops at the same time
             else:
                 self.play(code_block.highlight(11, 3)) if animate_code_block else None
@@ -528,14 +526,14 @@ class Show(MovingCameraScene):
                     self.play(*[m.animate.set_color(BACKGROUND) for m in mobject_to_flash], run_time=speed)
                     self.play(*[m.animate.set_color(GRAY) for m in mobject_to_flash], run_time=speed)
                 if animations_update_key:
-                    self.play(code_block.highlight(14), run_time=speed) if animate_code_block else None
+                    self.play(code_block.highlight(14)) if animate_code_block else None
                     self.play(*animations_update_key, run_time=1.5*speed)
-                    self.play(code_block.highlight(15), run_time=speed) if animate_code_block else None
+                    self.play(code_block.highlight(15)) if animate_code_block else None
             self.play(v.color(fill_color=PINK4, stroke_color=PINK3, stroke_width=WIDTH, has_key=True))
 
-        self.play(code_block.highlight(16), run_time=speed) if animate_code_block else None
-        self._remove_edges(graph, edges, speed=speed)
-        self.play(code_block.highlight(17), run_time=speed) if animate_code_block else None
+        self.play(code_block.highlight(16)) if animate_code_block else None
+        self.play(code_block.highlight(17)) if animate_code_block else None
+        self._remove_edges(graph, edges)
         return edges
 
 
@@ -563,23 +561,18 @@ class Show(MovingCameraScene):
         edges = []
         unreach = list(graph.value2node.values())
         min_edge = {}
-        self.play(code_block.highlight(1), run_time=speed) if animate_code_block else None
-        self.wait() if animate_code_block else None
-        self.play(code_block.highlight(2), run_time=speed) if animate_code_block else None
-        self.wait() if animate_code_block else None
-        self.play(code_block.highlight(3), run_time=speed) if animate_code_block else None
-        self.wait() if animate_code_block else None
+        self.play(code_block.highlight(1, wait_time_after=2)) if animate_code_block else None
+        self.play(code_block.highlight(2, wait_time_after=2)) if animate_code_block else None
+        self.play(code_block.highlight(3, wait_time_after=2)) if animate_code_block else None
+        self.play(code_block.highlight(4, wait_time_after=2)) if animate_code_block else None
         # Accumulate animations for all nodes and show them at once
         transforms = []
         for node in graph.value2node.values():
-            node.initialize_key(float('inf'), show_value=False)
+            node.initialize_key('∞', show_value=False)
             transforms += node.animations
         unreach_nodes_group = GraphNodesGroup(unreach)
         self.play(*transforms, run_time=1.5*speed)
-        self.play(code_block.highlight(4), run_time=speed) if animate_code_block else None
-        self.wait() if animate_code_block else None
-        self.play(code_block.highlight(5), run_time=speed) if animate_code_block else None
-        self.wait()
+        self.play(code_block.highlight(5, wait_time_after=2)) if animate_code_block else None
         if not source:
             source_node = graph.value2node.values()[0]
         else:
@@ -588,34 +581,38 @@ class Show(MovingCameraScene):
         prev_v = None
         while unreach:
             # Show group of unreached nodes
-            self.play(code_block.highlight(6), run_time=speed) if animate_code_block else None
-            self.wait() if animate_code_block else None
-            self.play(code_block.highlight(7), run_time=speed) if animate_code_block else None
+            self.play(code_block.highlight(6, wait_time_after=WAIT_TIME_AFTER)) if animate_code_block else None
+            self.play(code_block.if_true()) if animate_code_block else None
+            self.play(code_block.highlight(7, wait_time_after=WAIT_TIME_AFTER)) if animate_code_block else None
             # Color the min node
             v = extract_min_node(unreach)
-            self.wait()
-            if not hide_details:
-                if prev_v:
-                    self.wait(speed)
-                    self.play(prev_v.color(fill_color=PINK4, stroke_color=PINK3, stroke_width=WIDTH, has_key=True), v.color(fill_color=PINK4, stroke_color=PINK5, stroke_width=WIDTH+2, has_key=True))
-                    edges.append(min_edge[v])
-                    self.play(min_edge[v].highlight(color=PINK4), run_time=0.5*speed)
-                    self.play(min_edge[v].dehighlight(), run_time=0.5*speed)
-                    self.play(min_edge[v].highlight(color=PINK4), run_time=0.5*speed)
-                else:
-                    self.wait(speed)
-                    self.play(v.color(fill_color=PINK4, stroke_color=PINK5, stroke_width=NODE_HIGHLIGHT_STROKE_WIDTH, has_key=True))
-                self.wait(1.5*speed)
-                prev_v = v
+            # if not hide_details:
+            if prev_v:
+                self.play(prev_v.color(fill_color=PINK4, stroke_color=PINK3, stroke_width=WIDTH, has_key=True), v.color(fill_color=PINK4, stroke_color=PINK5, stroke_width=WIDTH+2, has_key=True))
+                self.play(code_block.highlight(8, wait_time_after=WAIT_TIME_AFTER)) if animate_code_block else None
+                self.play(code_block.if_true()) if animate_code_block else None
+                self.play(code_block.highlight(9, wait_time_after=WAIT_TIME_AFTER)) if animate_code_block else None
+                edges.append(min_edge[v])
+                self.play(min_edge[v].highlight(color=PINK4))
             else:
-                if prev_v:
-                    edges.append(min_edge[v])
-                    self.play(min_edge[v].highlight(color=PINK4, width=EDGE_HIGHLIGHT_STROKE_WIDTH), prev_v.color(fill_color=PINK4, stroke_color=PINK3, stroke_width=WIDTH, has_key=True), v.color(fill_color=PINK4, stroke_color=PINK5, stroke_width=WIDTH+2, has_key=True))
-                else:
-                    self.wait()
-                    self.play(v.color(fill_color=PINK4, stroke_color=PINK5, stroke_width=NODE_HIGHLIGHT_STROKE_WIDTH, has_key=True))
-                self.wait(1.5*speed)
-                prev_v = v
+                self.play(v.color(fill_color=PINK4, stroke_color=PINK5, stroke_width=NODE_HIGHLIGHT_STROKE_WIDTH, has_key=True))
+                self.play(code_block.highlight(8, wait_time_after=WAIT_TIME_AFTER)) if animate_code_block else None
+                self.play(code_block.if_true(False)) if animate_code_block else None
+            self.wait(speed)
+            prev_v = v
+            # Comment out temperarity to output detailed version of adding edge
+            # else:
+            #     if prev_v:
+            #         self.play(prev_v.color(fill_color=PINK4, stroke_color=PINK3, stroke_width=WIDTH, has_key=True), v.color(fill_color=PINK4, stroke_color=PINK5, stroke_width=WIDTH+2, has_key=True))
+            #         self.play(code_block.highlight(8, 2, wait_time_after=WAIT_TIME_AFTER)) if animate_code_block else None
+            #         edges.append(min_edge[v])
+            #         self.play(min_edge[v].highlight(color=PINK4, width=EDGE_HIGHLIGHT_STROKE_WIDTH), prev_v.color(fill_color=PINK4, stroke_color=PINK3, stroke_width=WIDTH, has_key=True), v.color(fill_color=PINK4, stroke_color=PINK5, stroke_width=WIDTH+2, has_key=True))
+            #     else:
+            #         self.play(v.color(fill_color=PINK4, stroke_color=PINK5, stroke_width=NODE_HIGHLIGHT_STROKE_WIDTH, has_key=True))
+            #         self.play(code_block.highlight(8, wait_time_after=WAIT_TIME_AFTER)) if animate_code_block else None
+            #         self.play(code_block.if_true(False)) if animate_code_block else None
+            #     self.wait(speed)
+            #     prev_v = v
             # Decrease key and save the min edge
             # Full version - playing each for loop one by one
             if not hide_details:
@@ -630,20 +627,16 @@ class Show(MovingCameraScene):
                 prev_u = None
                 for u in v.neighbors:
                     edge_v_u = v.neighbor2edge[u]
-                    self.play(code_block.highlight(8), run_time=speed) if animate_code_block else None
+                    self.play(code_block.highlight(10, wait_time_after=2)) if animate_code_block else None
                     if prev_u:
                         self.play(prev_u.dehighlight(), u.highlight(stroke_color=GREEN, stroke_width=NODE_HIGHLIGHT_STROKE_WIDTH))
                     else:
-                        self.wait(1)
                         self.play(u.highlight(stroke_color=GREEN, stroke_width=NODE_HIGHLIGHT_STROKE_WIDTH))
                     prev_u = u
-                    self.wait(0.5)
-                    self.play(code_block.highlight(9), run_time=speed) if animate_code_block else None
-                    self.wait()
-                    self.play(code_block.highlight(10), run_time=speed) if animate_code_block else None
-                    self.wait(1.7)
+                    self.play(code_block.highlight(11, 2, wait_time_after=2)) if animate_code_block else None
                     if edge_v_u.weight < u.key:
-                        self.play(code_block.highlight(11), run_time=1.5*speed) if animate_code_block else None
+                        self.play(code_block.if_true()) if animate_code_block else None
+                        self.play(code_block.highlight(13, 2, wait_time_after=2), run_time=1.5*speed) if animate_code_block else None
                         self.wait()
                         u.key = edge_v_u.weight + v.key
                         update_key_color = GRAY
@@ -651,18 +644,14 @@ class Show(MovingCameraScene):
                             update_key_color = BACKGROUND
                         self.play(u.update_key(u.key, color=update_key_color), run_time=1.5*speed)
                         min_edge[u] = edge_v_u
-                        self.wait(1)
-                        self.play(code_block.highlight(12), run_time=speed) if animate_code_block else None
-                        self.wait(1)
+                        self.wait()
                 self.play(prev_u.dehighlight())
                 self.play(edges_to_disappear_group.appear(include_label=True), nodes_to_disappear_group.appear(), run_time=0.8*speed)
 
             # Shortened version - playing all for loops at the same time
             else:
-                # self.play(code_block.highlight(8, 5), run_time=speed) if animate_code_block else None
                 # Accumulate animations for all qualified nodes and show them at once
-                self.play(code_block.highlight(8, 5), run_time=speed) if animate_code_block else None
-                self.wait(2) if animate_code_block else None
+                self.play(code_block.highlight(10, wait_time_after=2)) if animate_code_block else None
                 nodes_to_keep = [u for u in v.neighbors]
                 nodes_to_keep.append(v)
                 edges_to_keep = list(v.neighbor2edge.values())
@@ -671,6 +660,7 @@ class Show(MovingCameraScene):
                 nodes_to_disappear_group = GraphNodesGroup(nodes_to_disappear)
                 edges_to_disappear_group = GraphEdgesGroup(edges_to_disappear)
                 self.play(edges_to_disappear_group.disappear(include_label=True), nodes_to_disappear_group.disappear(), run_time=0.8*speed)
+                self.play(code_block.highlight(11, 2, wait_time_after=2)) if animate_code_block else None
                 highlight_animations = []
                 relax_animations = []
                 dehighlight_animations = []
@@ -685,6 +675,7 @@ class Show(MovingCameraScene):
                         relax_animations.append(u.update_key(u.key, color=update_key_color))
                         min_edge[u] = edge_v_u
                         dehighlight_animations.append(u.dehighlight())
+                self.play(code_block.highlight(13, 2, wait_time_after=2)) if animate_code_block else None
                 if highlight_animations:
                     self.wait(speed)
                     self.play(*highlight_animations)
@@ -695,14 +686,14 @@ class Show(MovingCameraScene):
                     self.wait(speed)
                     self.play(*dehighlight_animations)
                 if not highlight_animations and not relax_animations and not dehighlight_animations:
-                    self.wait(1.5*speed)
-                self.wait(1.2*speed)
-                self.play(edges_to_disappear_group.appear(include_label=True), nodes_to_disappear_group.appear(), run_time=0.8*speed)
+                    self.wait(speed)
+                self.wait(speed)
+                self.play(edges_to_disappear_group.appear(include_label=True), nodes_to_disappear_group.appear(), run_time=speed)
         self.play(prev_v.color(fill_color=PINK4, stroke_color=PINK3, stroke_width=WIDTH, has_key=True))
-        self.play(code_block.highlight(6), run_time=speed) if animate_code_block else None
-        self.wait() if animate_code_block else None
-        self.play(code_block.highlight(13), run_time=speed) if animate_code_block else None
-        self.wait() if animate_code_block else None
+        self.play(code_block.highlight(6, wait_time_after=2)) if animate_code_block else None
+        self.play(code_block.if_true(False)) if animate_code_block else None
+        self.play(code_block.highlight(15, wait_time_after=2)) if animate_code_block else None
+        self.play(code_block.highlight(16, wait_time_after=2)) if animate_code_block else None
         self._remove_edges(graph, edges, speed=0.5)
         return edges
 
@@ -2059,69 +2050,68 @@ class Show(MovingCameraScene):
             kruskal = Character("Kruskal", "kruskal.png")
             self.play(kruskal.fade_in())
             self.wait()
-            mst_rect = RoundedRectangle(height=2.7, width=2.3, corner_radius=0.2)
-            mst_name = get_text("MST ®", weight=HEAVY, font_size=20).next_to(mst_rect, UP, buff=0.2)
-            mst_company = VGroup(mst_rect, mst_name)
-            # self.play(FadeIn(mst_company))
-
-            # self.wait()
-            concepts_map = ConceptsMap([kruskal.mobject, mst_rect, mst_name])
-            # self.play(concepts_map.show_only([mst_name]))
-            # mst_name.save_state()
-            # self.play(mst_name.animate.to_edge(UR, buff=0.8).shift(0.2 * UP))
+            self.play(kruskal.add_company("MST ®", stroke_color=MST_COMPANY[0], fill_color=MST_COMPANY[1]))
+            self.wait()
+            concepts_map = ConceptsMap([kruskal])
+            self.play(concepts_map.show_only([kruskal.company], is_company=True))
+            kruskal.company.mobject.save_state()
+            self.play(kruskal.company.mobject.animate.to_edge(UR, buff=0.8).shift(0.2 * UP))
             new_position = scale_position(FAIRYTALE_POSITION, 1.8, 1.8)
             graph = GraphObject(FAIRYTALE_MAP, new_position)
-            # self.play(graph.fade_in())
-            # mst_edges_group = graph.get_mst_edges('A')
-            # mst_nodes_group = graph.get_mst_nodes()
-            # self.play(mst_edges_group.highlight(width=EDGE_HIGHLIGHT_STROKE_WIDTH+5), mst_nodes_group.highlight(text_color=BACKGROUND))
-            # formula = get_text_below("4 + 7 + 2 + 1 + 5 + 2 = 21", graph)
-            # self.play(Write(formula))
-            # self.wait()
-            # self._remove_edges(graph, mst_edges_group.edges_array, is_sync=True)
-            # self.wait()
-            # mst_title = get_text("Minimum Spanning Tree", weight=ULTRAHEAVY).to_edge(UP, buff=0.7)
-            # self.play(Write(mst_title))
-            # self.wait()
-            # self.play(Unwrite(formula))
-            # self._restore_edges(graph, mst_edges_group.edges_array, is_sync=True)
-            # self.wait()
-            # self.play(graph.shift_graph(2))
-            # outline = LeftSideOutline("1. Cover all nodes")
-            # self.play(outline.show("1. Cover all nodes"))
-            # self.play(mst_edges_group.dehighlight())
-            # self.wait()
-            # self.play(outline.add("""
-            # 2. The sum of edge weights
-            # is minimum
-            # """))
-            # self.play(mst_edges_group.highlight(width=EDGE_HIGHLIGHT_STROKE_WIDTH+5))
-            # self.wait()
-            # self.play(outline.add("4 + 7 + 2 + 1 + 5 + 2 = 21"))
-            # self.wait()
-            # self._remove_edges(graph, mst_edges_group.edges_array, is_sync=True)
-            # self.wait()
-            # self.play(graph.fade_out(), outline.fade_out())
-            # self.play(Restore(mst_name))
-            self.play(concepts_map.show_all([mst_name]))
+            self.play(graph.fade_in())
+            mst_edges_group = graph.get_mst_edges('A')
+            mst_nodes_group = graph.get_mst_nodes()
+            self.play(mst_edges_group.highlight(width=EDGE_HIGHLIGHT_STROKE_WIDTH+5), mst_nodes_group.highlight(text_color=BACKGROUND))
+            formula = get_text_below("4 + 7 + 2 + 1 + 5 + 2 = 21", graph)
+            self.play(Write(formula))
+            self.wait()
+            self._remove_edges(graph, mst_edges_group.edges_array, is_sync=True)
+            self.wait()
+            mst_title = get_text("Minimum Spanning Tree", weight=ULTRAHEAVY).to_edge(UP, buff=0.7)
+            self.play(Write(mst_title))
+            self.wait()
+            self.play(Unwrite(formula))
+            self._restore_edges(graph, mst_edges_group.edges_array, is_sync=True)
+            self.wait()
+            self.play(graph.shift(x_offset=3))
+            outline = LeftSideOutline("1. Cover all nodes", buff=2)
+            self.play(outline.show("1. Cover all nodes"))
+            self.play(mst_edges_group.dehighlight())
+            self.wait()
+            self.play(outline.add("""
+            2. The sum of edge weights
+            is minimum
+            """))
+            self.play(mst_edges_group.highlight(width=EDGE_HIGHLIGHT_STROKE_WIDTH+5))
+            self.wait()
+            self.play(outline.add("4 + 7 + 2 + 1 + 5 + 2 = 21"))
+            self.wait()
+            self._remove_edges(graph, mst_edges_group.edges_array, is_sync=True)
+            self.wait()
+            self.play(graph.fade_out(), outline.fade_out(), FadeOut(mst_title))
+            self.play(Restore(kruskal.company.mobject))
+            self.play(concepts_map.show_all([kruskal.company], is_company=True))
 
             ### Animation 2: Kruskal ###
-            self.play(concepts_map.show_only([kruskal.mobject]))
+            # self.play(concepts_map.show_only([kruskal]))
             new_position = scale_position(FAIRYTALE_POSITION, 2, 2)
             graph = GraphObject(FAIRYTALE_MAP, new_position)
-            self.play(kruskal.move_to_top_right(scale=0.6))
+            # self.play(kruskal.move_to_top_right(scale=0.6))
             kruskal_code_block = CodeBlock(CODE_FOR_KRUSKAL)
-            l = Legend({('LINE', PINK4, PINK4): "MST so far", ('LINE', GREEN, GREEN): "curr min edge"}, is_horizontal=True)
-            l.mobjects.next_to(kruskal.mobject, LEFT, buff=0.7)
+            l = Legend({
+                (PINK4, PINK4): "MST so far", 
+                ('LINE', GREEN, GREEN): "curr min edge"
+            }, is_horizontal=True)
+            l.mobjects.next_to(kruskal.mobject, LEFT, buff=LEGEND_CHARACTER_BUFF)
             # self.play(kruskal_code_block.create(x_offset=-2.7))
-            # self.play(graph.fade_in(scale=0.9, x_offset=3.5, y_offset=-0.3))
+            # self.play(graph.fade_in(scale=0.9, x_offset=3.6, y_offset=-0.5))
             # self.play(l.fade_in())
             # self.mst_kruskal_basic(graph, code_block=kruskal_code_block, create_legend=False)
             # self.wait()
 
             ### Animation 3: add same label ###
             # self.play(kruskal_code_block.create(x_offset=-2.7))
-            # self.play(graph.fade_in(scale=0.9, x_offset=3.5, y_offset=-0.3))
+            # self.play(graph.fade_in(scale=0.9, x_offset=3.6, y_offset=-0.5))
             # self.play(l.fade_in())
             # self.wait()
             # self.play(kruskal_code_block.highlight(4, 2))
@@ -2139,41 +2129,133 @@ class Show(MovingCameraScene):
             # self.play(green_edge_1.dehighlight(), green_edge_2.highlight(color=GREEN))
             # self.wait()
             union_find = Character("Union-Find", "union_find.png")
-            self.play(union_find.fade_in(scale=0.6, x_offset=0.7, y_offset=0))
+            # self.play(union_find.fade_in_by_position(scale=0.6, x_offset=0.7, y_offset=0))
             # self.wait()
-            self.play(union_find.next_to(kruskal.mobject, DOWN))
+            # self.play(union_find.next_to(kruskal.mobject, DOWN))
             # self.play(graph.restore_graph(), kruskal_code_block.uncreate(), l.fade_out(), small_group_nodes.delete_keys(), large_group_nodes.delete_keys())
 
-            ### Animation: kruskal 2 (implementation) ###
+            ### Animation 4: kruskal 2 (implementation) ###
             # self.wait()
-            # kruskal_uf_code_block = CodeBlock(CODE_FOR_KRUSKAL_UNION_FIND)
+            kruskal_uf_code_block = CodeBlock(CODE_FOR_KRUSKAL_UNION_FIND)
             # self.play(kruskal_uf_code_block.create(x_offset=-2.9))
-            # l = Legend({("MULTICOLORS", "LINE"): "MST so far", ('LINE', GREEN, GREEN): "curr min edge"}, is_horizontal=True)
-            # l.mobjects.next_to(kruskal.mobject, LEFT, buff=0.7)
+            l = Legend({
+                ("MULTICOLORS", "CIRCLE"): "MST so far", 
+                ('LINE', GREEN, GREEN): "curr min edge"
+            }, is_horizontal=True)
+            # l.mobjects.next_to(kruskal.mobject, LEFT, buff=LEGEND_CHARACTER_BUFF)
             # self.play(l.fade_in())
             # self.mst_kruskal_union_find(graph, code_block=kruskal_uf_code_block, create_legend=False)
             # self.play(kruskal_uf_code_block.fade_out(), l.fade_out(), graph.fade_out())
 
-            ### Animation: map kruskal and union find ###
-            self.wait()
-            temp_group = Group(kruskal.mobject, union_find.mobject)
-            self.play(temp_group.animate.scale(1/0.6).move_to(1.3*DOWN))
-            self.play(concepts_map.show_all([kruskal.mobject]))
-            concepts_map.add(union_find.mobject)
-            self.play(union_find.shift(y_offset=-1.4))
-            self.play(concepts_map.center(scale=0.8))
-            self.wait()
-            self.play(concepts_map.add_line(kruskal, union_find, weight='Collaberation'))
+            ### Animation 5 map kruskal, union find, prim ###
+            # self.play(kruskal.fade_in())
+            # self.play(kruskal.fill_rect(stroke_color=PINK1, fill_color='#292239'))  # 10% opacity
+            # self.play(mst.fade_in())
+            # self.play(concepts_map.show_only([kruskal]))
+            # self.play(kruskal.move_to_top_right(scale=0.6))
+            # self.play(union_find.fade_in_by_position(scale=0.6, x_offset=0.7, y_offset=0))
+            # self.play(union_find.next_to(kruskal.mobject, DOWN))
+            # self.wait()
+            # temp_group = Group(kruskal.mobject, union_find.mobject)
+            # self.play(temp_group.animate.scale(1/0.6).next_to(mst.mobject, DOWN, buff=COMPANY_CHARACTER_BUFF).align_to(mst.mobject, LEFT))
+            # self.play(concepts_map.show_all([kruskal]))
+            # concepts_map.add(union_find)
+            # self.play(union_find.shift(y_offset=-1.4))
+            # self.play(concepts_map.center(scale=0.8))
+            # self.wait()
+            # self.play(concepts_map.add_line(kruskal, union_find, weight='Collaberation'))
+            # self.wait()
+            # self.play(kruskal.add_time_complexity('O(E · logV)'))
+            # self.wait()
+            # self.play(concepts_map.shift(x_offset=-2))
+            # self.wait()
+            prim = Character('Prim', 'prim.png')
+            # self.play(prim.fade_in(scale=0.8, object=kruskal, direction=RIGHT, buff=1.5))
+            # concepts_map.add(prim)
+            # self.play(prim.add_company("MST ®", stroke_color=MST_COMPANY[0], fill_color=MST_COMPANY[1]))
+            # self.play(concepts_map.add_line(kruskal, prim, weight='Colleague'))
+            # self.play(concepts_map.center())
+            # self.play(concepts_map.show_only([prim]))
+            # self.wait()
+            # prim.save_state()
+            # self.play(prim.move_to_top_right(scale=0.6))
+            # self.wait()
 
+            ### Animation 6: prim and heap ###
+            # self.play(prim.fade_in(scale=0.8, object=kruskal, direction=RIGHT, buff=1.5))
+            # self.play(prim.add_company("MST ®", stroke_color=MST_COMPANY[0], fill_color=MST_COMPANY[1]))
+            # self.play(concepts_map.show_only([prim]))
+            # self.play(prim.move_to_top_right(scale=0.6))
+            prim_code_block = CodeBlock(CODE_FOR_PRIM_BASIC)
+            l = Legend({
+                (PINK4, PINK4): "MST so far", 
+                ('LINE', GREEN, GREEN): "curr min edge"
+            }, is_horizontal=True)
+            l.mobjects.next_to(prim.basic_mobject, LEFT, buff=LEGEND_CHARACTER_BUFF)
+            # self.play(prim_code_block.create(x_offset=-2.7))
+            # self.play(graph.fade_in(scale=0.9, x_offset=3.6, y_offset=-0.5))
+            graph.save_state()
+            # self.play(l.fade_in())
+            # self.mst_prim_basic(graph, code_block=prim_code_block, create_legend=False)
+            # self.wait()
+            # self.play(prim_code_block.highlight(7, 2))  # Go to the code to show where to get the min edge
+            min_heap = Character("Min Heap", "min_heap.png")
+            current_scale = prim.scale
+            # self.play(min_heap.fade_in_by_position(scale=current_scale, x_offset=-6, y_offset=-0.2))
+            # self.wait()
+            # self.play(min_heap.next_to(prim.basic_mobject, DOWN))
+            # self.wait()
+            # self.play(prim_code_block.fade_out(), l.fade_out(), graph.restore())
+            
+
+            ### Animation 7: prim 2 ###
+            # self.play(prim.fade_in(scale=0.8, object=kruskal, direction=RIGHT, buff=1.5))
+            # self.play(prim.add_company("MST ®", stroke_color=MST_COMPANY[0], fill_color=MST_COMPANY[1]))
+            # self.play(concepts_map.show_only([prim]))
+            # prim.save_state()
+            # self.play(prim.move_to_top_right(scale=0.6))
+            # current_scale = prim.scale
+            # self.play(min_heap.fade_in_by_position(scale=current_scale, x_offset=-6, y_offset=-0.2))
+            # self.play(min_heap.next_to(prim.basic_mobject, DOWN))
+            # prim_heap_code_block = CodeBlock(CODE_FOR_PRIM_QUEUE)
+            # l = Legend({
+            #     (PINK4, PINK4): "MST so far", 
+            #     (PINK4, PINK5): "min node u",
+            #     (BACKGROUND, GREEN): "decrease key"
+            # }, is_horizontal=True)
+            # l.mobjects.next_to(prim.basic_mobject, LEFT, buff=LEGEND_CHARACTER_BUFF).align_to(prim.basic_mobject, UP)
+            # self.play(graph.fade_in(scale=0.9, x_offset=3.6, y_offset=-0.5))
+            # self.wait()
+            # self.play(prim_heap_code_block.create(x_offset=-3, y_offset=-0.2), graph.shift(x_offset=-0.5))
+            # self.play(l.fade_in())
+            # self.mst_prim_queue(graph, source='A', code_block=prim_heap_code_block, create_legend=False, hide_details=True)
+            # self.wait()
+            # self.play(prim_heap_code_block.fade_out(), l.fade_out(), graph.fade_out())
+            
+
+            ### Animation 8: back to map (need uncomment Animation 5) ###
+            # current_scale = prim.scale
+            # self.play(min_heap.fade_in_by_position(scale=current_scale, x_offset=-6, y_offset=-0.2))
+            # self.play(min_heap.next_to(prim.basic_mobject, DOWN))
+            # temp_group = Group(prim.basic_mobject, min_heap.mobject)
+            # self.play(temp_group.animate.scale(1/0.6).next_to(prim.company.mobject, DOWN, buff=COMPANY_CHARACTER_BUFF).align_to(prim.company.mobject, LEFT))
+            # self.play(concepts_map.show_all([prim]))
+
+            # concepts_map.add(union_find)
+            # self.play(union_find.shift(y_offset=-1.4))
+            # self.play(concepts_map.center(scale=0.8))
+            # self.wait()
+            # self.play(concepts_map.add_line(kruskal, union_find, weight='Collaberation'))
+            # self.wait()
+            # self.play(kruskal.add_time_complexity('O(E · logV)'))
+            # self.wait()
+            # self.play(concepts_map.shift(x_offset=-2))
+            # self.wait()
+
+            # self.play(prim.restore())
 
 
         fairytale_algorithm()
-        new_position = scale_position(FAIRYTALE_POSITION, 1.6, 1.6)
-        graph = GraphObject(FAIRYTALE_MAP, new_position)
-        # self.play(graph.fade_in())
-        # edges = self.mst_prim_queue(graph, source='A', create_legend=False, animate_code_block=False, hide_details=True, speed=1)
-
-
 
         
 
