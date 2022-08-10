@@ -408,12 +408,10 @@ class Show(MovingCameraScene):
             minimum = float("inf")
             minimum_node = None
             minimum_edge = None
-            # neighbor_edges = GraphEdgesGroup()
             for v in selected:
                 for e in v.edges:
                     u = e.get_the_other_end(v)
                     if u not in selected:
-                        # neighbor_edges.add(e)
                         if graph.adjacency_list[u.value][v.value] < minimum:
                             minimum = graph.adjacency_list[u.value][v.value]
                             minimum_node = u
@@ -421,126 +419,24 @@ class Show(MovingCameraScene):
             selected_edges.add(minimum_edge)
             # show all available edges
             self.play(code_block.highlight(7, 2, wait_time_after=WAIT_TIME_AFTER)) if animate_code_block else None
-            self.play(minimum_edge.highlight(color=GREEN))
+            print(minimum_edge)
+            u = minimum_edge.start_node
+            v = minimum_edge.end_node
+            if v in selected:
+                u, v = v, u
+            self.play(minimum_edge.highlight(color=GREEN), u.fade_in_variable('u', direction='DOWN'), v.fade_in_variable('v', direction='DOWN'))
             self.wait()
             # show the shortest edge - the next edge to add
             self.play(code_block.highlight(9, 3, wait_time_after=WAIT_TIME_AFTER)) if animate_code_block else None
             selected.add(minimum_node)
             self.play(minimum_node.color(fill_color=PINK4), minimum_edge.highlight(color=PINK4))
+            self.play(u.fade_out_variable(), v.fade_out_variable())
         self.play(code_block.highlight(6, wait_time_after=WAIT_TIME_AFTER)) if animate_code_block else None
         self.play(code_block.if_true(False)) if animate_code_block else None
         self.play(code_block.highlight(12, wait_time_after=WAIT_TIME_AFTER)) if animate_code_block else None
         self._remove_edges(graph, selected_edges)
         self.play(code_block.highlight(13, wait_time_after=WAIT_TIME_AFTER)) if animate_code_block else None
         
-
-    # def mst_prim_queue0(self, graph, source=None, create_legend=True, show_horizontal_legend=False, animate_code_block=True, code_block=None, speed=1, hide_details=False):
-    #     speed = 1 / speed
-    #     def extract_min_node(list):
-    #         min_so_far = float('inf')
-    #         min_node = None
-    #         for n in list:
-    #             if n.key < min_so_far:
-    #                 min_so_far = n.key
-    #                 min_node = n
-    #         list.remove(min_node)
-    #         return min_node
-    #     if create_legend:
-    #         l = Legend({(PINK4, PINK4): "MST so far", (PINK4, PINK5): "v"}, is_horizontal=show_horizontal_legend)
-    #         l.mobjects.next_to(graph.graph_mobject, UP, buff=0.3)
-    #         # l.mobjects.move_to(2*UP+1.5*RIGHT)
-    #         self.play(l.animation)
-    #         self.wait()
-    #     if animate_code_block and not code_block:
-    #         code_block = CodeBlock(CODE_FOR_PRIM_QUEUE)
-    #         self.play(Create(code_block.code))
-    #     self.play(code_block.highlight(1)) if animate_code_block else None
-    #     self.play(code_block.highlight(2)) if animate_code_block else None
-    #     self.play(code_block.highlight(3)) if animate_code_block else None
-    #     self.play(code_block.highlight(4)) if animate_code_block else None
-    #     edges = []
-    #     unreach = list(graph.value2node.values())
-    #     min_edge = {}
-    #     self.play(code_block.highlight(5)) if animate_code_block else None
-    #     # Accumulate animations for all nodes and show them at once
-    #     transforms = []
-    #     for node in graph.value2node.values():
-    #         node.initialize_key(float('inf'), show_value=False)
-    #         transforms += node.animations
-    #     unreach_nodes_group = GraphNodesGroup(unreach)
-    #     self.play(*transforms)
-    #     self.play(code_block.highlight(6)) if animate_code_block else None
-    #     if not source:
-    #         source_node = graph.value2node.values()[0]
-    #     else:
-    #         source_node = graph.value2node[source]
-    #     self.play(source_node.update_key(0), run_time=1.5*speed)
-    #     while unreach:
-    #         # Show group of unreached nodes
-    #         self.play(code_block.highlight(7)) if animate_code_block else None
-    #         self.play(code_block.highlight(8)) if animate_code_block else None
-    #         # Flash candidates
-    #         self.wait()
-    #         self.play(unreach_nodes_group.color(stroke_color=GRAY, key_color=BACKGROUND, has_key=True), run_time=1.2*speed)
-    #         self.play(unreach_nodes_group.color(stroke_color=GRAY, key_color=GRAY, has_key=True), run_time=1.2*speed)
-    #         # Color the min node
-    #         v = extract_min_node(unreach)
-    #         self.play(v.color(fill_color=PINK4, stroke_color=PINK5, stroke_width=NODE_HIGHLIGHT_STROKE_WIDTH, has_key=True))
-    #         # Get the min edge
-    #         self.play(code_block.highlight(9)) if animate_code_block else None
-    #         if v in min_edge:
-    #             edges.append(min_edge[v])
-    #             self.play(code_block.highlight(10)) if animate_code_block else None
-    #             self.wait(speed)
-    #             self.play(min_edge[v].highlight(color=PINK4), run_time=0.5*speed)
-    #             self.play(min_edge[v].dehighlight(), run_time=0.5*speed)
-    #             self.play(min_edge[v].highlight(color=PINK4), run_time=0.5*speed)
-    #             self.wait(speed)
-    #         # Decrease key and save the min edge
-    #         # Full version - playing each for loop one by one
-    #         if not hide_details:
-    #             for u in v.neighbors:
-    #                 if u in unreach:
-    #                     self.play(code_block.highlight(11)) if animate_code_block else None
-    #                     self.play(code_block.highlight(12, 2)) if animate_code_block else None
-    #                     edge_v_u = v.neighbor2edge[u]
-    #                     # Flash edge_v_u.weight and u.key
-    #                     temp_group = [edge_v_u.mobject, u.key_mobject]
-    #                     self.play(*[m.animate.set_color(BACKGROUND) for m in temp_group], run_time=speed)
-    #                     self.play(*[m.animate.set_color(GRAY) for m in temp_group], run_time=speed)
-    #                     if edge_v_u.weight < u.key:
-    #                         self.play(code_block.highlight(14)) if animate_code_block else None
-    #                         self.play(u.update_key(edge_v_u.weight), run_time=speed)
-    #                         u.key = edge_v_u.weight
-    #                         min_edge[u] = edge_v_u
-    #                         self.play(code_block.highlight(15)) if animate_code_block else None
-    #         # Shortened version - playing all for loops at the same time
-    #         else:
-    #             self.play(code_block.highlight(11, 3)) if animate_code_block else None
-    #             # Accumulate animations for all qualified mobjects and show them at once
-    #             mobject_to_flash = []
-    #             animations_update_key = []
-    #             for u in v.neighbors:
-    #                 if u in unreach:
-    #                     edge_v_u = v.neighbor2edge[u]
-    #                     if edge_v_u.weight < u.key:
-    #                         mobject_to_flash += [edge_v_u.mobject["text"]["text"], edge_v_u.mobject["line"], u.key_mobject]
-    #                         animations_update_key.append(u.update_key(edge_v_u.weight))
-    #                         u.key = edge_v_u.weight
-    #                         min_edge[u] = edge_v_u
-    #             if mobject_to_flash:
-    #                 self.play(*[m.animate.set_color(BACKGROUND) for m in mobject_to_flash], run_time=speed)
-    #                 self.play(*[m.animate.set_color(GRAY) for m in mobject_to_flash], run_time=speed)
-    #             if animations_update_key:
-    #                 self.play(code_block.highlight(14)) if animate_code_block else None
-    #                 self.play(*animations_update_key, run_time=1.5*speed)
-    #                 self.play(code_block.highlight(15)) if animate_code_block else None
-    #         self.play(v.color(fill_color=PINK4, stroke_color=PINK3, stroke_width=WIDTH, has_key=True))
-    #     self.play(code_block.highlight(16)) if animate_code_block else None
-    #     self._remove_edges(graph, edges)
-    #     self.play(code_block.highlight(17)) if animate_code_block else None
-    #     return edges
-
 
     # the new version (matched wit Dijkstra)
     def mst_prim_queue(self, graph, source=None, create_legend=True, show_horizontal_legend=False, animate_code_block=True, code_block=None, speed=1, hide_details=False, character_object=None):
@@ -2051,7 +1947,7 @@ class Show(MovingCameraScene):
                 return get_text(string, weight=BOLD, font_size=20).to_edge(LEFT, buff=1)
             def get_text_left_next(string, mobject_above):
                 return get_text_left(string, graph).next_to(mobject_above, DOWN, buff=0.3).align_to(mobject_above, LEFT)
-            title_mobject = show_title_for_demo("The Fairytale of Algorithms")
+            title_mobject = show_title_for_demo("The Fairy Tale of Algorithms")
             self.add(title_mobject)
 
             ### Animation 1 MST ###
@@ -2202,57 +2098,57 @@ class Show(MovingCameraScene):
             # self.wait()
 
             ### Animation 6 prim and heap ###
-            # self.play(prim.fade_in(scale=0.8, object=kruskal, direction=RIGHT, buff=1.5))
-            # self.play(concepts_map.add_company("MST ®", prim, stroke_color=MST_COMPANY[0], fill_color=MST_COMPANY[1]))
-            # self.play(concepts_map.show_only([prim]))
-            # self.play(prim.move_to_top_right(scale=CHARACTER_TO_EDGE_SCALE))
-            # self.wait()
-            prim_code_block = CodeBlock(CODE_FOR_PRIM_BASIC)
-            # l = Legend({
-            #     (PINK4, PINK4): "MST so far", 
-            #     ('LINE', GREEN, GREEN): "curr min edge"
-            # }, is_horizontal=True)
-            # l.mobjects.next_to(prim.mobject, LEFT, buff=LEGEND_CHARACTER_BUFF)
-            # self.play(prim_code_block.create(x_offset=-2.7))
-            # self.play(graph.fade_in(scale=0.9, x_offset=3.7, y_offset=-0.3))
-            # graph.save_state()
-            # self.play(l.fade_in())
-            # self.wait()
-            # self.mst_prim_basic(graph, code_block=prim_code_block, create_legend=False)
-            # self.wait()
-            # self.play(prim_code_block.highlight(7, 2))  # Go to the code to show where to get the min edge
-            min_heap = Character("Min Heap", "min_heap.png")
-            # current_scale = prim.scale
-            # self.wait()
-            # self.play(min_heap.fade_in_by_position(scale=current_scale, x_offset=-5.86, y_offset=-0.2, together=True))
-            # self.wait()
-            # self.play(min_heap.next_to(prim.mobject, DOWN))
-            # self.wait()
-            # self.play(prim_code_block.fade_out(), l.fade_out(), graph.restore())
-            
-
-            ### Animation 7 prim 2 ###
             self.play(prim.fade_in(scale=0.8, object=kruskal, direction=RIGHT, buff=1.5))
             self.play(concepts_map.add_company("MST ®", prim, stroke_color=MST_COMPANY[0], fill_color=MST_COMPANY[1]))
             self.play(concepts_map.show_only([prim]))
             self.play(prim.move_to_top_right(scale=CHARACTER_TO_EDGE_SCALE))
-            current_scale = prim.scale
-            self.play(min_heap.fade_in_by_position(scale=current_scale, x_offset=-6, y_offset=-0.2))
-            self.play(min_heap.next_to(prim.mobject, DOWN))
-            prim_heap_code_block = CodeBlock(CODE_FOR_PRIM_QUEUE)
+            self.wait()
+            prim_code_block = CodeBlock(CODE_FOR_PRIM_BASIC)
             l = Legend({
                 (PINK4, PINK4): "MST so far", 
-                (PINK4, PINK5): "curr min node",
-                (BACKGROUND, GREEN): "decrease key"
+                ('LINE', GREEN, GREEN): "curr min edge"
             }, is_horizontal=True)
             l.mobjects.next_to(prim.mobject, LEFT, buff=LEGEND_CHARACTER_BUFF)
+            self.play(prim_code_block.create(x_offset=-2.7))
             self.play(graph.fade_in(scale=0.9, x_offset=3.7, y_offset=-0.3))
-            self.wait()
-            self.play(prim_heap_code_block.create(x_offset=-2.8, y_offset=-0.4), graph.shift(x_offset=-0.6))
+            graph.save_state()
             self.play(l.fade_in())
-            self.mst_prim_queue(graph, source='A', code_block=prim_heap_code_block, create_legend=False, hide_details=True, character_object=min_heap)
             self.wait()
-            self.play(prim_heap_code_block.fade_out(), l.fade_out(), graph.fade_out())
+            self.mst_prim_basic(graph, code_block=prim_code_block, create_legend=False)
+            self.wait()
+            self.play(prim_code_block.highlight(7, 2))  # Go to the code to show where to get the min edge
+            min_heap = Character("Min Heap", "min_heap.png")
+            current_scale = prim.scale
+            self.wait()
+            self.play(min_heap.fade_in_by_position(scale=current_scale, x_offset=-5.86, y_offset=-0.2, together=True))
+            self.wait()
+            self.play(min_heap.next_to(prim.mobject, DOWN))
+            self.wait()
+            self.play(prim_code_block.fade_out(), l.fade_out(), graph.restore())
+            
+
+            ### Animation 7 prim 2 ###
+            # self.play(prim.fade_in(scale=0.8, object=kruskal, direction=RIGHT, buff=1.5))
+            # self.play(concepts_map.add_company("MST ®", prim, stroke_color=MST_COMPANY[0], fill_color=MST_COMPANY[1]))
+            # self.play(concepts_map.show_only([prim]))
+            # self.play(prim.move_to_top_right(scale=CHARACTER_TO_EDGE_SCALE))
+            # current_scale = prim.scale
+            # self.play(min_heap.fade_in_by_position(scale=current_scale, x_offset=-6, y_offset=-0.2))
+            # self.play(min_heap.next_to(prim.mobject, DOWN))
+            # prim_heap_code_block = CodeBlock(CODE_FOR_PRIM_QUEUE)
+            # l = Legend({
+            #     (PINK4, PINK4): "MST so far", 
+            #     (PINK4, PINK5): "curr min node",
+            #     (BACKGROUND, GREEN): "decrease key"
+            # }, is_horizontal=True)
+            # l.mobjects.next_to(prim.mobject, LEFT, buff=LEGEND_CHARACTER_BUFF)
+            # self.play(graph.fade_in(scale=0.9, x_offset=3.7, y_offset=-0.3))
+            # self.wait()
+            # self.play(prim_heap_code_block.create(x_offset=-2.8, y_offset=-0.4), graph.shift(x_offset=-0.6))
+            # self.play(l.fade_in())
+            # self.mst_prim_queue(graph, source='A', code_block=prim_heap_code_block, create_legend=False, hide_details=True, character_object=min_heap)
+            # self.wait()
+            # self.play(prim_heap_code_block.fade_out(), l.fade_out(), graph.fade_out())
             
 
             ### Animation 8 back to map (need uncomment Animation 5) ###
@@ -2275,9 +2171,12 @@ class Show(MovingCameraScene):
             # self.clear()
             # self.wait()
 
-        fairytale_algorithm()
-        # title_mobject = show_title_for_demo("The Fairy Tale of Algorithms")
-        # self.add(title_mobject)
+        # fairytale_algorithm()
+        # self.play(endding('EN'))
+        self.play(fairytale_header())
+
+
+
 
         
 
