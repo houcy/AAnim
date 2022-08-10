@@ -5,7 +5,13 @@ from util import *
 
 # z_index: edge: 0, circle: 1, text: 3, key: 5
 class GraphNode:
-    def __init__(self, value, position_x, position_y, is_music_note=False, node_radius=RADIUS, font_color=GRAY, font_size=VALUE_SIZE):
+    def __init__(self, value, position_x, position_y, is_music_note=False, node_radius=RADIUS, fill_color=BACKGROUND, stroke_color=GRAY, font_color=GRAY, font_size=VALUE_SIZE, zoom_in_power=1):
+        self.font_color = font_color
+        self.font_size = font_size
+        self.zoom_in_power = zoom_in_power
+        self.node_radius = node_radius
+        self.fill_color = fill_color
+        self.stroke_color = stroke_color
         self.value = value
         self.neighbor2edge = {}
         self.neighbors = []
@@ -14,9 +20,11 @@ class GraphNode:
         self.position_y = position_y
         self.mobject = None
         self.text_mobject = None
+        self.text_mobject_is_showing = True
         self.circle_mobject = None
-        self._create_mobject(is_music_note=is_music_note, node_radius=node_radius, font_color=font_color, font_size=font_size)
+        self._create_mobject(is_music_note=is_music_note)
         self.key = None
+        self.key_string = ''
         self.key_mobject = None
         self.animations = None
         self.rect = None
@@ -26,18 +34,23 @@ class GraphNode:
         self.is_showing = False
         self.variable_name = None
         self.min_edge = None
+
     
-    def _create_mobject(self, is_music_note, node_radius, font_color, font_size):
+    def _create_text_mobject(self, color=None):
+        if not color:
+            color = self.font_color
+        count_digit = len(str(self.value))
+        if count_digit >= 3:
+            self.font_size = self.font_size - (count_digit - 2) * 5
+        return Text(str(self.value), color=color, font=FONT, weight=BOLD, font_size=self.font_size/self.zoom_in_power).set_z_index(7).shift(self.circle_mobject.get_center())
+    
+    def _create_mobject(self, is_music_note):
         """
         Convert a node to an MObject so that it shows on the canvas
         """
-        self.circle_mobject = Circle(radius=node_radius).set_stroke(color=LINE_COLOR, width=WIDTH).set_fill(BACKGROUND, opacity=1.0).set_z_index(1).shift(RIGHT * self.position_x + UP * self.position_y)
+        self.circle_mobject = Circle(radius=self.node_radius/self.zoom_in_power).set_stroke(color=self.stroke_color, width=WIDTH/self.zoom_in_power).set_fill(self.fill_color, opacity=1.0).set_z_index(1).shift(RIGHT * self.position_x + UP * self.position_y)
         if not is_music_note:
-            count_digit = len(str(self.value))
-            if count_digit >= 3:
-                font_size = font_size - (count_digit - 2) * 5
-            self.text_mobject = Text(str(self.value), color=font_color, font=FONT, weight=BOLD, font_size=font_size).set_z_index(3).shift(self.circle_mobject.get_center())
-
+            self.text_mobject = self._create_text_mobject()
         else:
             # for music note
             value = str(self.value)
@@ -50,23 +63,22 @@ class GraphNode:
 
     def mobjects(self):
         m = VDict([("c", self.circle_mobject)])
-        if self.text_mobject:
+        if self.text_mobject_is_showing:
             m["t"] = self.text_mobject
         if self.key_mobject:
             m["k"] = self.key_mobject
         return m
 
-    def initialize_key(self, key, show_value=False):
+    def _update_mobject(self):
+        self.mobject = self.mobjects()
+
+    def initialize_key(self, key_string=None, show_value=False, color=GRAY):
         animations = []
-        key_string = ''
-        if key == float('inf'):
-            key_string = '∞'
-        elif isinstance(key, int):
-            key_string = str(key)
-        else:
-            print("Failed to initialize key: need passing an integer")
-            return
-        self.key = key
+        if key_string == '∞':
+            self.key = float('inf')
+        elif isinstance(key_string, int) or isinstance(key_string, float):
+            self.key = str(key_string)
+            key_string = str(key_string)
         if show_value:
             new_text_mobject = None
             if show_value == 'BACK':
@@ -75,15 +87,29 @@ class GraphNode:
                 new_text_mobject = get_text(str(self.value), SMALL_FONT_SIZE, color=GRAY, weight=BOLD).next_to(self.mobject, UP, buff=0.15)
             animations.append(ReplacementTransform(self.text_mobject, new_text_mobject))
             self.text_mobject = new_text_mobject
-            self.key_mobject = get_text(key_string, font_size=KEY_SIZE, weight=BOLD).move_to(self.circle_mobject.get_center()).set_z_index(5)
+            self.key_mobject = get_text(key_string, font_size=KEY_SIZE, weight=BOLD, color=color).move_to(self.circle_mobject.get_center()).set_z_index(5)
             animations.append(FadeIn(self.key_mobject))
         else:
-            self.text_mobject.save_state()
-            self.key_mobject = get_text(key_string, font_size=KEY_SIZE, weight=BOLD).move_to(self.circle_mobject.get_center()).set_z_index(5)
+            self.text_mobject_is_showing = False
+            self.key_mobject = get_text(key_string, font_size=KEY_SIZE, weight=BOLD, color=color).move_to(self.circle_mobject.get_center()).set_z_index(5)
             animations.append(ReplacementTransform(self.text_mobject, self.key_mobject))
             self.text_mobject = None
+        self._update_mobject()
         self.animations = animations    # If show_value is True, there will be 2 animations: Transform and FadeIn; Otherwise, only 1 animation
+        self.key_string = key_string
         return AnimationGroup(*animations, lag_ratio=1)
+
+    def delete_key(self):
+        self.key_string = ''
+        self.key = None
+        return FadeOut(self.key_mobject)
+
+    def fade_out_key_restore_name(self, color=GRAY):
+        self.key_string = ''
+        self.key = None
+        self.text_mobject_is_showing = True
+        self.text_mobject = self._create_text_mobject(color)
+        return ReplacementTransform(self.key_mobject, self.text_mobject)
     
     def update_key(self, key, color=GRAY):
         animations = []
@@ -93,7 +119,7 @@ class GraphNode:
         self.key_mobject = new_key_mobject
         self.animations = animations
         return AnimationGroup(*animations)
-
+        
     def highlight_stroke(self, color=HIGHLIGHT_STROKE):
         """
         Change the stroke color of the node to be highlight color
@@ -130,7 +156,7 @@ class GraphNode:
         """
         if not has_key:
             return AnimationGroup(self.circle_mobject.animate.set_fill(fill_color).set_stroke(stroke_color, width=stroke_width), self.text_mobject.animate.set_color(text_color))
-        elif self.text_mobject:
+        elif self.text_mobject_is_showing:
             return AnimationGroup(self.circle_mobject.animate.set_fill(fill_color).set_stroke(stroke_color, width=stroke_width), self.key_mobject.animate.set_color(text_color), self.text_mobject.animate.set_color(text_color))
         else:
             return AnimationGroup(self.circle_mobject.animate.set_fill(fill_color).set_stroke(stroke_color, width=stroke_width), self.key_mobject.animate.set_color(text_color))
@@ -175,7 +201,7 @@ class GraphNode:
 
     def fade_in(self):
         self.is_showing = True
-        return FadeIn(self.mobject())
+        return FadeIn(self.mobject)
 
     def fade_in_variable(self, variable_name, show_background=True, direction='UP'):
         text = Text(variable_name, color=GRAY, font=FONT, weight=NORMAL, font_size=WEIGHT_SIZE).set_z_index(10).set_stroke(color=EDGE_STROKE_COLOR, width=EDGE_STROKE_WIDTH)
@@ -203,7 +229,10 @@ class Test(Scene):
     def construct(self):
         self.camera.background_color = BACKGROUND
         node = GraphNode(value='A', position_x=1, position_y=1)
-        self.add(node.mobject)
-        self.play(node.color(fill_color=PINK3, stroke_color=PINK1, stroke_width=WIDTH+2))
-        self.play(node.color(fill_color=PINK2, stroke_color=PINK2, stroke_width=WIDTH))
-        # self.play(node.highlight_stroke_and_change_shape(shape = "HEART"))
+        self.play(node.fade_in())
+        # self.play(node.initialize_key('∞'))
+        # self.wait()
+        # self.play(node.update_key('1'))
+        # self.wait()
+        # self.play(node.fade_out_key_restore_name(color=PINK3))
+        # self.wait()
