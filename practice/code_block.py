@@ -21,7 +21,8 @@ class CodeBlock():
             self.title = None
             self._set_background_color()
             self.last_n_lines = 1
-            self.x_offset = SHIFT_LEFT_UNIT
+            self.x_offset = 0
+            self.y_offset = 0
 
     def _set_background_color(self):
         self.code.background_mobject.set_fill(BACKGROUND)
@@ -30,36 +31,81 @@ class CodeBlock():
         self.title = Text(title, color=LINE_COLOR, font="Karla").scale(TITLE_SIZE).set_z_index(2).next_to(self.code, UP, buff=0.5)
         return self.title
 
-    def create(self, x_offset=SHIFT_LEFT_UNIT, y_offset=0):
+    def create(self, x_offset=0, y_offset=0):
         self.x_offset = x_offset
-        return Create(self.code.shift(self.x_offset * RIGHT + y_offset * UP))
+        self.y_offset = y_offset
+        return Create(self.code.shift(self.x_offset * RIGHT + self.y_offset * UP))
+
+    def shift(self, x_offset=0, y_offset=0):
+        self.x_offset += x_offset
+        self.y_offset += y_offset
+        return self.code.animate.shift(self.x_offset * RIGHT + self.y_offset * UP)
+
+    def shift_only(self, x_offset=0, y_offset=0):
+        self.x_offset += x_offset
+        self.y_offset += y_offset
+        self.code.shift(self.x_offset * RIGHT + self.y_offset * UP)
 
     def fade_out(self):
-        print(self.code)
-        return FadeOut(self.code, self.highlight_rect)
+        if self.highlight_rect:
+            return FadeOut(self.code, self.highlight_rect)
+        else:
+            return FadeOut(self.code)
 
-    def highlight(self, line_number, n_lines=1, wait_time_before=1, wait_time_after=1):
+    def highlight(self, line_number, n_lines=1, wait_time_before=1, wait_time_after=1, character_object=None, company=''):
         """
         To highlight line 3 for example: self.play(code_instance.highlight(3))
+        character_object is only for making videos about fairytales
         """
         if line_number+n_lines-1 > self.total_lines or line_number <= 0:
             print("Error: line number out of the range")
             return
         y_base = self.top - self.line_height_include_spacing * (line_number - 1) - 0.5 * self.line_height
         y_position = y_base - (n_lines - 1) * (self.line_height_include_spacing / 2)
+        animations = [Wait(wait_time_before)]
+        rect_width = 0
+        if self.total_lines < 10:
+            rect_width = self.width+CODE_BLOCK_WIDTH_PADDING
+        else:
+            rect_width = self.width+CODE_BLOCK_WIDTH_PADDING-0.1    # When total_lines >= 10, the padding will be larger
         if not self.highlight_rect:
-            self.highlight_rect = RoundedRectangle(corner_radius=0.05, width=self.width+CODE_BLOCK_WIDTH_PADDING, height=self.line_height_include_spacing*n_lines+CODE_BLOCK_HEIGHT_PADDING).set_stroke(color=GRAY, width=BOX_STROKE_WIDTH).shift(self.x_offset * RIGHT + UP * (y_position))
+            # Create a rect
+            self.highlight_rect = RoundedRectangle(corner_radius=0.05, width=rect_width, height=self.line_height_include_spacing*n_lines+CODE_BLOCK_HEIGHT_PADDING).set_stroke(color=GRAY, width=BOX_STROKE_WIDTH).shift(self.x_offset * RIGHT + (y_position + self.y_offset) * UP)
             self.last_n_lines = n_lines
             # self.code = VGroup(self.code, self.highlight_rect)
-            return Succession(Wait(wait_time_before), FadeIn(self.highlight_rect), Wait(wait_time_after), lag_ratio=1)
+            if character_object and company:
+                # character_object is only for making videos about fairytales, appear together with the rect
+                animations.append(AnimationGroup(FadeIn(self.highlight_rect), character_object.highlight(company)))
+            else:
+                animations.append(FadeIn(self.highlight_rect))
+            animations.append(Wait(wait_time_after))
+            return Succession(*animations, lag_ratio=1)
         else:
             if self.last_n_lines == n_lines:
-                return Succession(Wait(wait_time_before), self.highlight_rect.animate.move_to(self.x_offset * RIGHT + UP * (y_position)), Wait(wait_time_after), lag_ratio=1)
+                # No change on rect
+                if character_object and company:
+                    animations.append(AnimationGroup(self.highlight_rect.animate.move_to(self.x_offset * RIGHT + (y_position + self.y_offset) * UP), character_object.highlight(company)))
+                else:
+                    animations.append(self.highlight_rect.animate.move_to(self.x_offset * RIGHT + (y_position + self.y_offset) * UP))
             else:
+                # Change the height of the rect
                 self.last_n_lines = n_lines
                 last_highlight_rect = self.highlight_rect
-                self.highlight_rect = RoundedRectangle(corner_radius=0.05, width=self.width+CODE_BLOCK_WIDTH_PADDING, height=self.line_height_include_spacing*n_lines+CODE_BLOCK_HEIGHT_PADDING).set_stroke(color=GRAY, width=BOX_STROKE_WIDTH).shift(self.x_offset * RIGHT + UP * (y_position))
-                return Succession(Wait(wait_time_before), ReplacementTransform(last_highlight_rect, self.highlight_rect), Wait(wait_time_after), lag_ratio=1)
+                self.highlight_rect = RoundedRectangle(corner_radius=0.05, width=rect_width, height=self.line_height_include_spacing*n_lines+CODE_BLOCK_HEIGHT_PADDING).set_stroke(color=GRAY, width=BOX_STROKE_WIDTH).shift(self.x_offset * RIGHT + (y_position + self.y_offset) * UP)
+                if character_object and company:
+                    animations.append(AnimationGroup(ReplacementTransform(last_highlight_rect, self.highlight_rect), character_object.highlight(company)))
+                else:
+                    animations.append(ReplacementTransform(last_highlight_rect, self.highlight_rect))
+            animations.append(Wait(wait_time_after))
+            return Succession(*animations, lag_ratio=1)
+
+    def dehighlight_character(self, character):
+        return character.dehighlight()
+    
+    def destroy_highlight(self):
+        if self.highlight_rect:
+            self.highlight_rect = None
+            return FadeOut(self.highlight_rect)
 
     def if_true(self, is_true=True, wait_time=1):
         """
@@ -67,25 +113,51 @@ class CodeBlock():
         self.play(code_block.if_true(wait_time=4))
         self.play(code_block.if_true(is_true=False, wait_time=4))
         """
+        # mark = None
+        # if is_true:
+        #     mark = SVGMobject("check.svg", height=0.17).set_fill(color=GREEN)
+        # else:
+        #     mark = SVGMobject("xmark.svg", height=0.17).set_fill(color=RED)
+        # mark.align_to(self.highlight_rect, UL).shift(CONDITION_MARK_SHIFT_RIGHT_UNIT*RIGHT+0.09*DOWN)
+        # return Succession(FadeIn(mark), Wait(wait_time), FadeOut(mark), lag_ratio=1)
+        
         mark = None
         if is_true:
-            mark = SVGMobject("check.svg", height=0.2).set_fill(color=GREEN).next_to(self.highlight_rect, RIGHT, buff=0.2)
+            mark = SVGMobject("check.svg", height=0.17).set_fill(color=GREEN).set_z_index(8)
         else:
-            mark = SVGMobject("xmark.svg", height=0.2).set_fill(color=RED).next_to(self.highlight_rect, RIGHT, buff=0.2)
-        return Succession(FadeIn(mark), Wait(wait_time), FadeOut(mark), lag_ratio=1)
+            mark = SVGMobject("xmark.svg", height=0.17).set_fill(color=RED).set_z_index(8)
+        mark_background = RoundedRectangle(corner_radius=0.05, width=0.4, height=0.28).set_fill(BACKGROUND, opacity=0.9).set_stroke(width=0).set_z_index(6)
+        mark_group = VGroup(mark, mark_background)
+        mark_group.move_to(self.highlight_rect).align_to(self.highlight_rect, UR).shift(0.03*LEFT, 0.03*DOWN)
+        return Succession(FadeIn(mark_group), Wait(wait_time), FadeOut(mark_group), lag_ratio=1)
 
 
 class Test(Scene):
     def construct(self):
-        TEST_CODE = """EXTRACT-FIRST(A) {
-        heapsize = length(A)
-        Exchange A[1] with A[heapsize]
-        }
-        """
-        test_code = CodeBlock(TEST_CODE)
-        self.play(test_code.create())
-        self.play(test_code.highlight(1, 1))
-        self.play(test_code.highlight(2, 1))
+        self.camera.background_color = BACKGROUND
+        test_code = CodeBlock(CODE_FOR_KRUSKAL_UNION_FIND)
+        self.play(test_code.create(x_offset=-2, y_offset=-2))
+        # self.play(test_code.highlight(1, 1))
+        self.play(test_code.highlight(5, 1))
+        self.play(test_code.if_true(False))
+        self.play(test_code.if_true())
+        self.play(test_code.highlight(3, 1))
+        self.play(test_code.if_true())
         self.play(test_code.highlight(4, 2))
-        self.play(test_code.uncreate())
+        self.play(test_code.if_true(False))
+        self.play(test_code.if_true())
+        self.play(test_code.if_true())
+        self.play(test_code.fade_out())
         self.wait()
+
+        # test_code = CodeBlock(CODE_FOR_PRIM_BASIC)
+        # self.play(test_code.create(x_offset=-2, y_offset=2))
+        # self.play(test_code.highlight(1, 1))
+        # self.play(test_code.highlight(2, 1))
+        # self.play(test_code.if_true(False))
+        # self.play(test_code.highlight(3, 1))
+        # self.play(test_code.if_true())
+        # self.play(test_code.highlight(4, 2))
+        # self.play(test_code.if_true())
+        # self.play(test_code.fade_out())
+        # self.wait()
