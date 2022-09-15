@@ -1,3 +1,4 @@
+from re import X
 from manim import *
 from style import *
 from code_constant import *
@@ -1940,7 +1941,10 @@ class Show(MovingCameraScene):
 
 
         ### 算法童话系列 ###
-        def fairytale_algorithm():
+        def fairytale_algorithm_en():
+            ##################################
+            # English
+            ##################################
             def get_text_below(string, graph):
                 return get_text(string, weight=NORMAL).next_to(graph.graph_mobject, DOWN, buff=0.5)
             def get_text_left(string):
@@ -1949,7 +1953,7 @@ class Show(MovingCameraScene):
                 return get_text_left(string, graph).next_to(mobject_above, DOWN, buff=0.3).align_to(mobject_above, LEFT)
             title_mobject = show_title_for_demo("The Fairy Tale of Algorithms")
             self.add(title_mobject)
-
+            
             ### Animation 1 MST ###
             kruskal = Character("Kruskal", "kruskal.png")
             concepts_map = ConceptsMap([kruskal])
@@ -2083,9 +2087,9 @@ class Show(MovingCameraScene):
             # self.wait()
             # self.play(concepts_map.shift(x_offset=-2.5))
             # self.wait()
-            prim = Character('Prim', 'prim.png')
+            # prim = Character('Prim', 'prim.png')
             # self.play(prim.fade_in(scale=0.8, object=kruskal, direction=RIGHT, buff=1.5))
-            concepts_map.add(prim)
+            # concepts_map.add(prim)
             # self.play(concepts_map.add_company("MST ®", prim, stroke_color=MST_COMPANY[0], fill_color=MST_COMPANY[1]))
             # self.wait()
             # self.play(concepts_map.add_edge(kruskal, prim, weight='Colleague'))
@@ -2098,33 +2102,33 @@ class Show(MovingCameraScene):
             # self.wait()
 
             ### Animation 6 prim and heap ###
-            self.play(prim.fade_in(scale=0.8, object=kruskal, direction=RIGHT, buff=1.5))
-            self.play(concepts_map.add_company("MST ®", prim, stroke_color=MST_COMPANY[0], fill_color=MST_COMPANY[1]))
-            self.play(concepts_map.show_only([prim]))
-            self.play(prim.move_to_top_right(scale=CHARACTER_TO_EDGE_SCALE))
-            self.wait()
-            prim_code_block = CodeBlock(CODE_FOR_PRIM_BASIC)
-            l = Legend({
-                (PINK4, PINK4): "MST so far", 
-                ('LINE', GREEN, GREEN): "curr min edge"
-            }, is_horizontal=True)
-            l.mobjects.next_to(prim.mobject, LEFT, buff=LEGEND_CHARACTER_BUFF)
-            self.play(prim_code_block.create(x_offset=-2.7))
-            self.play(graph.fade_in(scale=0.9, x_offset=3.7, y_offset=-0.3))
-            graph.save_state()
-            self.play(l.fade_in())
-            self.wait()
-            self.mst_prim_basic(graph, code_block=prim_code_block, create_legend=False)
-            self.wait()
-            self.play(prim_code_block.highlight(7, 2))  # Go to the code to show where to get the min edge
-            min_heap = Character("Min Heap", "min_heap.png")
-            current_scale = prim.scale
-            self.wait()
-            self.play(min_heap.fade_in_by_position(scale=current_scale, x_offset=-5.86, y_offset=-0.2, together=True))
-            self.wait()
-            self.play(min_heap.next_to(prim.mobject, DOWN))
-            self.wait()
-            self.play(prim_code_block.fade_out(), l.fade_out(), graph.restore())
+            # self.play(prim.fade_in(scale=0.8, object=kruskal, direction=RIGHT, buff=1.5))
+            # self.play(concepts_map.add_company("MST ®", prim, stroke_color=MST_COMPANY[0], fill_color=MST_COMPANY[1]))
+            # self.play(concepts_map.show_only([prim]))
+            # self.play(prim.move_to_top_right(scale=CHARACTER_TO_EDGE_SCALE))
+            # self.wait()
+            # prim_code_block = CodeBlock(CODE_FOR_PRIM_BASIC)
+            # l = Legend({
+            #     (PINK4, PINK4): "MST so far", 
+            #     ('LINE', GREEN, GREEN): "curr min edge"
+            # }, is_horizontal=True)
+            # l.mobjects.next_to(prim.mobject, LEFT, buff=LEGEND_CHARACTER_BUFF)
+            # self.play(prim_code_block.create(x_offset=-2.7))
+            # self.play(graph.fade_in(scale=0.9, x_offset=3.7, y_offset=-0.3))
+            # graph.save_state()
+            # self.play(l.fade_in())
+            # self.wait()
+            # self.mst_prim_basic(graph, code_block=prim_code_block, create_legend=False)
+            # self.wait()
+            # self.play(prim_code_block.highlight(7, 2))  # Go to the code to show where to get the min edge
+            # min_heap = Character("Min Heap", "min_heap.png")
+            # current_scale = prim.scale
+            # self.wait()
+            # self.play(min_heap.fade_in_by_position(scale=current_scale, x_offset=-5.86, y_offset=-0.2, together=True))
+            # self.wait()
+            # self.play(min_heap.next_to(prim.mobject, DOWN))
+            # self.wait()
+            # self.play(prim_code_block.fade_out(), l.fade_out(), graph.restore())
             
 
             ### Animation 7 prim 2 ###
@@ -2171,9 +2175,259 @@ class Show(MovingCameraScene):
             # self.clear()
             # self.wait()
 
-        # fairytale_algorithm()
+
+        def fairytale_algorithm_ch():
+            ##################################
+            # Chinese
+            ##################################
+            def get_text_below(string, graph):
+                return get_text(string, weight=NORMAL).next_to(graph.graph_mobject, DOWN, buff=0.5)
+            def get_text_left(string):
+                return get_text(string, weight=BOLD, font_size=20).to_edge(LEFT, buff=1)
+            def get_text_left_next(string, mobject_above):
+                return get_text_left(string, graph).next_to(mobject_above, DOWN, buff=0.3).align_to(mobject_above, LEFT)
+            title_mobject = show_title_for_demo("算法童话")
+            self.add(title_mobject)
+
+            ### Animation 1 MST ###
+            kruskal = Character("Kruskal", "kruskal.png")
+            concepts_map = ConceptsMap([kruskal])
+            self.play(kruskal.fade_in())
+            self.wait()
+            self.play(concepts_map.add_company("MST ®", kruskal, stroke_color=MST_COMPANY[0], fill_color=MST_COMPANY[1]))
+            # self.wait()
+            # self.play(concepts_map.show_only([kruskal.company]))
+            # self.play(kruskal.company.move_to_top_right())
+            # self.wait()
+            # new_position = scale_position(FAIRYTALE_POSITION, 2, 2)
+            # graph = GraphObject(FAIRYTALE_MAP, new_position)
+            # self.play(graph.fade_in())
+            # self.wait()
+            # mst_edges_group = graph.get_mst_edges('A')
+            # mst_nodes_group = graph.get_mst_nodes()
+            # self.play(mst_edges_group.highlight(width=EDGE_HIGHLIGHT_STROKE_WIDTH), mst_nodes_group.fill())
+            # formula = get_text_below("4 + 7 + 2 + 1 + 5 + 3 = 22", graph)
+            # self.wait()
+            # self.play(Write(formula))
+            # self.wait()
+            # self._remove_edges(graph, mst_edges_group.edges_array, is_sync=True)
+            # self.wait()
+            # mst_title = get_text("最小生成树 (Minimum Spanning Tree)", weight=BOLD).to_edge(UP, buff=0.9)
+            # self.play(Write(mst_title))
+            # self.wait()
+            # self.play(Unwrite(formula))
+            # self.wait()
+            # self._restore_edges(graph, mst_edges_group.edges_array, is_sync=True)
+            # self.play(graph.shift(x_offset=3))
+            # outline = LeftSideOutline("1. 覆盖所有的点", buff=2)
+            # self.wait()
+            # self.play(outline.show("1. 覆盖所有的点"))
+            # self.wait()
+            # self.play(mst_edges_group.dehighlight())
+            # self.wait()
+            # self.play(outline.add("2. 边的权重之和越小越好"))
+            # self.play(mst_edges_group.highlight(width=EDGE_HIGHLIGHT_STROKE_WIDTH))
+            # self.wait()
+            # self.play(outline.add("4 + 7 + 2 + 1 + 5 + 3 = 22", is_secondary=True))
+            # self.wait()
+            # self._remove_edges(graph, mst_edges_group.edges_array, is_sync=True)
+            # self.wait()
+            # self._restore_edges(graph, mst_edges_group.edges_array, is_sync=True)
+            # self.wait()
+            # self.play(graph.fade_out(), outline.fade_out(), FadeOut(mst_title))
+            # self.wait()
+            # self.play(kruskal.company.back_from_top_right())
+            # self.play(concepts_map.show_all())
+            # self.wait()
+
+            ### Animation 2 Kruskal ###
+            # self.wait()
+            # self.play(concepts_map.show_only([kruskal]))
+            # self.play(kruskal.move_to_top_right(scale=CHARACTER_TO_EDGE_SCALE*0.8))
+            # self.wait()
+            # kruskal_code_block = CodeBlock(CODE_FOR_KRUSKAL)
+            # l = Legend({
+            #     (PINK4, PINK4): "最小生成树", 
+            #     ('LINE', GREEN, GREEN): "当前最小边"
+            # }, is_horizontal=True)
+            # l.mobjects.next_to(kruskal.mobject, LEFT, buff=LEGEND_CHARACTER_BUFF)
+            # self.play(kruskal_code_block.create(x_offset=-2.6))
+            # self.play(graph.fade_in(scale=0.9, x_offset=3.7, y_offset=-0.3))
+            # self.play(l.fade_in())
+            # self.mst_kruskal_basic(graph, code_block=kruskal_code_block, create_legend=False)
+            # self.wait()
+
+            ### Animation 3 add same label ###
+            # self.play(graph.fade_in(scale=0.9, x_offset=3.7, y_offset=-0.3))
+            # self.play(l.fade_in())
+            # self.wait()
+            # self.play(kruskal_code_block.highlight(4, 2))
+            # self.wait()
+            # green_edge_1 = graph.get_edge_by_name('B', 'C')
+            # green_edge_2 = graph.get_edge_by_name('C', 'D')
+            # small_group_edges = GraphEdgesGroup([graph.get_edge_by_name(start, end) for start, end in [('B', 'E')]])
+            # large_group_edges = GraphEdgesGroup([graph.get_edge_by_name(start, end) for start, end in [('A', 'D'), ('C', 'F'), ('D', 'F'), ('D', 'G')]])
+            # small_group_nodes = GraphNodesGroup([graph.get_node_by_name('B'), graph.get_node_by_name('E')])
+            # large_group_nodes = GraphNodesGroup([graph.get_node_by_name('A'), graph.get_node_by_name('C'), graph.get_node_by_name('D'), graph.get_node_by_name('F'), graph.get_node_by_name('G')])
+            # self.play(green_edge_1.highlight(color=GREEN), small_group_edges.highlight(color=PINK4), large_group_edges.highlight(color=PINK4), small_group_nodes.fill(stroke_color=PINK3), large_group_nodes.fill(stroke_color=PINK3))
+            # self.wait()
+            # change name
+            # self.play(small_group_edges.highlight(color='#9BA3EC'), small_group_nodes.fill(fill_color='#9BA3EC'), small_group_nodes.initialize_keys("♥", color=BACKGROUND))
+            # self.wait()
+            # self.play(large_group_edges.highlight(color='#FDF8CA'), large_group_nodes.fill(fill_color='#FDF8CA'), large_group_nodes.initialize_keys("★", color=BACKGROUND))
+            # self.wait()
+            # self.play(green_edge_1.dehighlight(), green_edge_2.highlight(color=GREEN))
+            # self.wait()
+            union_find = Character("Union-Find", "union_find.png")
+            # self.play(union_find.fade_in_by_position(scale=0.48, x_offset=-5.85, y_offset=0, together=True))
+            # self.wait()
+            # self.play(union_find.next_to(kruskal.mobject, DOWN))
+            # self.wait()
+            # self.play(graph.restore_graph(), kruskal_code_block.fade_out(), l.fade_out(), small_group_nodes.delete_keys(), large_group_nodes.delete_keys())
+
+            ### Animation 4 kruskal 2 ###
+            # self.wait()
+            # kruskal_uf_code_block = CodeBlock(CODE_FOR_KRUSKAL_UNION_FIND)
+            # self.play(kruskal_uf_code_block.create(x_offset=-2.7), graph.shift(x_offset=-0.2))
+            # l = Legend({
+            #     ("MULTICOLORS", "CIRCLE"): "最小生成树", 
+            #     ('LINE', GREEN, GREEN): "当前最小边"
+            # }, is_horizontal=True)
+            # l.mobjects.next_to(kruskal.mobject, LEFT, buff=LEGEND_CHARACTER_BUFF)
+            # self.play(l.fade_in())
+            # self.mst_kruskal_union_find(graph, code_block=kruskal_uf_code_block, create_legend=False, union_find_object=union_find)
+            # self.play(kruskal_uf_code_block.fade_out(), l.fade_out(), graph.fade_out())
+
+            ### Animation 5 map kruskal, union find, prim ###
+            self.play(concepts_map.show_only([kruskal]))
+            self.play(kruskal.move_to_top_right(scale=CHARACTER_TO_EDGE_SCALE*0.8))
+            self.play(union_find.fade_in_by_position(scale=CHARACTER_TO_EDGE_SCALE*0.8, x_offset=0.7, y_offset=0))
+            self.play(union_find.next_to(kruskal.mobject, DOWN))
+            # self.wait()
+            kruskal_and_uf = ObjectGroup([kruskal, union_find])
+            self.play(kruskal_and_uf.next_to_company(kruskal.company, scale=1/0.48))
+            # self.play(concepts_map.show_all())
+            concepts_map.add(union_find)
+            self.play(union_find.shift(y_offset=-1.2))
+            self.play(concepts_map.center(scale=0.8))
+            # self.wait()
+            self.play(concepts_map.add_edge(kruskal, union_find, weight='帮助'))
+            # self.wait()
+            self.play(kruskal.add_time_complexity('O(E·lgV)'))
+            # self.wait()
+            self.play(concepts_map.shift(x_offset=-2.5))
+            # self.wait()
+            prim = Character('Prim', 'prim.png')
+            self.play(prim.fade_in(scale=0.8, object=kruskal, direction=RIGHT, buff=1.5))
+            concepts_map.add(prim)
+            self.play(concepts_map.add_company("MST ®", prim, stroke_color=MST_COMPANY[0], fill_color=MST_COMPANY[1]))
+            self.wait()
+            self.play(concepts_map.add_edge(kruskal, prim, weight='同事'))
+            self.wait()
+            self.play(concepts_map.center())
+            self.wait()
+            self.play(concepts_map.show_only([prim]))
+            self.wait()
+            self.play(prim.move_to_top_right(scale=CHARACTER_TO_EDGE_SCALE))
+            self.wait()
+
+            ### Animation 6 prim and heap ###
+            # self.play(prim.fade_in(scale=0.8, object=kruskal, direction=RIGHT, buff=1.5))
+            # self.play(concepts_map.add_company("MST ®", prim, stroke_color=MST_COMPANY[0], fill_color=MST_COMPANY[1]))
+            # self.play(concepts_map.show_only([prim]))
+            # self.play(prim.move_to_top_right(scale=CHARACTER_TO_EDGE_SCALE))
+            # self.wait()
+            # prim_code_block = CodeBlock(CODE_FOR_PRIM_BASIC)
+            # l = Legend({
+            #     (PINK4, PINK4): "最小生成树", 
+            #     ('LINE', GREEN, GREEN): "当前边"
+            # }, is_horizontal=True)
+            # l.mobjects.next_to(prim.mobject, LEFT, buff=LEGEND_CHARACTER_BUFF)
+            # self.play(prim_code_block.create(x_offset=-2.7))
+            # self.play(graph.fade_in(scale=0.9, x_offset=3.7, y_offset=-0.3))
+            # graph.save_state()
+            # self.play(l.fade_in())
+            # self.wait()
+            # self.mst_prim_basic(graph, code_block=prim_code_block, create_legend=False)
+            # self.wait()
+            # self.play(prim_code_block.highlight(7, 2))  # Go to the code to show where to get the min edge
+            min_heap = Character("Min Heap", "min_heap.png")
+            # current_scale = prim.scale
+            # self.wait()
+            # self.play(min_heap.fade_in_by_position(scale=current_scale, x_offset=-5.86, y_offset=-0.2, together=True))
+            # self.wait()
+            # self.play(min_heap.next_to(prim.mobject, DOWN))
+            # self.wait()
+            # self.play(prim_code_block.fade_out(), l.fade_out(), graph.restore())
+            
+
+            ### Animation 7 prim 2 ###
+            # self.play(prim.fade_in(scale=0.8, object=kruskal, direction=RIGHT, buff=1.5))
+            # self.play(concepts_map.add_company("MST ®", prim, stroke_color=MST_COMPANY[0], fill_color=MST_COMPANY[1]))
+            # self.play(concepts_map.show_only([prim]))
+            # self.play(prim.move_to_top_right(scale=CHARACTER_TO_EDGE_SCALE))
+            # current_scale = prim.scale
+            # self.play(min_heap.fade_in_by_position(scale=current_scale, x_offset=-6, y_offset=-0.2))
+            # self.play(min_heap.next_to(prim.mobject, DOWN))
+            # prim_heap_code_block = CodeBlock(CODE_FOR_PRIM_QUEUE)
+            # l = Legend({
+            #     (PINK4, PINK4): "最小生成树", 
+            #     (PINK4, PINK5): "当前最小的点",
+            #     (BACKGROUND, GREEN): "键值降低的点"
+            # }, is_horizontal=True)
+            # l.mobjects.next_to(prim.mobject, LEFT, buff=LEGEND_CHARACTER_BUFF)
+            # self.play(graph.fade_in(scale=0.9, x_offset=3.7, y_offset=-0.3))
+            # self.wait()
+            # self.play(prim_heap_code_block.create(x_offset=-2.8, y_offset=-0.4), graph.shift(x_offset=-0.6))
+            # self.play(l.fade_in())
+            # self.mst_prim_queue(graph, source='A', code_block=prim_heap_code_block, create_legend=False, hide_details=True, character_object=min_heap)
+            # self.wait()
+            # self.play(prim_heap_code_block.fade_out(), l.fade_out(), graph.fade_out())
+            
+
+            ### Animation 8 back to map (need uncomment Animation 5) ###
+            current_scale = prim.scale
+            self.play(min_heap.fade_in_by_position(scale=current_scale, x_offset=-6, y_offset=-0.2))
+            self.wait()
+            self.play(min_heap.next_to(prim.mobject, DOWN))
+            self.wait()
+            prim_and_mh = ObjectGroup([prim, min_heap])
+            self.play(prim_and_mh.next_to_company(prim.company, scale=1/0.6))
+            self.wait()
+            self.play(concepts_map.show_all())
+            concepts_map.add(min_heap)
+            self.play(min_heap.align_to(union_find.mobject, UP))
+            self.wait()
+            self.play(concepts_map.add_edge(prim, min_heap, weight='帮助'))
+            self.wait()
+            self.play(prim.add_time_complexity('O(E+V·lgV)'))
+            self.wait()
+            self.play(concepts_map.show_only([kruskal, prim]))
+            self.play(kruskal.shift(scale=0.8, x_offset=-3.5, y_offset=0), prim.shift(scale=0.8, x_offset=3.5, y_offset=0))
+            self.wait()
+            self.play(kruskal.shift(scale=1/0.8, x_offset=3.5, y_offset=0), prim.shift(scale=1/0.8, x_offset=-3.5, y_offset=0))
+            self.play(concepts_map.show_all())
+            self.wait()
+            self.clear()
+
+        # fairytale_algorithm_en()
         # self.play(endding('EN'))
-        self.play(fairytale_header())
+        # self.play(fairytale_header())
+
+        # self.play(fairytale_header(language='CH'))
+        # fairytale_algorithm_ch()
+        # self.play(endding('CH'))
+
+        # re = Ellipse(width=1.5, height=0.8)
+        # rl = Line((0,0,0), (0.15,0.15,0)).shift(0.52*DOWN+0.75*LEFT)
+        # rtext1 = get_text('勿拉踩', color=GRAY, font_size=SMALL_FONT_SIZE, weight=ULTRAHEAVY).move_to(re)
+        # rdialogue = VGroup(re, rl).set_stroke(color=GRAY)
+        # rdialogue += rtext1
+        # self.play(Write(rdialogue))
+        # self.wait(3)
+        # self.play(Unwrite(rdialogue))
+
+        
 
 
 

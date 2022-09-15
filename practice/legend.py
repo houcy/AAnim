@@ -77,6 +77,12 @@ class Legend:
     def fade_out(self):
         return FadeOut(self.mobjects)
 
+    def next_to(self, mobject, direction=UP, buff=LEGEND_CHARACTER_BUFF):
+        return self.mobjects.animate.next_to(mobject, direction, buff=buff)
+
+    def next_to_character_top_left(self, mobject, direction=LEFT, buff=LEGEND_CHARACTER_BUFF):
+        return self.mobjects.animate.next_to(mobject, direction, buff=buff)
+
 class Test(Scene):
     def construct(self):
         self.camera.background_color = BLACK

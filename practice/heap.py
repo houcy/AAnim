@@ -1,5 +1,6 @@
 from manim import *
 from style import *
+import math
 from heap_array import HeapArray
 
 # create low quality video $ manim -ql -p heap.py BinaryHeap
@@ -10,6 +11,7 @@ from heap_array import HeapArray
 
 
 class BinaryHeap(Scene):
+    # Comment out to test easily
     def __init__(self, array):
         self.heap = HeapArray(array) 
         super().__init__()
@@ -95,9 +97,9 @@ class BinaryHeap(Scene):
         """
         Build a heap by heapify each node from bottom to up
         """
-        self.play(FadeIn(heap.code_for_build.code, heap.code_for_build.create_title('Building the heap')))
+        self.play(FadeIn(heap.code_for_build.code))
         self.wait(1)
-        for i in range((len(heap.array)-1) // 2, -1, -1):
+        for i in range((math.floor(len(heap.array) // 2) - 1), -1, -1):
             node = heap.array[i]
             # Color
             self.play(heap.code_for_build.highlight(2))
@@ -108,14 +110,14 @@ class BinaryHeap(Scene):
             self.play(heap.code_for_build.highlight(3))
             self._heapify(heap, node, is_min_heap)
             self._decolor_all(heap.array)
-        self.play(FadeOut(heap.code_for_build.code, heap.code_for_build.highlight_rect, heap.code_for_build.title))
+        self.play(FadeOut(heap.code_for_build.code, heap.code_for_build.highlight_rect))
 
 
     def extract(self, heap):
         if len(heap.array) == 0:
             print("Heap is empty")
             return
-        self.play(FadeIn(heap.code_for_extract.code, heap.code_for_build.create_title('Deletion')))
+        self.play(FadeIn(heap.code_for_extract.code))
         self.wait(0.5)
         # Swap
         self.play(heap.code_for_extract.highlight(3))
@@ -135,14 +137,14 @@ class BinaryHeap(Scene):
         self._heapify(heap, first, True)
         self._decolor_all(heap.array)
         # Clean up
-        self.play(FadeOut(heap.code_for_extract.code, heap.code_for_extract.highlight_rect, heap.code_for_build.title))
+        self.play(FadeOut(heap.code_for_extract.code, heap.code_for_extract.highlight_rect))
 
 
     def insert(self, heap, value):
         if len(heap.array) == 0:
             print("Heap is empty")
             return
-        self.play(FadeIn(heap.code_for_insert.code, heap.code_for_build.create_title('Insertion')))
+        self.play(FadeIn(heap.code_for_insert.code))
         self.wait(0.5)
         # Insert
         self.play(heap.code_for_insert.highlight(3))
@@ -155,9 +157,20 @@ class BinaryHeap(Scene):
         self._filterup(heap, node, True)
         self._decolor_all(heap.array)
         # Clean up
-        self.play(FadeOut(heap.code_for_insert.code, heap.code_for_insert.highlight_rect, heap.code_for_build.title))
+        self.play(FadeOut(heap.code_for_insert.code, heap.code_for_insert.highlight_rect))
+
+    # def construct(self):
+    #     self.camera.background_color = BACKGROUND
+    #     array = [9, 8, 7, 6, 5, 4, 3, 2]
+    #     heap = HeapArray(array) 
+    #     self.play(heap.show())
+    #     self.build_heap(heap, is_min_heap=True)
+    #     self.extract(heap)
+    #     self.insert(heap, 1)
 
 
+
+    # Comment out to test easily
     def construct(self, command):
         """
         Main function called by manim
@@ -184,9 +197,3 @@ class BinaryHeap(Scene):
         # Insertion
         elif command[0] == 'insert':
             self.insert(self.heap, int(command[1]))
-
-
-
-
-
-

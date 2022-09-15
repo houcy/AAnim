@@ -1,10 +1,10 @@
-CODE_FOR_BUILD = """BUILD-HEAP(A[1,...,n]) {
+CODE_FOR_BUILD = """BUILD_HEAP(A[1,...,n]) {
     for i = floor(n/2) downto 1
         HeapifyDown(A, i)
 }
 """
 
-CODE_FOR_EXTRACT = """EXTRACT-FIRST(A) {
+CODE_FOR_EXTRACT = """EXTRACT_FIRST(A) {
     heapsize = length(A)
     Exchange A[1] with A[heapsize]
     Remove A[heapsize]
@@ -22,14 +22,14 @@ CODE_FOR_INSERT = """INSERT(A, value) {
 CODE_FOR_DFS = """DFS(G) {
     for each vertex u
         if u.color = BLACK
-            DFS-VISIT(G, u)
+            DFS_VISIT(G, u)
 }
 
-DFS-VISIT(G, u) {
+DFS_VISIT(G, u) {
     u.color = PINK
     for each neighbor v of u
         if v.color = BLACK
-            DFS-VISIT(G, v)
+            DFS_VISIT(G, v)
     u.color = BLUE
 }
 """
@@ -66,42 +66,41 @@ CODE2_FOR_BFS = """BFS(G, s) {
 }
 """
 
-CODE_FOR_PRIM_BASIC = """MST-PRIM(G) {
+CODE_FOR_PRIM_BASIC = """PRIM_IDEA(G) {
     Edges = ∅
     ReachSet = ∅
     UnReachSet = G.V
     add an arbitrary vertex v to ReachSet
     while ReachSet ≠ G.V
-        find (v, u) be the min edge such that
-        v ∈ ReachSet and u ∈ UnReachSet
-        Edges = Edges ∪ {(v, u)}
-        ReachSet = ReachSet ∪ {u}
-        UnReachSet = UnReachSet - {u}
+        find (u, v) be the min edge such that
+        u ∈ ReachSet and v ∈ UnReachSet
+        Edges = Edges ∪ {(u, v)}
+        ReachSet = ReachSet ∪ {v}
+        UnReachSet = UnReachSet - {v}
     return Edges
 }
 """
 
-CODE_FOR_PRIM_QUEUE = """MST-PRIM(G) {
-    Edges = ∅
-    UnReachSet = G.V
+CODE_FOR_PRIM_QUEUE = """PRIM(G) {
+    Edges = ∅, UnReachSet = G.V
     set all vertices v.minEdge = ∅
     set all vertices v.key = ∞
     set an arbitrary vertex v.key = 0
     while UnReachSet ≠ ∅
-        v = EXTRACT-MIN(UnReachSet)
-        if v.minEdge ≠ ∅
-            add v.minEdge to Edges
-        for each neighbor u of v
-            if u ∈ UnReachSet and
-            weight(v, u) < u.key
-                u.key = weight(v, u)
-                u.minEdge = (v, u)
+        u = EXTRACT_MIN(UnReachSet)
+        if u.minEdge ≠ ∅
+            add u.minEdge to Edges
+        for each neighbor v of u
+            if v ∈ UnReachSet and
+            weight(u, v) < v.key
+                v.key = weight(u, v)
+                v.minEdge = (u, v)
     return Edges
 }
 """
 
 
-CODE_FOR_KRUSKAL = """MST-KRUSKAL(G) {
+CODE_FOR_KRUSKAL = """KRUSKAL_IDEA(G) {
     Edges = ∅
     scan all edges by nondecreasing weight
         if an edge is safe (does not form
@@ -111,7 +110,7 @@ CODE_FOR_KRUSKAL = """MST-KRUSKAL(G) {
 }
 """
 
-CODE_FOR_KRUSKAL_CHINESE = """MST-KRUSKAL(G) {
+CODE_FOR_KRUSKAL_CHINESE = """KRUSKAL(G) {
     Edges = ∅
     按从小到大的顺序检查每条边
         如果这条边是安全的（没有和最小生成树形成任何环）
@@ -121,13 +120,13 @@ CODE_FOR_KRUSKAL_CHINESE = """MST-KRUSKAL(G) {
 """
 
 
-CODE_FOR_KRUSKAL_UNION_FIND = """MST-KRUSKAL(G) {
+CODE_FOR_KRUSKAL_UNION_FIND = """KRUSKAL(G) {
     Edges = ∅
     for each vertex v ∈ G.V
-        MAKE-SET(v)
+        MAKE_SET(v)
     scan all edges by nondecreasing weight
     for each edge (u, v)
-        if FIND-SET(u) ≠ FIND-SET(v)
+        if FIND_SET(u) ≠ FIND_SET(v)
             Edges = Edges ∪ {(u, v)}   
             UNION(u, v)
     return Edges 
@@ -140,9 +139,9 @@ CODE_FOR_DIJKASTRA_WITH_RELAX = """DIJKSTRA(G, s) {
     set all vertices v.key = ∞
     set an arbitrary vertex v.key = 0
     while UnReachSet ≠ ∅
-        v = EXTRACT-MIN(UnReachSet)
-        for each neighbor u of v
-            RELAX(u, v, G.Weight)
+        u = EXTRACT_MIN(UnReachSet)
+        for each neighbor v of u
+            RELAX(u, v, weight(u, v))
 }
 }
 """
@@ -160,12 +159,12 @@ CODE_FOR_DIJKASTRA_WITHOUT_RELAX = """DIJKSTRA(G, s) {
     set all vertices v.previous = ∅
     s.key = 0
     while UnReachSet ≠ ∅
-        v = EXTRACT-MIN(UnReachSet)
-        for each neighbor u of v
-            // Relax edge (v, u)
-            if u.key > v.key + weight(u, v)
-                u.key = v.key + weight(u, v)
-                u.previous = v
+        u = EXTRACT_MIN(UnReachSet)
+        for each neighbor v of u
+            // Relax edge (u, v)
+            if v.key > u.key + weight(u, v)
+                v.key = u.key + weight(u, v)
+                v.previous = u
 }
 """
 
@@ -175,7 +174,7 @@ CODE_FOR_DIJKASTRA_WITHOUT_RELAX_CH = """DIJKSTRA(G, s) {
     对于每一个点v设置 v.previous = ∅
     对于源点s设置 s.key = 0
     while UnReachSet ≠ ∅
-        v = EXTRACT-MIN(UnReachSet)
+        v = EXTRACT_MIN(UnReachSet)
         对于从v出发的每条边(v, u)
             // 松弛边(v, u)
             if u.key > v.key + weight(u, v)
@@ -184,7 +183,7 @@ CODE_FOR_DIJKASTRA_WITHOUT_RELAX_CH = """DIJKSTRA(G, s) {
 }
 """
 
-CODE_FOR_BELLMAN_FORD = """BELLMAN-FORD(G, s) {
+CODE_FOR_BELLMAN_FORD = """BELLMAN_FORD(G, s) {
     UnReachSet = G.V
     set all vertices v.key = ∞
     set all vertices v.previous = ∅
@@ -203,7 +202,7 @@ CODE_FOR_BELLMAN_FORD = """BELLMAN-FORD(G, s) {
 }
 """
 
-CODE_FOR_BELLMAN_FORD_WITH_RELAX = """BELLMAN-FORD(G, src) {
+CODE_FOR_BELLMAN_FORD_WITH_RELAX = """BELLMAN_FORD(G, src) {
     set all vertices v.key = ∞
     set all vertices v.previous = ∅
     src.key = 0

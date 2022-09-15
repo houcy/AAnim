@@ -13,7 +13,7 @@ class ColorGenerator:
         return '%02x%02x%02x' % rgb
     
     def vivid_colors(self, n):
-        s = 0.34
+        s = 0.30
         v = 0.93
         s_low = 0.15
         v_low = 0.93
@@ -31,8 +31,14 @@ class ColorGenerator:
         stroke_hex_colors = [self.rgb_to_hex(color) for color in stroke_rgb_colors]
         hex_colors_cor_manim = ["#" + color for color in hex_colors]
         stroke_hex_colors_cor_manim = ["#" + color for color in stroke_hex_colors]
-        print("vivid_colors: ", stroke_hex_colors_cor_manim)
         return list(zip(hex_colors_cor_manim, stroke_hex_colors_cor_manim))
+
+    def same_vue_colors(self, h, n, s_offset=0, v=96):
+        step_length = 100 / n
+        hsv_colors = []
+        for i in range(n):
+            s = s_offset + i * step_length
+            
 
 class Test(Scene):
     def construct(self):

@@ -5,7 +5,7 @@ from curved_arrow import Curved_Arrow
 
 
 class GraphEdge:
-    def __init__(self, start_node, end_node, weight=None, line_mobject=None, is_cyclic=False, is_directed=False, is_topological_graph=False, is_straight_graph=False, edge_radius=EDGE_RADIUS, color=GRAY, tip_length=TIP_LENGTH_FOR_CURVED_LINE, tip_width=TIP_LENGTH_FOR_CURVED_LINE):
+    def __init__(self, start_node, end_node, weight=None, weight_font_size=WEIGHT_SIZE, line_mobject=None, is_cyclic=False, is_directed=False, is_topological_graph=False, is_straight_graph=False, edge_radius=EDGE_RADIUS, color=GRAY, tip_length=TIP_LENGTH_FOR_CURVED_LINE, tip_width=TIP_LENGTH_FOR_CURVED_LINE, zoom_in_power=1):
         self.weight = weight
         self.start_node = start_node
         self.end_node = end_node
@@ -41,14 +41,20 @@ class GraphEdge:
 
         # for weighted edge
         if self.weight:
-            text = Text(str(weight), color=EDGE_COLOR, font=FONT, weight=WEIGHT_WEIGHT, font_size=WEIGHT_SIZE).move_to(line_mobject.get_center()).set_z_index(10).set_stroke(color=EDGE_STROKE_COLOR, width=EDGE_STROKE_WIDTH)
+            text = Text(str(weight), color=EDGE_COLOR, font=FONT, weight=WEIGHT_WEIGHT, font_size=weight_font_size/zoom_in_power).move_to(line_mobject.get_center()).set_z_index(10).set_stroke(color=EDGE_STROKE_COLOR, width=EDGE_STROKE_WIDTH/zoom_in_power)
             circle_radius = WEIGHT_CIRCLE_RADIUS
             count_digit = len(str(weight))
             if count_digit > 2:
                 circle_radius = circle_radius + (count_digit - 2) * 0.1
-            text_background = Circle(radius=circle_radius).set_stroke(color=BACKGROUND, width=WIDTH).set_fill(BACKGROUND, opacity=1.0).set_z_index(9).move_to(text.get_center())
+            text_background = Circle(radius=circle_radius/zoom_in_power).set_stroke(color=BACKGROUND, width=WIDTH/zoom_in_power).set_fill(BACKGROUND, opacity=1.0).set_z_index(9).move_to(text.get_center())
             self.mobject["text"] = VDict([("text", text), ("text_background", text_background)])
 
+    def get_start_node(self):
+        return self.start_node
+
+    def get_end_node(self):
+        return self.end_node
+    
     def get_the_other_end(self, node):
         if node == self.start_node:
             return self.end_node
@@ -64,17 +70,15 @@ class GraphEdge:
         #         width = EDGE_HIGHLIGHT_STROKE_WIDTH_FOR_DIGRAPH_CURVY
         #     else:
         #         width = EDGE_HIGHLIGHT_STROKE_WIDTH_FOR_DIGRAPH
-        print(EDGE_HIGHLIGHT_STROKE_WIDTH)
         self.mobject["line"].save_state()
         self.save_state = True
         if self.is_directed and change_tip_width:
             return AnimationGroup(self.mobject["line"].animate.set_stroke(width=width).set_color(color=color))
         else:
-            if self.weight:
-                return AnimationGroup(self.mobject["line"].animate.set_color(color=color).set_stroke(width=width), self.mobject["text"]["text"].animate.set_color(color=color))
-            else:
-                print("ere")
-                return AnimationGroup(self.mobject["line"].animate.set_color(color=color))
+            # if self.weight:
+            #     return AnimationGroup(self.mobject["line"].animate.set_color(color=color).set_stroke(width=width), self.mobject["text"]["text"].animate.set_color(color=color))
+            # else:
+            return AnimationGroup(self.mobject["line"].animate.set_color(color=color).set_stroke(width=width))
 
 
     def dehighlight(self, color=GRAY, force_color=False):

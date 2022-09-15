@@ -18,8 +18,9 @@ class GraphEdgesGroup:
         return VGroup(self.line_mobject, self.text_mobject)
 
     def add(self, edge):
-        self.line_mobject += edge.mobject["line"]
-        self.text_mobject += edge.mobject["text"]
+        self.line_mobject += edge.mobject['line']
+        if 'text' in edge.mobject:
+            self.text_mobject += edge.mobject['text']
         self.edges_array.append(edge)
 
     def highlight(self, color=PINK4, width=EDGE_HIGHLIGHT_STROKE_WIDTH):
@@ -28,11 +29,11 @@ class GraphEdgesGroup:
         return AnimationGroup(self.line_mobject.animate.set_stroke(color=color, width=width))
 
     def dehighlight(self, color=GRAY):
-        if self.save_state:
-            self.save_state = False
-            return AnimationGroup(Restore(self.line_mobject), Wait(), lag_ratio=1)
-        else:
-            return AnimationGroup(self.line_mobject.animate.set_stroke(color=color, width=WIDTH), Wait(), lag_ratio=1)
+        # if self.save_state:
+        #     self.save_state = False
+        #     return AnimationGroup(Restore(self.line_mobject), Wait(), lag_ratio=1)
+        # else:
+        return AnimationGroup(self.line_mobject.animate.set_stroke(color=color, width=WIDTH), Wait(), lag_ratio=1)
 
     def disappear(self, include_label=False):
         # self.line_mobject.save_state()

@@ -18,7 +18,8 @@ class UnionFind:
         color_index = 0
         animations = []
         cg = ColorGenerator()
-        color_tuples= cg.vivid_colors(len(array))
+        color_tuples = cg.vivid_colors(len(array))
+        # color_tuples = [('#a6eded', '#caeded'), ('#d9a6ed', '#e3caed'), ('#eda6c4', '#edcad9'), ('#a6b0ed', '#cacfed'), ('#edc4a6', '#edd9ca'), ('#d9eda6', '#e3edca'), ('#a6edb0', '#caedcf')]
         for node in array:
             node_color, stroke_color = color_tuples[color_index]
             animations.append(node.color(fill_color=node_color, stroke_color=stroke_color))

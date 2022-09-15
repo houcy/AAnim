@@ -3,27 +3,8 @@ from style import *
 from heap_node import HeapNode
 from table import Table
 from code_block import CodeBlock
+from code_constant import *
 
-CODE_FOR_BUILD = """BUILD-HEAP(A[1,...,n]) {
-    for i = floor(n/2) downto 1
-        HeapifyDown(A, i)
-}
-"""
-
-CODE_FOR_EXTRACT = """EXTRACT-FIRST(A) {
-    heapsize = length(A)
-    Exchange A[1] with A[heapsize]
-    Remove A[heapsize]
-    HeapifyDown(A, 1)
-}
-"""
-
-CODE_FOR_INSERT = """INSERT(A, value) {
-    heapsize = length(A) + 1
-    A[heapsize] = value
-    HeapifyUp(A, heapsize)
-}
-"""
 
 class HeapArray():
     def __init__(self, array):
@@ -39,6 +20,9 @@ class HeapArray():
         self.code_for_extract = CodeBlock(CODE_FOR_EXTRACT)
         self.code_for_insert = CodeBlock(CODE_FOR_INSERT)
         self.animation = AnimationGroup(*self.animation, *self.table.animation, lag_ratio=0.5)
+
+    def show(self):
+        return self.animation
     
     def _get_offset(self):
         """
