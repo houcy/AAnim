@@ -2,6 +2,9 @@ from manim import *
 from style import *
 from graph_node import GraphNode
 from graph_edge import GraphEdge
+from graph_edges_group import GraphEdgesGroup
+from graph_nodes_group import GraphNodesGroup
+from sub_graph import SubGraph
 
 # For Testing
 # Limit input to:
@@ -22,7 +25,7 @@ POSITION_CYCLE3 = {'A': (-2, -2), 'B': (2, 2)}
 MAP_CYCLE = {'A': {'B': 3}, 'B': {'A': 2}}
 
 class GraphObject:
-    def __init__(self, adjacency_list, position, is_topological_graph=False, edge_radius=RADIUS, node_radius=RADIUS, is_cyclic=False, font_color=GRAY, font_size=VALUE_SIZE):
+    def __init__(self, adjacency_list, position, is_topological_graph=False, edge_radius=RADIUS, edge_color=GRAY, node_radius=RADIUS, node_fill_color=BACKGROUND, node_stroke_color=GRAY, is_cyclic=False, font_color=GRAY, node_font_size=VALUE_SIZE, weight_font_size=WEIGHT_SIZE, zoom_in_power=1):
         self.graph_mobject = VGroup()
         self.value2node = {}
         visited_edge = set()
@@ -33,11 +36,11 @@ class GraphObject:
         for start in self.adjacency_list:
             if start not in self.value2node:
                 position_x, position_y = position[start]
-                self._create_node(start, position_x, position_y, node_radius, font_color=font_color, font_size=font_size)
+                self._create_node(start, position_x, position_y, node_radius, font_color=font_color, font_size=node_font_size, fill_color=node_fill_color, stroke_color = node_stroke_color, zoom_in_power=zoom_in_power)
             for end in self.adjacency_list[start]:
                 if end not in self.value2node:
                     position_x, position_y = position[end]
-                    self._create_node(end, position_x, position_y, node_radius, font_color=font_color, font_size=font_size)
+                    self._create_node(end, position_x, position_y, node_radius, font_color=font_color, font_size=node_font_size, fill_color=node_fill_color, stroke_color = node_stroke_color, zoom_in_power=zoom_in_power)
                 is_directed = True
                 not_created = True
                 # Not directed
@@ -46,15 +49,19 @@ class GraphObject:
                     if (end, start) in visited_edge:
                         not_created = False
                 if is_directed or (not is_directed and not_created):
-                    self._create_edge(start, end, is_directed, is_topological_graph, edge_radius, is_cyclic=is_cyclic)
+                    self._create_edge(start, end, is_directed, is_topological_graph, edge_radius, edge_color, is_cyclic=is_cyclic, weight_font_size=weight_font_size, zoom_in_power=zoom_in_power)
                     visited_edge.add((start, end))
         self.graph_mobject = self.graph_mobject.move_to(ORIGIN)
+        self.sub_graph_dict = {}
 
     def show(self, x_offset=0, y_offset=0):
         return FadeIn(self.graph_mobject.shift(RIGHT*x_offset+UP*y_offset))
 
     def get_node_names(self):
         return list(self.value2node.keys())
+
+    def get_node_by_name(self, node_name):
+        return self.value2node[node_name]
 
     def get_edges(self):
         return self.edges
@@ -72,11 +79,16 @@ class GraphObject:
     def get_nodes(self):
         return list(self.value2node.values())
 
-    def fade_in(self, graph_scale=1, x_offset=0, y_offset=0):
-        return FadeIn(self.graph_mobject.scale(graph_scale).shift(x_offset*RIGHT+y_offset*UP))
+    def fade_in(self, scale=1, x_offset=0, y_offset=0):
+        self.graph_mobject.scale(scale).shift(x_offset*RIGHT+y_offset*UP)
+        self.graph_mobject.save_state()
+        return FadeIn(self.graph_mobject)
 
     def fade_out(self):
         return AnimationGroup(*[e.fade_out() for e in self.get_nodes() + self.get_edges()])
+
+    def restore_graph(self):
+        return Restore(self.graph_mobject)
     
     def n_nodes(self):
         return len(self.value2node)
@@ -84,25 +96,30 @@ class GraphObject:
     def n_edges(self):
         return len(self.edges)
                 
-    def _create_node(self, value, position_x, position_y, node_radius, font_color, font_size):
-        node = GraphNode(value, position_x, position_y, node_radius=node_radius, font_color=font_color, font_size=font_size)
+    def _create_node(self, value, position_x, position_y, node_radius, font_color, font_size, zoom_in_power, fill_color, stroke_color):
+        node = GraphNode(value, position_x, position_y, node_radius=node_radius, font_color=font_color, fill_color=fill_color, stroke_color=stroke_color, font_size=font_size, zoom_in_power=zoom_in_power)
         self.value2node[value] = node
         self.graph_mobject += node.mobject
 
-    def get_edge(self, start, end):
-        return self.nodes2edge[(start, end)]
+    def get_edge(self, start_node, end_node):
+        return self.nodes2edge[(start_node, end_node)]
+
+    def get_edge_by_name(self, start, end):
+        start_node = self.value2node[start]
+        end_node = self.value2node[end]
+        return self.get_edge(start_node, end_node)
 
     def get_edge_from_value(self, start_value, end_value):
         return self.nodes2edge[(self.value2node[start_value], self.value2node[end_value])]
 
-    def _create_edge(self, start, end, is_directed, is_topological_graph, edge_radius, is_cyclic=False):
+    def _create_edge(self, start, end, is_directed, is_topological_graph, edge_radius, edge_color, is_cyclic=False, weight_font_size=WEIGHT_SIZE, zoom_in_power=1):
         start_node = self.value2node[start]
         end_node = self.value2node[end]
         weight = self.adjacency_list[start][end]
         # if start -> end && end -> strt, we need to use curved edges
         if end in self.adjacency_list and start in self.adjacency_list[end]:
             is_cyclic = True
-        edge_object = GraphEdge(start_node=start_node, end_node=end_node, weight=weight, is_cyclic=is_cyclic, is_directed=is_directed, is_topological_graph=is_topological_graph, edge_radius=4)
+        edge_object = GraphEdge(start_node=start_node, end_node=end_node, weight=weight, weight_font_size=weight_font_size, color=edge_color, is_cyclic=is_cyclic, is_directed=is_directed, is_topological_graph=is_topological_graph, edge_radius=4, zoom_in_power=zoom_in_power)
         start_node.neighbor2edge[end_node] = edge_object
         start_node.neighbors.append(end_node)
         start_node.edges.append(edge_object)
@@ -142,10 +159,70 @@ class GraphObject:
             if node.min_edge:
                 path_edges.append(node.min_edge)
         return set(path_edges)
+
+    def get_mst_edges(self, source_name):
+        def extract_min_node(list):
+            min_so_far = float('inf')
+            min_node = None
+            for n in list:
+                if n.key < min_so_far:
+                    min_so_far = n.key
+                    min_node = n
+            list.remove(min_node)
+            return min_node
+        edges = []
+        unreached = self.get_nodes()
+        for node in unreached:
+            node.key = float('inf')
+        source = self.get_node_by_name(source_name)
+        source.key = 0
+        while unreached:
+            min_node = extract_min_node(unreached)
+            if min_node != source:
+                edges.append(min_node.min_edge)
+            for neighbor in min_node.neighbors:
+                edge = self.get_edge(min_node, neighbor)
+                if edge.weight < neighbor.key:
+                    neighbor.key = edge.weight
+                    neighbor.min_edge = edge
+        return GraphEdgesGroup(edges)
+
+    def get_mst_nodes(self):
+        return GraphNodesGroup(self.get_nodes())
     
     def highlight(self, node_name, fill_color=PINK2, stroke_color=PINK3,  stroke_width=WIDTH, text_color=BACKGROUND):
         node = self.value2node[node_name]        
         return node.color(fill_color=fill_color, stroke_color=stroke_color, stroke_width=stroke_width, text_color=text_color)
+
+    def shift(self, x_offset=0, y_offset=0):
+        return self.graph_mobject.animate.shift(x_offset*RIGHT + y_offset*UP)
+
+    def save_state(self):
+        self.graph_mobject.save_state()
+
+    def restore(self):
+        return Restore(self.graph_mobject)
+
+    def create_sub_graph(self, name, edge_list):
+        """
+        edge_list example: [('A', 'B'), ('C', 'D')]
+        """
+        edges = []
+        nodes = []
+        for start, end in edge_list:
+            edges.append(self.get_edge_by_name(start, end))
+            start_node = self.get_node_by_name(start)
+            end_node = self.get_node_by_name(end)
+            if start_node not in nodes:
+                nodes.append(start_node)
+            if end_node not in nodes:
+                nodes.append(end_node)
+        self.sub_graph_dict[name] = SubGraph(edges_list=edges, node_list=nodes)
+        return self.sub_graph_dict[name]
+        
+
+
+        
 
 class Test(Scene):
     def construct(self):
