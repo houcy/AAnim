@@ -1,0 +1,4 @@
+60 80 3 0 2 1 4
+build min
+extract
+insert 1

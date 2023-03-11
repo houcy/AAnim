@@ -93,11 +93,11 @@ class BinaryHeap(Scene):
                 self.swap(heap, node, parent)
                 self._filterup(heap, parent, is_min_heap)
     
-    def build_heap(self, heap, is_min_heap=True):
+    def build_heap(self, heap, is_min_heap=True, x_offset=-3.3, y_offset=0):
         """
         Build a heap by heapify each node from bottom to up
         """
-        self.play(FadeIn(heap.code_for_build.code))
+        self.play(heap.code_for_build.create(x_offset, y_offset))
         self.wait(1)
         for i in range((math.floor(len(heap.array) // 2) - 1), -1, -1):
             node = heap.array[i]
@@ -113,11 +113,11 @@ class BinaryHeap(Scene):
         self.play(FadeOut(heap.code_for_build.code, heap.code_for_build.highlight_rect))
 
 
-    def extract(self, heap):
+    def extract(self, heap, x_offset=-3.3, y_offset=0):
         if len(heap.array) == 0:
             print("Heap is empty")
             return
-        self.play(FadeIn(heap.code_for_extract.code))
+        self.play(heap.code_for_extract.create(x_offset, y_offset))
         self.wait(0.5)
         # Swap
         self.play(heap.code_for_extract.highlight(3))
@@ -129,8 +129,7 @@ class BinaryHeap(Scene):
         # Remove last
         self.play(heap.code_for_extract.highlight(4))
         self.wait(1)
-        self.play(FadeOut(last.mobject), FadeOut(last.line_mobject), heap.table.remove())
-        heap.remove()
+        self.play(heap.remove())
         # Heapify
         self.play(heap.code_for_extract.highlight(5))
         self.wait(1)
@@ -140,11 +139,11 @@ class BinaryHeap(Scene):
         self.play(FadeOut(heap.code_for_extract.code, heap.code_for_extract.highlight_rect))
 
 
-    def insert(self, heap, value):
+    def insert(self, heap, value, x_offset=-3.3, y_offset=0):
         if len(heap.array) == 0:
             print("Heap is empty")
             return
-        self.play(FadeIn(heap.code_for_insert.code))
+        self.play(heap.code_for_insert.create(x_offset, y_offset))
         self.wait(0.5)
         # Insert
         self.play(heap.code_for_insert.highlight(3))
@@ -176,13 +175,13 @@ class BinaryHeap(Scene):
         Main function called by manim
         command is a list of string
         """
-        # print("command", command)
+        print("Generating animations for command:", command)
         self.camera.background_color = BACKGROUND
         
         # Draw an array and a tree 
         if command[0].isdigit():   
-            print("self.heap.animation", self.heap.animation)  
-            self.play(self.heap.animation, run_time=3)
+            # self.play(self.heap.animation, run_time=3)
+            self.play(self.heap.show(3, 0))
         # Building the heap
         elif command[0] == 'build':
             if command[1] == 'min':

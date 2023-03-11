@@ -39,6 +39,7 @@ class Table():
             self.second_line = VDict(zip(list(range(15, self.length)), self.table[15:])).arrange(buff=0)
             self.second_line.next_to(self.first_line, direction = DOWN, buff=self.buff) 
             self.animation = [FadeIn(x) for x in self.table]
+        self.y_offset = self.first_line.get_y()
 
     def add(self, value):
         if self.length >= 32:
@@ -57,20 +58,20 @@ class Table():
             self.first_line = self.first_line.add([(self.length, square)])
             animation.append(FadeIn(square))
             position_y = self.first_line.get_y()
-            animation.append(self.first_line.animate.move_to([SHIFT_RIGHT_UNIT, position_y, 0]))
+            # animation.append(self.first_line.animate.move_to([SHIFT_RIGHT_UNIT, position_y, 0]))
         elif self.length == 15:
             self.second_line = self.second_line.add([(self.length, square)])
             self.second_line.next_to(self.first_line, direction = DOWN, buff=self.buff) 
             square.next_to(self.second_line, RIGHT, buff=0)
             animation.append(FadeIn(square))
             position_y = self.second_line.get_y()
-            animation.append(self.second_line.animate.move_to([SHIFT_RIGHT_UNIT, position_y, 0]))    
+            # animation.append(self.second_line.animate.move_to([SHIFT_RIGHT_UNIT, position_y, 0]))    
         else:
             square.next_to(self.second_line, RIGHT, buff=0)
             self.second_line = self.second_line.add([(self.length, square)])
             animation.append(FadeIn(square))
             position_y = self.second_line.get_y()
-            animation.append(self.second_line.animate.move_to([SHIFT_RIGHT_UNIT, position_y, 0]))        
+            # animation.append(self.second_line.animate.move_to([SHIFT_RIGHT_UNIT, position_y, 0]))        
         self.animation = AnimationGroup(*animation)
         self.length += 1
         return self.animation
@@ -96,7 +97,8 @@ class Table():
                 mobject_to_swap = self.second_line[text_to_swap]["text"]
         return Swap(mobject, mobject_to_swap)
 
-    def remove(self):
+    def remove(self, x_offset=0, y_offset=0):
+        y_offset=self.y_offset
         if self.length == 0:
             print("Array is empty")
             return
@@ -106,8 +108,7 @@ class Table():
             del self.text2index[last_square["text"]]
             animation.append(FadeOut(last_square))
             self.first_line.remove(self.length-1)
-            position_y = self.first_line.get_y()
-            animation.append(self.first_line.animate.move_to([SHIFT_RIGHT_UNIT, position_y, 0]))
+            # animation.append(self.first_line.animate.move_to(x_offset, y_offset))
         else:
             animation.append(FadeOut(self.second_line[self.length-1]))
             self.second_line.remove(self.length-1)

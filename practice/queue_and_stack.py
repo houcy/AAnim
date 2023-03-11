@@ -33,18 +33,27 @@ class Show(Scene):
 
     def construct(self):
         self.camera.background_color = BACKGROUND
-        print(self.valid_parentheses("[{(}]"))
+        # print(self.valid_parentheses("[{(}]"))
 
+        # input_string = "[{(}]"
+        # array = TableLine(input_string, show_box=False, x_position=0, y_position=0)
+        # self.play(array.show())
+        # array.initialize_scan()
+        # for _ in input_string:
+        #     self.play(array.scan_next())
+
+        LIST = [1, 2]
         # s = StackObject(LIST)
         # self.play(s.show())
         # self.play(s.append(1))
         # self.play(s.pop())
         # self.play(s.pop())
+        # self.play(s.pop())
 
-        # q = QueueObject(LIST)
-        # self.play(q.show())
-        # self.play(q.append(1))
-        # self.play(q.pop())
-        # self.play(q.append(3))
-        # self.play(q.append(5))
-        # self.play(q.pop())
+        q = QueueObject(LIST)
+        self.play(q.show())
+        self.play(q.append(1))
+        self.play(q.pop())
+        self.play(q.pop())
+        self.play(q.pop())
+

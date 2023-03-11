@@ -14,14 +14,19 @@ class HeapArray():
             self.array.append(node)
         self.table = self._table()
         self._populate_position_and_mobjects()  
-        self.tree, self.animation = self._tree()
-        self.table.first_line.next_to(self.tree, direction = DOWN, buff=1)  # Align the tree and the table
         self.code_for_build = CodeBlock(CODE_FOR_BUILD)
         self.code_for_extract = CodeBlock(CODE_FOR_EXTRACT)
         self.code_for_insert = CodeBlock(CODE_FOR_INSERT)
-        self.animation = AnimationGroup(*self.animation, *self.table.animation, lag_ratio=0.5)
+        self.x_offset = 0
+        self.y_offset = 0
 
-    def show(self):
+    def show(self, x_offset=0, y_offset=0):
+        self.x_offset = x_offset
+        self.y_offset = y_offset
+        self.tree = self._tree()
+        self.animation = [FadeIn(x.shift(x_offset * RIGHT + y_offset * UP)) for x in self.tree]
+        self.table.first_line.next_to(self.tree, direction = DOWN, buff=1)  # Align the tree and the table
+        self.animation = AnimationGroup(*self.animation, *self.table.animation, lag_ratio=0.5)
         return self.animation
     
     def _get_offset(self):
@@ -71,7 +76,7 @@ class HeapArray():
                 line = Line(node.mobject.get_center(), self.array[node.right].mobject.get_center()).set_stroke(color=LINE_COLOR, width=WIDTH).set_z_index(0)
                 mobjects.append(line)
                 self.array[node.right].line_mobject = line
-        return VGroup(*mobjects), [FadeIn(x.shift(SHIFT_RIGHT_UNIT * RIGHT)) for x in mobjects]
+        return VGroup(*mobjects)
         
 
     def _table(self):
@@ -82,7 +87,12 @@ class HeapArray():
         """
         Remove the last node
         """
+        if not self.array:
+            print("Error: the array is empty")
+            return
+        last = self.array[-1]
         self.array.pop()
+        return AnimationGroup(FadeOut(last.mobject), FadeOut(last.line_mobject), self.table.remove(x_offset=self.x_offset))
 
     def add(self, value):
         """
