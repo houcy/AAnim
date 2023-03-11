@@ -1,0 +1,104 @@
+1. CLRS 
+graph G {
+    A -- B [xlabel=4]
+    A -- H [xlabel=8]
+    B -- C [xlabel=8]
+    B -- H [xlabel=11]
+    C -- D [xlabel=7]
+    C -- I [xlabel=2]
+    C -- F [xlabel=4]
+    I -- G [xlabel=6]
+    G -- F [xlabel=2]
+    D -- F [xlabel=14]
+    D -- E [xlabel=9]
+    E -- F [xlabel=10]
+    H -- G [xlabel=1]
+    H -- I [xlabel=7]
+}
+MAP_MST = {'A': {'B': 4, 'H': 8}, 'B': {'A': 4, 'C': 8, 'H': 11}, 'H': {'A': 8, 'B': 11, 'G': 1, 'I': 7}, 'C': {'B': 8, 'D': 7, 'I': 2, 'F': 4}, 'D': {'C': 7, 'F': 14, 'E': 9}, 'I': {'C': 2, 'G': 6, 'H': 7}, 'F': {'C': 4, 'G': 2, 'D': 14, 'E': 10}, 'G': {'I': 6, 'F': 2, 'H': 1}, 'E': {'D': 9, 'F': 10}}
+POSITION_MST = {'A': (0.6042746838748182, 0.7103137006229252), 'B': (1.4402327576560112, 2.1393785668991754), 'H': (2.23008691111194, 0.4028497892498788), 'C': (2.9889216307956286, 3.1086575403782315), 'D': (4.368905964414935, 4.069901898616137), 'I': (3.082024693200045, 1.457062926629117), 'F': (4.744899101048156, 2.5254205677197956), 'G': (4.178671341713604, 0.7153493229885487), 'E': (6.0, 3.649819090603902)}
+
+2. MST shape
+graph G {
+	A -- B [xlabel=7]
+	B -- C [xlabel=5]
+	C -- D [xlabel=5]
+	D -- E [xlabel=3]
+	E -- F [xlabel=2]
+	F -- G [xlabel=5]
+	G -- H [xlabel=5]
+	P -- Q [xlabel=5]
+	H -- I [xlabel=5]
+	I -- J [xlabel=3]
+	J -- K [xlabel=5]
+	K -- L [xlabel=3]
+	L -- M [xlabel=3]
+	M -- N [xlabel=3]
+	N -- O [xlabel=2]
+	O -- P [xlabel=5]
+	Q -- R [xlabel=5]
+	R -- S [xlabel=2]
+	R -- T [xlabel=5]
+	T -- U [xlabel=3]
+	A -- D [xlabel=8]
+	A -- G [xlabel=8]
+	B -- D [xlabel=6]
+	C -- E [xlabel=8]
+	D -- F [xlabel=5]
+	D -- G [xlabel=9]
+	E -- N [xlabel=8]
+	E -- M [xlabel=6]
+	F -- M [xlabel=7]
+	G -- M [xlabel=6]
+	P -- K [xlabel=8]
+	O -- L [xlabel=9]
+	O -- M [xlabel=8]
+	O -- K [xlabel=5]
+	M -- H [xlabel=9]
+	M -- I [xlabel=6]
+	L -- I [xlabel=6]
+	K -- I [xlabel=9]
+	K -- Q [xlabel=6]
+	K -- T [xlabel=9]
+	K -- U [xlabel=6]
+	J -- U [xlabel=6]
+	J -- T [xlabel=6]
+	S -- T [xlabel=6]
+	Q -- T [xlabel=7]
+}
+MAP_HARD = {'A': {'B': 7, 'D': 8, 'G': 8}, 'B': {'A': 7, 'C': 5, 'D': 6}, 'C': {'B': 5, 'D': 5, 'E': 8}, 'D': {'C': 5, 'E': 3, 'A': 8, 'B': 6, 'F': 5, 'G': 9}, 'E': {'D': 3, 'F': 2, 'C': 8, 'N': 8, 'M': 6}, 'F': {'E': 2, 'G': 5, 'D': 5, 'M': 7}, 'G': {'F': 5, 'H': 5, 'A': 8, 'D': 9, 'M': 6}, 'H': {'G': 5, 'I': 5, 'M': 9}, 'P': {'Q': 5, 'O': 5, 'K': 8}, 'Q': {'P': 5, 'R': 5, 'K': 6, 'T': 7}, 'I': {'H': 5, 'J': 3, 'M': 6, 'L': 6, 'K': 9}, 'J': {'I': 3, 'K': 5, 'U': 6, 'T': 6}, 'K': {'J': 5, 'L': 3, 'P': 8, 'O': 5, 'I': 9, 'Q': 6, 'T': 9, 'U': 6}, 'L': {'K': 3, 'M': 3, 'O': 9, 'I': 6}, 'M': {'L': 3, 'N': 3, 'E': 6, 'F': 7, 'G': 6, 'O': 8, 'H': 9, 'I': 6}, 'N': {'M': 3, 'O': 2, 'E': 8}, 'O': {'N': 2, 'P': 5, 'L': 9, 'M': 8, 'K': 5}, 'R': {'Q': 5, 'S': 2, 'T': 5}, 'S': {'R': 2, 'T': 6}, 'T': {'R': 5, 'U': 3, 'K': 9, 'J': 6, 'S': 6, 'Q': 7}, 'U': {'T': 3, 'K': 6, 'J': 6}}
+POSITION_HARD = {'A': (-4, -1), 'B': (-4, 0), 'C': (-4, 1), 'D': (-3, 0), 'E': (-2, 1), 'F': (-2, 0), 'G': (-2, -1), 'H': (-1, -1), 'I': (0, -1), 'J': (1, -1), 'K': (1, 0), 'L': (0, 0), 'M': (-1, 0), 'N': (-1, 1), 'O': (0, 1), 'P': (1, 1), 'Q': (2, 1), 'R': (3, 1), 'S': (4, 1), 'T': (3, 0), 'U': (3, -1)}
+
+3. AMAZING GRACE
+digraph G {
+    C4 -> E4
+    C4 -> A3
+    C4 -> G3
+    C4 -> C4
+    E4 -> C4
+    E4 -> D4
+	E4 -> G4
+    D4 -> C4
+    D4 -> G4
+	G3 -> C4
+	G3 -> A3
+	G3 -> G3
+	G4 -> E4
+	A3 -> C4
+	A3 -> G3
+}
+ADJACENCY_LIST = {'C4': {'E4': None, 'A3': None, 'G3': None, 'C4': None}, 'E4': {'C4': None, 'D4': None, 'G4': None}, 'D4': {'C4': None, 'G4': None}, 'G3': {'C4': None, 'A3': None, 'G3': None}, 'G4': {'E4': None}, 'A3': {'C4': None, 'G3': None}}
+
+4. not sure
+digraph G {
+    A -> B [xlabel=10]
+    A -> E [xlabel=5]
+    B -> C [xlabel=1]
+    B -> E [xlabel=2]
+    C -> D [xlabel=4]
+    D -> C [xlabel=6]
+    D -> A [xlabel=7]
+    E -> C [xlabel=9]
+    E -> D [xlabel=2]
+    E -> B [xlabel=3]
+}

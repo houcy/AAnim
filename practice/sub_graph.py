@@ -20,10 +20,10 @@ class SubGraph:
     def get_edges(self):
         return self.edges
 
-    def highlight(self, node_text_color=BACKGROUND, node_fill_color=PINK4, node_stroke_color=PINK5, edge_color=GRAY, edge_width=EDGE_HIGHLIGHT_STROKE_WIDTH, together=True, lag_ratio=0.1):
+    def highlight(self, node_text_color=BACKGROUND, node_fill_color=PINK4, node_stroke_color=PINK5, node_stroke_width=WIDTH, edge_color=PINK4, edge_width=EDGE_HIGHLIGHT_STROKE_WIDTH, together=True, lag_ratio=0.1):
         if together:
             return AnimationGroup(
-                self.nodes_group.highlight(text_color=node_text_color, fill_color=node_fill_color, stroke_color=node_stroke_color),
+                self.nodes_group.highlight(text_color=node_text_color, fill_color=node_fill_color, stroke_color=node_stroke_color, stroke_width=node_stroke_width),
                 self.edges_group.highlight(color=edge_color, width=edge_width)
             )
         else:

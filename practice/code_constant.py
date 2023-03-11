@@ -161,7 +161,6 @@ CODE_FOR_DIJKASTRA_WITHOUT_RELAX = """DIJKSTRA(G, s) {
     while UnReachSet ≠ ∅
         u = EXTRACT_MIN(UnReachSet)
         for each neighbor v of u
-            // Relax edge (u, v)
             if v.key > u.key + weight(u, v)
                 v.key = u.key + weight(u, v)
                 v.previous = u

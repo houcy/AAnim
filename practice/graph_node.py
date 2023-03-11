@@ -32,7 +32,8 @@ class GraphNode:
         self.children = []  # for Union-Find
         self.is_isolated = True
         self.is_showing = False
-        self.variable_name = None
+        self.label_name = ''
+        self.label_mobject = None
         self.min_edge = None
 
     
@@ -67,6 +68,8 @@ class GraphNode:
             m["t"] = self.text_mobject
         if self.key_mobject:
             m["k"] = self.key_mobject
+        if self.label_mobject:
+            m["l"] = self.label_mobject
         return m
 
     def _update_mobject(self):
@@ -77,7 +80,7 @@ class GraphNode:
         if key_string == '∞':
             self.key = float('inf')
         elif isinstance(key_string, int) or isinstance(key_string, float):
-            self.key = str(key_string)
+            self.key = key_string
             key_string = str(key_string)
         if show_value:
             new_text_mobject = None
@@ -116,6 +119,7 @@ class GraphNode:
         new_key_mobject = get_text(str(key), font_size=KEY_SIZE, weight=BOLD, color=color).move_to(self.circle_mobject.get_center()).set_z_index(5)
         animations.append(ReplacementTransform(self.key_mobject, new_key_mobject))
         self.key = key
+        self.key_string = str(key)
         self.key_mobject = new_key_mobject
         self.animations = animations
         return AnimationGroup(*animations)
@@ -124,7 +128,10 @@ class GraphNode:
         """
         Change the stroke color of the node to be highlight color
         """
-        return AnimationGroup(self.circle_mobject.animate.set_stroke(color=color), Wait())
+        return AnimationGroup(
+            self.circle_mobject.animate.set_stroke(color=color), 
+            Wait()
+        )
 
     def highlight_stroke_and_change_shape(self, fill_color=PINK3, stroke_color=PINK1, shape="ROUNDEDRECTANGLE"):
         """
@@ -148,7 +155,10 @@ class GraphNode:
         """
         Fill this node as PINK1 (dark pink)
         """
-        return AnimationGroup(self.circle_mobject.animate.set_fill(PINK1).set_stroke(PINK2), self.text_mobject.animate.set_color(BACKGROUND))
+        return AnimationGroup(
+            self.circle_mobject.animate.set_fill(PINK1).set_stroke(PINK2), 
+            self.text_mobject.animate.set_color(BACKGROUND)
+        )
 
     def color(self, fill_color=PINK2, stroke_color=PINK3, stroke_width=WIDTH, text_color=BACKGROUND, has_key=False):
         """
@@ -203,8 +213,8 @@ class GraphNode:
         self.is_showing = True
         return FadeIn(self.mobject)
 
-    def fade_in_variable(self, variable_name, show_background=True, direction='UP'):
-        text = Text(variable_name, color=GRAY, font=FONT, weight=NORMAL, font_size=WEIGHT_SIZE).set_z_index(10).set_stroke(color=EDGE_STROKE_COLOR, width=EDGE_STROKE_WIDTH)
+    def fade_in_label(self, label_name, show_background=True, direction='UP', stroke_width=2, font_size=WEIGHT_SIZE, font_weight=NORMAL):
+        text = Text(label_name, color=GRAY, font=FONT, weight=font_weight, font_size=font_size).set_z_index(10).set_stroke(color=EDGE_STROKE_COLOR, width=EDGE_STROKE_WIDTH)
         if direction == 'UP':
             text.move_to(self.circle_mobject.get_top()).shift(UP * 0.22)
         elif direction == 'LEFT':
@@ -213,17 +223,17 @@ class GraphNode:
             text.move_to(self.circle_mobject.get_right()).shift(RIGHT * 0.22)
         elif direction == 'DOWN':
             text.move_to(self.circle_mobject.get_bottom()).shift(DOWN * 0.22)
-        side_length = VARIABLE_SQUARE_SIZE
-        text_background = RoundedRectangle(corner_radius=0.05, width=side_length, height=side_length).set_stroke(color=GRAY, width=2).set_fill(BACKGROUND, opacity=1.0).set_z_index(9).move_to(text.get_center())
-        self.variable_name = variable_name
+        side_length = LABEL_SQUARE_SIZE
+        text_background = RoundedRectangle(corner_radius=0.05, width=side_length, height=side_length).set_stroke(color=GRAY, width=stroke_width).set_fill(BACKGROUND, opacity=1.0).set_z_index(9).move_to(text.get_center())
+        self.label_name = label_name
         if show_background:
-            self.variable_mobject = VDict([("text", text), ("text_background", text_background)])
+            self.label_mobject = VDict([("text", text), ("text_background", text_background)])
         else:
-            self.variable_mobject = VDict([("text", text)])
-        return FadeIn(self.variable_mobject)
+            self.label_mobject = VDict([("text", text)])
+        return FadeIn(self.label_mobject)
 
-    def fade_out_variable(self):
-        return FadeOut(self.variable_mobject)
+    def fade_out_label(self):
+        return FadeOut(self.label_mobject)
 
 class Test(Scene):
     def construct(self):

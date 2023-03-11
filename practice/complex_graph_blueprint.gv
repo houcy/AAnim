@@ -1,0 +1,16 @@
+graph G {
+	A -- B [xlabel=4]
+	A -- H [xlabel=8]
+	B -- C [xlabel=8]
+	B -- H [xlabel=11]
+	C -- D [xlabel=7]
+	C -- I [xlabel=2]
+	C -- F [xlabel=4]
+	I -- G [xlabel=6]
+	G -- F [xlabel=2]
+	D -- F [xlabel=14]
+	D -- E [xlabel=9]
+	E -- F [xlabel=10]
+	H -- G [xlabel=1]
+	H -- I [xlabel=7]
+}

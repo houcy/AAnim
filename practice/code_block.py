@@ -16,16 +16,17 @@ class CodeBlock():
             self.height = self.top - self.bottom
             self.width = self.right - self.left
             self.line_height = self.height / (self.total_lines + self.total_lines*CODE_LINE_SPACING - CODE_LINE_SPACING)
-            self.line_height_include_spacing = self.line_height + self.line_height * CODE_LINE_SPACING
+            self.spacing = self.line_height * CODE_LINE_SPACING
+            self.line_height_include_spacing = self.line_height + self.spacing
             self.highlight_rect = None
             self.title = None
-            self._set_background_color()
+            self._set_background_color(self.code)
             self.last_n_lines = 1
             self.x_offset = 0
             self.y_offset = 0
 
-    def _set_background_color(self):
-        self.code.background_mobject.set_fill(BACKGROUND)
+    def _set_background_color(self, code_mobject):
+        code_mobject.background_mobject.set_fill(BACKGROUND)
 
     def create_title(self, title):
         self.title = Text(title, color=LINE_COLOR, font="Karla").scale(TITLE_SIZE).set_z_index(2).next_to(self.code, UP, buff=0.5)
@@ -132,23 +133,58 @@ class CodeBlock():
         return Succession(FadeIn(mark_group), Wait(wait_time), FadeOut(mark_group), lag_ratio=1)
 
 
+    def replace(self, line_no_from, replacement_code, font=CODE_FONT):
+        # The replacement code replace all lines starting from the line_no_from ending at the last line. It can't be an insertion.
+        # Replace the bottom part
+        replacement_code_mobject = Code(code=replacement_code, stroke_width=1, line_spacing=CODE_LINE_SPACING, font=font, background="rectangle", margin=0, background_stroke_width=0, tab_width=2, language="Python", font_size=16, line_no_from=line_no_from)
+        self._set_background_color(replacement_code_mobject)
+        replacement_code_mobject.align_to(self.code, LEFT).align_to(self.code, UP)
+        replacement_code_mobject.shift((line_no_from-1) * self.line_height_include_spacing * DOWN)
+        # Create a rectangle to hide the bottom part
+        rect_height = (self.total_lines-line_no_from+1) * self.line_height_include_spacing
+        rect = Rectangle(color=BACKGROUND, height=rect_height, width=self.width).set_fill(BACKGROUND, opacity=1).align_to(self.code, LEFT).align_to(self.code, UP)
+        rect.shift((line_no_from-1) * self.line_height_include_spacing * DOWN).shift(self.spacing / 2 * UP)
+        # Update attributes
+        replacement_number_lines = len(replacement_code_mobject.code_json)
+        self.total_lines = line_no_from + replacement_number_lines - 1
+        self.bottom = replacement_code_mobject.get_bottom()[1]
+        self.height = self.top - self.bottom
+        self.code = VGroup(self.code, replacement_code_mobject)
+        return AnimationGroup(FadeIn(rect), FadeIn(replacement_code_mobject))
+
+    # def shift(self, x_offset, y_offset)
+
+
+
 class Test(Scene):
     def construct(self):
         self.camera.background_color = BACKGROUND
-        test_code = CodeBlock(CODE_FOR_KRUSKAL_UNION_FIND)
-        self.play(test_code.create(x_offset=-2, y_offset=-2))
+        test_code = CodeBlock(CODE_FOR_DIJKASTRA_WITHOUT_RELAX)
+        self.play(test_code.create(-2.9, -0.2))
+        self.play(test_code.replace(9, """              RELAX(u, v, weight)
+}
+
+RELAX(u, v, weight) {
+    if v.key > u.key + weight(u, v)
+        v.key = u.key + weight(u, v)
+        v.previous = u
+}
+"""))
+
+        # test_code2 = CodeBlock(CODE_FOR_RELAX)
+        # self.play(test_code2.create())
         # self.play(test_code.highlight(1, 1))
-        self.play(test_code.highlight(5, 1))
-        self.play(test_code.if_true(False))
-        self.play(test_code.if_true())
-        self.play(test_code.highlight(3, 1))
-        self.play(test_code.if_true())
-        self.play(test_code.highlight(4, 2))
-        self.play(test_code.if_true(False))
-        self.play(test_code.if_true())
-        self.play(test_code.if_true())
-        self.play(test_code.fade_out())
-        self.wait()
+        # self.play(test_code.highlight(5, 1))
+        # self.play(test_code.if_true(False))
+        # self.play(test_code.if_true())
+        # self.play(test_code.highlight(3, 1))
+        # self.play(test_code.if_true())
+        # self.play(test_code.highlight(4, 2))
+        # self.play(test_code.if_true(False))
+        # self.play(test_code.if_true())
+        # self.play(test_code.if_true())
+        # self.play(test_code.fade_out())
+        # self.wait()
 
         # test_code = CodeBlock(CODE_FOR_PRIM_BASIC)
         # self.play(test_code.create(x_offset=-2, y_offset=2))
