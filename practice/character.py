@@ -9,7 +9,7 @@ class Character():
     def __init__(self, name, image):
         self.name = name
         self.cartoon_mobject = ImageMobject(image).set_z_index(10)
-        self.name_mobject = get_text(name, weight=HEAVY, font_size=23).next_to(self.cartoon_mobject, DOWN, buff=-0.1).set_z_index(10)
+        self.name_mobject = get_text(name, weight=HEAVY, font_size=24).next_to(self.cartoon_mobject, DOWN, buff=-0.1).set_z_index(10)
         self.rect_mobject = RoundedRectangle(height=2.8, width=2, corner_radius=0.2, stroke_width=3).set_fill(color=BACKGROUND, opacity=1).set_z_index(6)
         self.mobject = Group(self.cartoon_mobject, self.name_mobject, self.rect_mobject)
         # self.basic_mobject = Group(self.cartoon_mobject, self.name_mobject, self.rect_mobject)
@@ -87,9 +87,9 @@ class Character():
         return Restore(self.mobject)
 
     def add_time_complexity(self, string):
-        self.time_mobject = get_text(string, weight=BOLD, font_size=25*self.scale, color=GRAY).align_to(self.rect_mobject, RIGHT).align_to(self.rect_mobject, UP).shift(0.1*DOWN, 0.1*LEFT).set_z_index(10)
+        self.time_mobject = get_text(string, weight=BOLD, font_size=16*self.scale, color=GRAY).align_to(self.rect_mobject, RIGHT).align_to(self.rect_mobject, UP).shift(0.1*DOWN, 0.1*LEFT).set_z_index(10)
         self._update_mobject()
-        return FadeIn(self.time_mobject)
+        return Write(self.time_mobject)
 
     def highlight(self, company_name):
         self.rect_mobject.save_state()
@@ -104,6 +104,7 @@ class Character():
         if self.save_state == False:
             print("Error: state should be saved first before restoring")
             return
+        self.save_state = False
         return Restore(self.rect_mobject)
 
 

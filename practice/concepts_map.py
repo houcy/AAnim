@@ -33,6 +33,8 @@ class ConceptsMap():
                 object.scale *= scale
 
     def add(self, object):
+        if object.name in self.name2object:
+            return
         self.name2object[object.name] = object
         self._update_mobject()
 
