@@ -10,11 +10,6 @@ from graph_nodes_group import GraphNodesGroup
 from util import *
 from union_find import UnionFind
 from color_generator import ColorGenerator
-from left_side_outline import LeftSideOutline
-from object_group import ObjectGroup
-from character import Character
-from concepts_map import ConceptsMap
-from company import Company
 from sub_graph import SubGraph
 import copy
 
