@@ -1,0 +1,5 @@
+digraph G {
+    A -> B [xlabel=2]
+    B -> C [xlabel=5]
+    C -> A [xlabel=3]
+}
