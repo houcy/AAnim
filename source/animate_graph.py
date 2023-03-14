@@ -3,8 +3,8 @@ import json
 import sys
 from style import *
 from collections import defaultdict
-from graph_algorithm import Show
-# from scale_position import *
+from graph_algorithm import GraphAlgorithm
+
 
 def get_adjacency_list(file_name):
     is_directed = False
@@ -57,9 +57,10 @@ def scale_position_to_fit(position):
     return new_position
 
 def get_position():
-    # argv[2] is one of `dot`, `neato`, `twopi`, `circo`, `fdp`, `osage`, `sfdp`
-    # command line: python animate_graph.py [.gv file] [algo: prim/kruskal/...]
-    # example command line: python animate_graph.py graph_blueprint.gv prim
+    '''
+    The command line should be: python animate_graph.py [.gv file] [algo: prim/kruskal/...]
+    An example command: python animate_graph.py graph_blueprint.gv prim
+    '''
     os.system("sfdp -Tpng " + sys.argv[1] + " -o output.png")   # Generate output.png in this dir
     os.system("sfdp -Tjson " + sys.argv[1] + " -o output.json") # Generate output.json in this dir
 
@@ -69,28 +70,30 @@ def get_position():
         x, y = e["pos"].split(",")
         position[e["name"]] = (float(x), float(y))
     return scale_position_to_fit(position)
-            
+
+
+### Main starts here
+if len(sys.argv) < 3:
+    print("Error: the command is not correct")
+graph_blueprint, algo_command = sys.argv[1], sys.argv[2]
 # Get the adjacency_list
-adjacency_list, is_directed = get_adjacency_list(sys.argv[1])
-print("adjacency_list", adjacency_list)
+adjacency_list, is_directed = get_adjacency_list(graph_blueprint)
+print("Adjacency list", dict(adjacency_list))
 
 # Get the position
 position = get_position()
-print("position", position)
+print("Optimized position", position)
+print("A `output.png` file has been generated. If you are curious what the graph look like, find it in `source` directory.")
+
+# Get source (if any, optional)
+source = None
+if len(sys.argv) > 3:
+    source = sys.argv[3]
 
 # Comment out to get position only
-# Call manim
-scene = Show(adjacency_list, position, is_directed)
-algo_command = sys.argv[2]
+# Call manim to generate partial video clips (in high resolution)
+scene = GraphAlgorithm(adjacency_list, position, is_directed, source)
 scene.construct(algo_command)
 
-# Use FFMPEG to combine partial videos      
-scene.renderer.scene_finished(scene)  
-
-
-
-
-
-
-
-
+# Call FFMPEG to combine video clips     
+scene.renderer.scene_finished(scene)

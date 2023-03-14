@@ -84,7 +84,3 @@ class UnionFind:
         for n in self.array:
             n.parent = None
             n.children = []
-
-        
-        
-

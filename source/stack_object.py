@@ -2,6 +2,7 @@ from manim import *
 from style import *
 from table_line import TableLine
 
+
 class StackObject:
     def __init__(self, array):
         self.array = array

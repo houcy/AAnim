@@ -3,6 +3,7 @@ from manim_fonts import *
 from style import *
 from util import *
 
+
 # z_index: edge: 0, circle: 1, text: 3, key: 5
 class GraphNode:
     def __init__(self, value, position_x, position_y, is_music_note=False, node_radius=RADIUS, fill_color=BACKGROUND, stroke_color=GRAY, font_color=GRAY, font_size=VALUE_SIZE, zoom_in_power=1):

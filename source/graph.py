@@ -7,23 +7,6 @@ from graph_edges_group import GraphEdgesGroup
 from graph_nodes_group import GraphNodesGroup
 from sub_graph import SubGraph
 
-# For Testing
-# Limit input to:
-# Directed:
-# {'A': {'B': 3}, 'B': {'A': 2}}
-# Undirected:
-# {'A': {'B': 3}, 'B': {'A': 3}}
-MAP_DIRECTED = {'A': {'B': None, 'C': None}, 'B': {'D': None, 'E': None}, 'D': {'F': None}, 'E': {'F': None}}
-MAP_UNDIRECTED = {'A': {'B': None, 'C': None}, 'B': {'A': None, 'D': None, 'E': None}, 'C': {'A': None}, 'D': {'B': None, 'F': None}, 'E': {'B': None}, 'F': {'D': None}}
-MAP_DIRECTED_WEIGHT = {'A': {'B': 7, 'C': 7}, 'B': {'D': 7, 'E': 7}, 'D': {'F': 7}, 'E': {'F': 7}}
-MAP_UNDIRECTED_WEIGHT = {'A': {'B': 7, 'C': 7}, 'B': {'A': 7, 'D': 7, 'E': 7}, 'C': {'A': 7}, 'D': {'B': 7, 'F': 7}, 'E': {'B': 7}, 'F': {'D': 7}}
-POSITION1 = {'A': (1.2692307692307692, 3.0), 'B': (0.8076923076923077, 2.076923076923077), 'C': (1.7307692307692308, 2.076923076923077), 'D': (0.34615384615384615, 1.1538461538461537), 'E': (1.2692307692307692, 1.1538461538461537), 'F': (0.34615384615384615, 0.23076923076923078)}
-
-POSITION_CYCLE = {'A': (-1, -1), 'B': (1, 1)}
-POSITION_CYCLE2 = {'A': (-0.5, -0.5), 'B': (0.5, 0.5)}
-POSITION_CYCLE3 = {'A': (-2, -2), 'B': (2, 2)}
-
-MAP_CYCLE = {'A': {'B': 3}, 'B': {'A': 2}}
 
 class GraphObject:
     def __init__(self, adjacency_list, position, is_topological_graph=False, edge_radius=RADIUS, edge_color=GRAY, node_radius=RADIUS, node_fill_color=BACKGROUND, node_stroke_color=GRAY, is_cyclic=False, font_color=GRAY, node_font_size=VALUE_SIZE, weight_font_size=WEIGHT_SIZE, zoom_in_power=1):
@@ -236,6 +219,16 @@ class GraphObject:
 
 class Test(Scene):
     def construct(self):
+        # For Testing
+        MAP_DIRECTED = {'A': {'B': None, 'C': None}, 'B': {'D': None, 'E': None}, 'D': {'F': None}, 'E': {'F': None}}
+        MAP_UNDIRECTED = {'A': {'B': None, 'C': None}, 'B': {'A': None, 'D': None, 'E': None}, 'C': {'A': None}, 'D': {'B': None, 'F': None}, 'E': {'B': None}, 'F': {'D': None}}
+        MAP_DIRECTED_WEIGHT = {'A': {'B': 7, 'C': 7}, 'B': {'D': 7, 'E': 7}, 'D': {'F': 7}, 'E': {'F': 7}}
+        MAP_UNDIRECTED_WEIGHT = {'A': {'B': 7, 'C': 7}, 'B': {'A': 7, 'D': 7, 'E': 7}, 'C': {'A': 7}, 'D': {'B': 7, 'F': 7}, 'E': {'B': 7}, 'F': {'D': 7}}
+        POSITION1 = {'A': (1.2692307692307692, 3.0), 'B': (0.8076923076923077, 2.076923076923077), 'C': (1.7307692307692308, 2.076923076923077), 'D': (0.34615384615384615, 1.1538461538461537), 'E': (1.2692307692307692, 1.1538461538461537), 'F': (0.34615384615384615, 0.23076923076923078)}
+        POSITION_CYCLE = {'A': (-1, -1), 'B': (1, 1)}
+        POSITION_CYCLE2 = {'A': (-0.5, -0.5), 'B': (0.5, 0.5)}
+        POSITION_CYCLE3 = {'A': (-2, -2), 'B': (2, 2)}
+        MAP_CYCLE = {'A': {'B': 3}, 'B': {'A': 2}}
         position = scale_position(POSITION1, 1.5, 1.5)
         self.camera.background_color = BACKGROUND
         graph = GraphObject(MAP_UNDIRECTED, position)

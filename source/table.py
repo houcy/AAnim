@@ -1,6 +1,7 @@
 from manim import *
 from style import *
 
+
 class Table():
     def __init__(self, array, is_mobject=False, buff=0.5):
         """
@@ -138,4 +139,3 @@ class Table():
 #         table = Table([mobject1, mobject2, mobject3], is_mobject=True)
 #         self.play(*table.animation)
 #         self.play(table.swap(mobject1, mobject3))
-        

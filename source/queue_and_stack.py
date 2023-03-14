@@ -9,7 +9,8 @@ E1 = "[{(}]"
 E2 = "[[][]]"
 E3 = "[[]]][[]"
 
-class Show(Scene):
+
+class QueueAndStackAlgo(Scene):
     def valid_parentheses(self, input_string):
         dict = {"}":"{", "]":"[", ")":"("}
         array = TableLine(input_string, show_box=False, x_position=0, y_position=2)
@@ -56,4 +57,3 @@ class Show(Scene):
         self.play(q.pop())
         self.play(q.pop())
         self.play(q.pop())
-

@@ -3,13 +3,11 @@ from style import *
 import math
 from heap_array import HeapArray
 
+
 # create low quality video $ manim -ql -p heap.py BinaryHeap
 # create medium quality video $ manim -qm -p heap.py BinaryHeap
 # create high quality video $ manim -qh -p heap.py BinaryHeap
-
 # Zindex: line 0, circle 1, description text 2
-
-
 class BinaryHeap(Scene):
     # Comment out to test easily
     def __init__(self, array):

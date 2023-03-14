@@ -2,6 +2,7 @@ from manim import *
 from style import *
 import colorsys
 
+
 class ColorGenerator:
     def __init__(self):
         pass

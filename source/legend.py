@@ -1,7 +1,6 @@
 from manim import *
 from style import *
 
-LINE_WIDTH = 7
 
 class Legend:
     def __init__(self, dict, is_horizontal=False, save_space=False):
@@ -13,17 +12,6 @@ class Legend:
         self.box = None
         for feature, description in dict.items():
             type = feature[0]
-            # if type == "HIGHLIGHT_ROUNDED_RECTANGLE":
-            #     command, fill_color, stroke_color = feature
-            #     if command == "HIGHLIGHT_ROUNDED_RECTANGLE":
-            #         rect = RoundedRectangle(corner_radius=0.06, height=2.2*SM_RADIUS, width=2.2*SM_RADIUS).set_fill(fill_color, 1).set_stroke(color=stroke_color)
-            #         text = Text(str(explanation), color=LINE_COLOR, font=FONT, font_size=LEGEND_SIZE*2).scale(0.5).next_to(circle, RIGHT, buff=2)
-            #         if is_horizontal or save_space:
-            #             row = VGroup(rect, text).arrange_in_grid(rows=1, buff=LEGEND_BUFF_MICRO)
-            #             inside += row
-            #         else:
-            #             inside += rect
-            #             inside += text
             if type == "MULTICOLORS":
                 legend = VGroup()
                 if feature[1] == "CIRCLE":
@@ -77,7 +65,7 @@ class Legend:
     def fade_out(self):
         return FadeOut(self.mobjects)
 
-    def next_to(self, mobject, direction=UP, buff=LEGEND_CHARACTER_BUFF):
+    def next_to(self, mobject, direction=UP, buff=LEGEND_OBJECT_BUFF):
         return self.mobjects.animate.next_to(mobject, direction, buff=buff)
 
     def next_to_character_top_left(self, mobject, direction=LEFT, buff=LEGEND_CHARACTER_BUFF):

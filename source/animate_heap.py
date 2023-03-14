@@ -1,6 +1,7 @@
 import sys
 from heap import BinaryHeap
 
+
 # Example command: python animate_heap.py command_heap.txt
 f = open(sys.argv[1], "r")
 scene = None
@@ -15,5 +16,4 @@ for i, c in enumerate(f.readlines()):
         print('Error: command is invalid:', command[0])
 
 # Use FFMPEG to combine partial videos      
-scene.renderer.scene_finished(scene)  
-
+scene.renderer.scene_finished(scene)

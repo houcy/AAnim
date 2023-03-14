@@ -3,6 +3,7 @@ from style import *
 from manim_fonts import *
 import math
 
+
 class HeapNode:
     def __init__(self, index, value):
         self.index = index
