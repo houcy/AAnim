@@ -39,3 +39,20 @@ def scale_position(positions, x_scale=1, y_scale=1):
         x, y = position
         pos[node] = (x*x_scale, y*y_scale)
     return pos
+
+def get_subtitle_mobject(graph, english_string='', chinese_string='', language='EN', legend_graph_buff=0.5, subtitle_alignment=None, subtitle_position='TOP'):
+    text = None
+    if language == 'CH':
+        text = chinese_string
+    elif language == 'EN':
+        text = english_string
+    text_check_mobject = get_text(text, font_size=SMALL_FONT_SIZE*2, weight=ULTRAHEAVY).scale(0.5)
+    # Place the subtitle on TOP/DOWN to the graph
+    if subtitle_position == 'UP':
+        text_check_mobject = text_check_mobject.next_to(graph.graph_mobject, UP, buff=legend_graph_buff)
+    elif subtitle_position == 'DOWN':
+        text_check_mobject = text_check_mobject.next_to(graph.graph_mobject, DOWN, buff=legend_graph_buff)
+    # Aligh the subtitle on LEFT/RIGHT/CENTER to the graph
+    if subtitle_alignment:
+        text_check_mobject = text_check_mobject.align_to(graph.graph_mobject, alignment)
+    return text_check_mobject

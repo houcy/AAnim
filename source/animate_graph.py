@@ -83,7 +83,7 @@ print("Adjacency list", dict(adjacency_list))
 # Get the position
 position = get_position()
 print("Optimized position", position)
-print("A `output.png` file has been generated. If you are curious what the graph look like, find it in `source` directory.")
+print("An output.png file has been generated just in case you are curious what the graph look like. Find it in `source` directory.")
 
 # Get source (if any, optional)
 source = None

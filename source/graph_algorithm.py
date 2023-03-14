@@ -9,50 +9,17 @@ from graph_edges_group import GraphEdgesGroup
 from graph_nodes_group import GraphNodesGroup
 from util import *
 from union_find import UnionFind
-from color_generator import ColorGenerator
-from sub_graph import SubGraph
 import copy
-
-MAP_UNDIRECTED = {'A': {'B': None, 'C': None}, 'B': {'A': None, 'D': None, 'E': None}, 'C': {'A': None}, 'D': {'B': None, 'F': None}, 'E': {'B': None}, 'F': {'D': None}}
-MAP_DIRECTED_WEIGHT = {'A': {'B': 7, 'C': 7}, 'B': {'D': 7, 'E': 7}, 'D': {'F': 7}, 'E': {'F': 7}}
-MAP_UNDIRECTED_WEIGHT = {'A': {'B': 7, 'C': 7}, 'B': {'A': 7, 'D': 7, 'E': 7}, 'C': {'A': 7}, 'D': {'B': 7, 'F': 7}, 'E': {'B': 7}, 'F': {'D': 7}}
-
-BFS_MAP = {'A': {'B': None, 'C': None}, 'B': {'D': None, 'E': None}, 'D': {'F': None}, 'E': {'F': None}}
-BFS_POSITION = {'A': (1.2692307692307692, 3.0), 'B': (0.8076923076923077, 2.076923076923077), 'C': (1.7307692307692308, 2.076923076923077), 'D': (0.34615384615384615, 1.1538461538461537), 'E': (1.2692307692307692, 1.1538461538461537), 'F': (0.34615384615384615, 0.23076923076923078)}
-
-# MST
-MAP_MST = {'A': {'B': 4, 'H': 8}, 'B': {'A': 4, 'C': 8, 'H': 11}, 'H': {'A': 8, 'B': 11, 'G': 1, 'I': 7}, 'C': {'B': 8, 'D': 7, 'I': 2, 'F': 4}, 'D': {'C': 7, 'F': 14, 'E': 9}, 'I': {'C': 2, 'G': 6, 'H': 7}, 'F': {'C': 4, 'G': 2, 'D': 14, 'E': 10}, 'G': {'I': 6, 'F': 2, 'H': 1}, 'E': {'D': 9, 'F': 10}}
-POSITION_MST = {'A': (0.7, 0.6), 'B': (1.4402327576560112, 2.1393785668991754), 'H': (2.5, -0.1), 'C': (2.9889216307956286, 3.1086575403782315), 'D': (4.368905964414935, 4.2), 'I': (3.082024693200045, 1.457062926629117), 'F': (4.744899101048156, 2.3), 'G': (4.4, 0.5), 'E': (6.0, 3.649819090603902)}
-
-MAP_HARD = {'Src': {'B': 7, 'D': 8, 'G': 8}, 'B': {'Src': 7, 'C': 5, 'D': 6}, 'C': {'B': 5, 'D': 5, 'E': 7}, 'D': {'C': 5, 'E': 3, 'Src': 8, 'B': 6, 'F': 5, 'G': 9}, 'E': {'D': 3, 'F': 2, 'C': 7, 'N': 8, 'M': 6}, 'F': {'E': 2, 'G': 5, 'D': 5, 'M': 7}, 'G': {'F': 5, 'H': 5, 'Src': 8, 'D': 9, 'M': 6}, 'H': {'G': 5, 'I': 5, 'M': 9}, 'P': {'Q': 5, 'O': 5, 'K': 8}, 'Q': {'P': 5, 'R': 5, 'K': 6, 'T': 7}, 'I': {'H': 5, 'J': 3, 'M': 6, 'L': 6, 'K': 9}, 'J': {'I': 3, 'K': 5, 'U': 6, 'T': 6}, 'K': {'J': 5, 'L': 3, 'P': 8, 'O': 5, 'I': 9, 'Q': 6, 'T': 9, 'U': 6}, 'L': {'K': 3, 'M': 3, 'O': 9, 'I': 6}, 'M': {'L': 3, 'N': 3, 'E': 6, 'F': 7, 'G': 6, 'O': 8, 'H': 9, 'I': 6}, 'N': {'M': 3, 'O': 2, 'E': 8}, 'O': {'N': 2, 'P': 5, 'L': 9, 'M': 8, 'K': 5}, 'R': {'Q': 5, 'S': 2, 'T': 5}, 'S': {'R': 2, 'T': 6}, 'T': {'R': 5, 'U': 3, 'K': 9, 'J': 6, 'S': 6, 'Q': 7}, 'U': {'T': 3, 'K': 6, 'J': 6}}
-POSITION_HARD = {'Src': (-4, -1), 'B': (-4, 0), 'C': (-4, 1), 'D': (-3, 0), 'E': (-2, 1), 'F': (-2, 0), 'G': (-2, -1), 'H': (-1, -1), 'I': (0, -1), 'J': (1, -1), 'K': (1, 0), 'L': (0, 0), 'M': (-1, 0), 'N': (-1, 1), 'O': (0, 1), 'P': (1, 1), 'Q': (2, 1), 'R': (3, 1), 'S': (4, 1), 'T': (3, 0), 'U': (3, -1)}
-
-# DIJKSTRS
-DIMAP_DIJKASTRA_CLRS = {'Src': {'B': 10, 'E': 5}, 'B': {'C': 1, 'E': 2}, 'C': {'D': 4}, 'D': {'C': 6}, 'E': {'C': 9, 'D': 2, 'B': 3}}
-DIPOSITION_DIJKASTRA_CLRS = {'Src': (1, 2), 'B': (2, 1), 'E': (0, 1), 'C': (2, 0), 'D': (0, 0)}
-MAP_HARD_DIJKSTRA = {'Src': {'B': 7, 'D': 8, 'G': 8}, 'B': {'Src': 7, 'C': 5, 'D': 6}, 'C': {'B': 5, 'D': 5, 'E': 7}, 'D': {'C': 5, 'E': 3, 'Src': 8, 'B': 6, 'F': 5, 'G': 9}, 'E': {'D': 3, 'F': 2, 'C': 7, 'N': 8, 'M': 6}, 'F': {'E': 2, 'G': 5, 'D': 5, 'M': 7}, 'G': {'F': 5, 'H': 5, 'Src': 8, 'D': 9, 'M': 6}, 'H': {'G': 5, 'I': 5, 'M': 9}, 'P': {'Q': 5, 'O': 5, 'K': 8}, 'Q': {'P': 5, 'R': 5, 'K': 6, 'T': 7}, 'I': {'H': 5, 'J': 3, 'M': 6, 'L': 6, 'K': 9}, 'J': {'I': 3, 'K': 5, 'U': 6, 'T': 6}, 'K': {'J': 5, 'L': 3, 'P': 8, 'O': 5, 'I': 9, 'Q': 6, 'T': 9, 'U': 6}, 'L': {'K': 3, 'M': 3, 'O': 9, 'I': 6}, 'M': {'L': 3, 'N': 3, 'E': 6, 'F': 7, 'G': 6, 'O': 8, 'H': 9, 'I': 6}, 'N': {'M': 3, 'O': 2, 'E': 8}, 'O': {'N': 2, 'P': 5, 'L': 9, 'M': 8, 'K': 5}, 'R': {'Q': 5, 'S': 2, 'T': 5}, 'S': {'R': 2, 'T': 6}, 'T': {'R': 5, 'U': 3, 'K': 9, 'J': 6, 'S': 6, 'Q': 7}, 'U': {'T': 3, 'K': 6, 'J': 6}}
-POSITION_HARD_DIJKSTRA = {'Src': (-4, -1), 'B': (-4, 0), 'C': (-4, 1), 'D': (-3, 0), 'E': (-2, 1), 'F': (-2, 0), 'G': (-2, -1), 'H': (-1, -1), 'I': (0, -1), 'J': (1, -1), 'K': (1, 0), 'L': (0, 0), 'M': (-1, 0), 'N': (-1, 1), 'O': (0, 1), 'P': (1, 1), 'Q': (2, 1), 'R': (3, 1), 'S': (4, 1), 'T': (3, 0), 'U': (3, -1)}
-
-
-MAP_DIJKSTRA_NEGATIVE_EN = {'Src': {'B': 2, 'C': 1}, 'B': {'C': -100}}
-POSITION_DIJKSTRA_NEGATIVE_EN = {'Src': (0, 1.73), 'B': (-1, 0), 'C': (1, 0)}
-
-MAP_TRIANGLE = {'A': {'B': 2}, 'B': {'C': 5}, 'C': {'A': 3}}
-MAP_TRIANGLE_UNDIR = {'A': {'B': 2, 'C': 3}, 'B': {'C': 5, 'A': 2}, 'C': {'A': 3, 'B': 5}}
-POSITION_TRIANGLE = {'A': (0, 1.73), 'B': (-1, 0), 'C': (1, 0)}
-
-
-MAP_6_NODES_HORIZONTAL = {'E': {'F': 1}, 'D': {'E': 1}, 'C': {'D': 1}, 'B': {'C': 1}, 'Src': {'B': 1}, }
-POSITION_6_NODES_HORIZONTAL = {'Src': (0, 0), 'B': (1, 0), 'C': (2, 0), 'D': (3, 0), 'E': (4, 0), 'F': (5, 0)}
 
 
 class GraphAlgorithm(MovingCameraScene):
-    # Comment out code for testing
-    # def __init__(self, adjacency_list, position, is_directed):
-    #     self.adjacency_list = adjacency_list
-    #     self.position = position
-    #     self.is_directed = is_directed
-    #     super().__init__()
+    # Comment out for testing
+    def __init__(self, adjacency_list, position, is_directed, source=None):
+        self.adjacency_list = adjacency_list
+        self.position = position
+        self.is_directed = is_directed
+        self.source = source
+        super().__init__()
 
     def _remove_edges(self, graph, selected_edges, speed=0.5, is_sync=False):
         animations = []
@@ -135,12 +102,12 @@ class GraphAlgorithm(MovingCameraScene):
     def dfs(
         self,
         graph,
-        graph_position=(3.5, 0),
+        graph_position=GRAPH_POSITION,
         graph_scale=1,
         create_graph=True,
         animate_code_block=True,
         code_block=None,
-        code_position=(-3.3, 0),
+        code_position=CODE_POSITION,
         create_legend=True,
         legend_is_horizontal=False,
         hide_details=False,
@@ -210,14 +177,14 @@ class GraphAlgorithm(MovingCameraScene):
         self, 
         graph, 
         source, 
-        graph_position=(3.5, 0),
+        graph_position=GRAPH_POSITION,
         graph_scale=1,
         create_graph=True,
         animate_code_block=True,
         code_block=None,
-        code_position=(-3.3, 0),
+        code_position=CODE_POSITION,
         create_legend=True,
-        legend_is_horizontal=False,
+        legend_is_horizontal=True,
         hide_details=False,
     ):
         """
@@ -277,15 +244,16 @@ class GraphAlgorithm(MovingCameraScene):
     # MST: Prim
     ##################################
 
-    def mst_prim_basic(
+    def prim_basic(
         self,
         graph,
-        graph_position=(3.5, 0),
+        source=None,
+        graph_position=GRAPH_POSITION,
         graph_scale=1,
         create_graph=True,
         animate_code_block=True,
         code_block=None,
-        code_position=(-3.3, 0),
+        code_position=CODE_POSITION,
         create_legend=True,
         legend_is_horizontal=True,
         hide_details=False,
@@ -305,12 +273,15 @@ class GraphAlgorithm(MovingCameraScene):
         self.play(code_block.highlight(1)) if animate_code_block else None
         selected_edges = set()
         selected = set()
-        first_node_key = list(graph.adjacency_list.keys())[0]
-        first_node = graph.value2node[first_node_key]
+        source_node = None
+        if not source:
+            source_node = graph.get_node_random()
+        else:
+            source_node = graph.get_node_by_name(source)
         self.play(code_block.highlight(2, 3)) if animate_code_block else None
         self.play(code_block.highlight(5)) if animate_code_block else None
-        selected.add(first_node)
-        self.play(first_node.color(fill_color=PINK4))
+        selected.add(source_node)
+        self.play(source_node.color(fill_color=PINK4))
         while len(selected) != len(graph.adjacency_list):
             self.play(code_block.highlight(6)) if animate_code_block else None
             self.play(code_block.if_true()) if animate_code_block else None
@@ -349,19 +320,19 @@ class GraphAlgorithm(MovingCameraScene):
         
 
     # Classical version with queue implementation (matched with Dijkstra)
-    def mst_prim_queue(
+    def prim(
         self, 
         graph,
-        graph_position=(3.5, 0),
+        source=None,
+        graph_position=GRAPH_POSITION,
         graph_scale=1,
         create_graph=True,
         animate_code_block=True,
         code_block=None,
-        code_position=(-3.3, 0),
+        code_position=CODE_POSITION,
         create_legend=True,
         legend_is_horizontal=True,
-        hide_details=False,
-        source=None,
+        hide_details=True,
     ):
         if animate_code_block:
             code_block = CodeBlock(CODE_FOR_PRIM_QUEUE)
@@ -390,10 +361,11 @@ class GraphAlgorithm(MovingCameraScene):
         unreach_nodes_group = GraphNodesGroup(unreach)
         self.play(*transforms, run_time=1.5)
         self.play(code_block.highlight(5)) if animate_code_block else None
+        source_node = None
         if not source:
-            source_node = graph.value2node.values()[0]
+            source_node = graph.get_node_random()
         else:
-            source_node = graph.value2node[source]
+            source_node = graph.get_node_by_name(source)
         self.play(source_node.update_key(0), run_time=1.5)
         while unreach:
             # Show group of unreached nodes
@@ -457,7 +429,7 @@ class GraphAlgorithm(MovingCameraScene):
                         self.wait()
                     else:
                         self.play(code_block.if_true(False)) if animate_code_block else None
-                self.play(u.dehighlight(), u.fade_out_label())
+                    self.play(u.dehighlight(), u.fade_out_label())
                 self.play(edges_to_disappear_group.appear(include_label=True), nodes_to_disappear_group.appear(), run_time=0.8)
                 self.play(v.color(fill_color=PINK4, stroke_color=PINK3, stroke_width=WIDTH, has_key=True), v.fade_out_label())
             else:
@@ -523,15 +495,15 @@ class GraphAlgorithm(MovingCameraScene):
     # MST: Kruskal
     ##################################
 
-    def mst_kruskal_basic(
+    def kruskal_basic(
         self, 
         graph,
-        graph_position=(3.5, 0),
+        graph_position=GRAPH_POSITION,
         graph_scale=1,
         create_graph=True,
         animate_code_block=True,
         code_block=None,
-        code_position=(-3.3, 0),
+        code_position=CODE_POSITION,
         create_legend=True,
         legend_is_horizontal=True,
         hide_details=False,
@@ -545,7 +517,7 @@ class GraphAlgorithm(MovingCameraScene):
             x_offset, y_offset = graph_position
             self.play(graph.fade_in(scale=graph_scale, x_offset=x_offset, y_offset=y_offset))
         if create_legend:
-            l = Legend({("LINE", PINK2, PINK2): "MST so far", ("LINE", PURPLE, PURPLE): "curr min edge"}, is_horizontal=legend_is_horizontal)
+            l = Legend({("LINE", PINK2, PINK2): "MST so far", ("LINE", GREEN, GREEN): "curr min edge"}, is_horizontal=legend_is_horizontal)
             l.mobjects.next_to(graph.mobject, UP, buff=LEGEND_GRAPH_BUFF)
             self.play(l.animation)
         self.wait()
@@ -597,15 +569,15 @@ class GraphAlgorithm(MovingCameraScene):
         return mst_edges
 
 
-    def mst_kruskal_union_find(
+    def kruskal(
         self, 
         graph, 
-        graph_position=(3.5, 0), 
+        graph_position=GRAPH_POSITION, 
         graph_scale=1, 
         create_graph=True, 
         animate_code_block=True, 
         code_block=None, 
-        code_position=(-3.3, 0), 
+        code_position=CODE_POSITION, 
         create_legend=True, 
         legend_is_horizontal=True, 
         add_sound=False, 
@@ -690,16 +662,16 @@ class GraphAlgorithm(MovingCameraScene):
         self.play(*transforms, run_time=1.5)
 
     # the new version
-    def shortest_paths_dijkstra(
+    def dijkstra(
         self, 
         graph,
         source,
-        graph_position=(3.5, 0),
+        graph_position=GRAPH_POSITION,
         graph_scale=1,
         create_graph=True,
         animate_code_block=True,
         code_block=None,
-        code_position=(-3.3, 0),
+        code_position=CODE_POSITION,
         create_legend=True,
         legend_is_horizontal=True,
         hide_details=False,
@@ -898,7 +870,7 @@ class GraphAlgorithm(MovingCameraScene):
         source_key, 
         dest_key, 
         create_legend=True, 
-        legend_is_horizontal=False, 
+        legend_is_horizontal=True, 
         animate_code_block=True, 
         code_block=None, 
         hide_details=False
@@ -912,7 +884,7 @@ class GraphAlgorithm(MovingCameraScene):
             self.play(Create(code_block.code))
             self.wait()
         if create_legend:
-            l = Legend({(BACKGROUND, GREEN): "需要放松的点"}, is_horizontal=True)
+            l = Legend({("CIRCLE", BACKGROUND, GREEN): "node needs relax"}, is_horizontal=legend_is_horizontal)
             l.mobjects.next_to(graph.mobject, UP, buff=0.8)
             self.play(l.animation)
         self.play(code_block.highlight(1)) if animate_code_block else None
@@ -979,12 +951,12 @@ class GraphAlgorithm(MovingCameraScene):
         self, 
         graph,
         source, 
-        graph_position=(3.5, 0),
+        graph_position=GRAPH_POSITION,
         graph_scale=1,
         create_graph=True,
         animate_code_block=True,
         code_block=None,
-        code_position=(-3.3, 0),
+        code_position=CODE_POSITION,
         create_legend=True,
         legend_is_horizontal=False,
         hide_details=False,
@@ -1023,14 +995,13 @@ class GraphAlgorithm(MovingCameraScene):
             self.play(code_block.highlight(4))
         else:
             self.wait()
-        source_node = graph.value2node[source]
+        source_node = graph.get_node_by_name(source)
         self.play(source_node.update_key(0), run_time=1.5)
         if not animate_code_block:
             self.play(FadeOut(subtitle_mobject))
             self.wait()
         is_converged = False
         for i in range(graph.n_nodes()-1):
-            # For no code version
             if animate_code_block:
                 self.play(code_block.highlight(5))
             else:
@@ -1116,86 +1087,130 @@ class GraphAlgorithm(MovingCameraScene):
         return True
 
 
-
-
     ##################################
     # Construct - with input commands
     ##################################
 
     # Comment out for easy testing
-    # def construct(self, command):
-    #     self.camera.background_color = BACKGROUND
-    #     w = watermark()
-    #     self.add(w)
-        
-    #     graph = GraphObject(self.adjacency_list, self.position)
-    #     if command == "prim":
-    #         print("Generating animations for Prim...")
-    #         self.add(show_title_for_demo("PRIM'S ALGO FOR MST"))
-    #         graph = GraphObject(self.adjacency_list, self.position)
-    #         self.mst_prim_queue(graph, graph_position=(3.5, -0.5), source='A')
-    #         self.wait(2)
-    #     elif command == "kruskal":
-    #         print("Generating animations for Kruskal...")
-    #         self.add(show_title_for_demo("KRUSKAL'S ALGO FOR MST"))
-    #         graph = GraphObject(self.adjacency_list, self.position)
-    #         self.mst_kruskal_union_find(graph, graph_position=(3.5, -0.5))
-    #         self.wait(2)
+    def construct(self, command):
+        self.camera.background_color = BACKGROUND
+        w = watermark()
+        self.add(w)
+        graph = GraphObject(self.adjacency_list, self.position)
+        if command == "bfs":
+            print("Generating animations on [BFS]...")
+            graph = GraphObject(self.adjacency_list, self.position)
+            self.bfs(graph, source=self.source)
+        elif command == "dfs":
+            print("Generating animations on [DFS]...")
+            graph = GraphObject(self.adjacency_list, self.position)
+            self.dfs(graph)
+        elif command == "prim-basic":
+            print("Generating animations on [Prim basic version (no queue involved)]...")
+            graph = GraphObject(self.adjacency_list, self.position)
+            self.prim_basic(graph, source=self.source)
+        elif command == "prim":
+            print("Generating animations on [Prim]...")
+            graph = GraphObject(self.adjacency_list, self.position)
+            self.prim(graph, source=self.source)
+        elif command == "kruskal-basic":
+            print("Generating animations on [Kruskal basic version (no union-find involved)]...")
+            graph = GraphObject(self.adjacency_list, self.position)
+            self.kruskal_basic(graph)
+        elif command == "kruskal":
+            print("Generating animations on [Kruskal]...")
+            graph = GraphObject(self.adjacency_list, self.position)
+            self.kruskal(graph)
+        elif command == "dijkstra":
+            print("Generating animations on [Dijkstra]...")
+            graph = GraphObject(self.adjacency_list, self.position)
+            self.dijkstra(graph, source=self.source)
+        elif command == "bellmanford":
+            print("Generating animations on [Bellman-Ford]...")
+            graph = GraphObject(self.adjacency_list, self.position)
+            self.bellman_ford(graph, source=self.source)
+
 
     ##################################
-    # Construct - without input commands (for developer easy testing)
+    # Construct - without input commands (for developer testing only)
     # To test, enter the command: `manim graph_algorithm.py GraphAlgorithm -ql`
     ##################################
 
-    def construct(self):
-        self.camera.background_color = BACKGROUND
-        # watermark_en = watermark(is_chinese=False)
-        # new_position = scale_position(POSITION_MST, 1, 1)
-        # graph = GraphObject(MAP_MST, new_position)
-        # title_mobject = show_title_for_demo("Produced by AAnim")
-        # self.add(title_mobject) 
+    #     # BFS/DFS
+    # MAP_UNDIRECTED = {'A': {'B': None, 'C': None}, 'B': {'A': None, 'D': None, 'E': None}, 'C': {'A': None}, 'D': {'B': None, 'F': None}, 'E': {'B': None}, 'F': {'D': None}}
+    # MAP_DIRECTED_WEIGHT = {'A': {'B': 7, 'C': 7}, 'B': {'D': 7, 'E': 7}, 'D': {'F': 7}, 'E': {'F': 7}}
+    # MAP_UNDIRECTED_WEIGHT = {'A': {'B': 7, 'C': 7}, 'B': {'A': 7, 'D': 7, 'E': 7}, 'C': {'A': 7}, 'D': {'B': 7, 'F': 7}, 'E': {'B': 7}, 'F': {'D': 7}}
+
+    # BFS_MAP = {'A': {'B': None, 'C': None}, 'B': {'D': None, 'E': None}, 'D': {'F': None}, 'E': {'F': None}}
+    # BFS_POSITION = {'A': (1.2692307692307692, 3.0), 'B': (0.8076923076923077, 2.076923076923077), 'C': (1.7307692307692308, 2.076923076923077), 'D': (0.34615384615384615, 1.1538461538461537), 'E': (1.2692307692307692, 1.1538461538461537), 'F': (0.34615384615384615, 0.23076923076923078)}
+
+    # # MST
+    # MAP_MST = {'A': {'B': 4, 'H': 8}, 'B': {'A': 4, 'C': 8, 'H': 11}, 'H': {'A': 8, 'B': 11, 'G': 1, 'I': 7}, 'C': {'B': 8, 'D': 7, 'I': 2, 'F': 4}, 'D': {'C': 7, 'F': 14, 'E': 9}, 'I': {'C': 2, 'G': 6, 'H': 7}, 'F': {'C': 4, 'G': 2, 'D': 14, 'E': 10}, 'G': {'I': 6, 'F': 2, 'H': 1}, 'E': {'D': 9, 'F': 10}}
+    # POSITION_MST = {'A': (0.7, 0.6), 'B': (1.4402327576560112, 2.1393785668991754), 'H': (2.5, -0.1), 'C': (2.9889216307956286, 3.1086575403782315), 'D': (4.368905964414935, 4.2), 'I': (3.082024693200045, 1.457062926629117), 'F': (4.744899101048156, 2.3), 'G': (4.4, 0.5), 'E': (6.0, 3.649819090603902)}
+
+    # MAP_HARD = {'Src': {'B': 7, 'D': 8, 'G': 8}, 'B': {'Src': 7, 'C': 5, 'D': 6}, 'C': {'B': 5, 'D': 5, 'E': 7}, 'D': {'C': 5, 'E': 3, 'Src': 8, 'B': 6, 'F': 5, 'G': 9}, 'E': {'D': 3, 'F': 2, 'C': 7, 'N': 8, 'M': 6}, 'F': {'E': 2, 'G': 5, 'D': 5, 'M': 7}, 'G': {'F': 5, 'H': 5, 'Src': 8, 'D': 9, 'M': 6}, 'H': {'G': 5, 'I': 5, 'M': 9}, 'P': {'Q': 5, 'O': 5, 'K': 8}, 'Q': {'P': 5, 'R': 5, 'K': 6, 'T': 7}, 'I': {'H': 5, 'J': 3, 'M': 6, 'L': 6, 'K': 9}, 'J': {'I': 3, 'K': 5, 'U': 6, 'T': 6}, 'K': {'J': 5, 'L': 3, 'P': 8, 'O': 5, 'I': 9, 'Q': 6, 'T': 9, 'U': 6}, 'L': {'K': 3, 'M': 3, 'O': 9, 'I': 6}, 'M': {'L': 3, 'N': 3, 'E': 6, 'F': 7, 'G': 6, 'O': 8, 'H': 9, 'I': 6}, 'N': {'M': 3, 'O': 2, 'E': 8}, 'O': {'N': 2, 'P': 5, 'L': 9, 'M': 8, 'K': 5}, 'R': {'Q': 5, 'S': 2, 'T': 5}, 'S': {'R': 2, 'T': 6}, 'T': {'R': 5, 'U': 3, 'K': 9, 'J': 6, 'S': 6, 'Q': 7}, 'U': {'T': 3, 'K': 6, 'J': 6}}
+    # POSITION_HARD = {'Src': (-4, -1), 'B': (-4, 0), 'C': (-4, 1), 'D': (-3, 0), 'E': (-2, 1), 'F': (-2, 0), 'G': (-2, -1), 'H': (-1, -1), 'I': (0, -1), 'J': (1, -1), 'K': (1, 0), 'L': (0, 0), 'M': (-1, 0), 'N': (-1, 1), 'O': (0, 1), 'P': (1, 1), 'Q': (2, 1), 'R': (3, 1), 'S': (4, 1), 'T': (3, 0), 'U': (3, -1)}
+
+    # # DIJKSTRS
+    # DIMAP_DIJKASTRA_CLRS = {'Src': {'B': 10, 'E': 5}, 'B': {'C': 1, 'E': 2}, 'C': {'D': 4}, 'D': {'C': 6}, 'E': {'C': 9, 'D': 2, 'B': 3}}
+    # DIPOSITION_DIJKASTRA_CLRS = {'Src': (1, 2), 'B': (2, 1), 'E': (0, 1), 'C': (2, 0), 'D': (0, 0)}
+    # MAP_HARD_DIJKSTRA = {'Src': {'B': 7, 'D': 8, 'G': 8}, 'B': {'Src': 7, 'C': 5, 'D': 6}, 'C': {'B': 5, 'D': 5, 'E': 7}, 'D': {'C': 5, 'E': 3, 'Src': 8, 'B': 6, 'F': 5, 'G': 9}, 'E': {'D': 3, 'F': 2, 'C': 7, 'N': 8, 'M': 6}, 'F': {'E': 2, 'G': 5, 'D': 5, 'M': 7}, 'G': {'F': 5, 'H': 5, 'Src': 8, 'D': 9, 'M': 6}, 'H': {'G': 5, 'I': 5, 'M': 9}, 'P': {'Q': 5, 'O': 5, 'K': 8}, 'Q': {'P': 5, 'R': 5, 'K': 6, 'T': 7}, 'I': {'H': 5, 'J': 3, 'M': 6, 'L': 6, 'K': 9}, 'J': {'I': 3, 'K': 5, 'U': 6, 'T': 6}, 'K': {'J': 5, 'L': 3, 'P': 8, 'O': 5, 'I': 9, 'Q': 6, 'T': 9, 'U': 6}, 'L': {'K': 3, 'M': 3, 'O': 9, 'I': 6}, 'M': {'L': 3, 'N': 3, 'E': 6, 'F': 7, 'G': 6, 'O': 8, 'H': 9, 'I': 6}, 'N': {'M': 3, 'O': 2, 'E': 8}, 'O': {'N': 2, 'P': 5, 'L': 9, 'M': 8, 'K': 5}, 'R': {'Q': 5, 'S': 2, 'T': 5}, 'S': {'R': 2, 'T': 6}, 'T': {'R': 5, 'U': 3, 'K': 9, 'J': 6, 'S': 6, 'Q': 7}, 'U': {'T': 3, 'K': 6, 'J': 6}}
+    # POSITION_HARD_DIJKSTRA = {'Src': (-4, -1), 'B': (-4, 0), 'C': (-4, 1), 'D': (-3, 0), 'E': (-2, 1), 'F': (-2, 0), 'G': (-2, -1), 'H': (-1, -1), 'I': (0, -1), 'J': (1, -1), 'K': (1, 0), 'L': (0, 0), 'M': (-1, 0), 'N': (-1, 1), 'O': (0, 1), 'P': (1, 1), 'Q': (2, 1), 'R': (3, 1), 'S': (4, 1), 'T': (3, 0), 'U': (3, -1)}
 
 
-        # new_position = scale_position(BFS_POSITION, 1, 1)
-        # graph = GraphObject(BFS_MAP, new_position)
-        ### BFS 
-        # self.bfs(graph, source='A')
+    # MAP_DIJKSTRA_NEGATIVE_EN = {'Src': {'B': 2, 'C': 1}, 'B': {'C': -100}}
+    # POSITION_DIJKSTRA_NEGATIVE_EN = {'Src': (0, 1.73), 'B': (-1, 0), 'C': (1, 0)}
 
-        ### DFS
-        # self.dfs(graph, show_topological_sort=True)
+    # MAP_TRIANGLE = {'A': {'B': 2}, 'B': {'C': 5}, 'C': {'A': 3}}
+    # MAP_TRIANGLE_UNDIR = {'A': {'B': 2, 'C': 3}, 'B': {'C': 5, 'A': 2}, 'C': {'A': 3, 'B': 5}}
+    # POSITION_TRIANGLE = {'A': (0, 1.73), 'B': (-1, 0), 'C': (1, 0)}
+
+
+    # MAP_6_NODES_HORIZONTAL = {'E': {'F': 1}, 'D': {'E': 1}, 'C': {'D': 1}, 'B': {'C': 1}, 'Src': {'B': 1}, }
+    # POSITION_6_NODES_HORIZONTAL = {'Src': (0, 0), 'B': (1, 0), 'C': (2, 0), 'D': (3, 0), 'E': (4, 0), 'F': (5, 0)}
+
+
+    # Remove comment for easy testing
+    # def construct(self):
+    #     self.camera.background_color = BACKGROUND
+    #     # watermark_en = watermark(is_chinese=False)
+    #     # new_position = scale_position(POSITION_MST, 1, 1)
+    #     # graph = GraphObject(MAP_MST, new_position)
+    #     # title_mobject = show_title_for_demo("Produced by AAnim")
+    #     # self.add(title_mobject) 
+
+
+    #     # new_position = scale_position(BFS_POSITION, 1, 1)
+    #     # graph = GraphObject(BFS_MAP, new_position)
+    #     ### BFS 
+    #     # self.bfs(graph, source='A')
+
+    #     ### DFS
+    #     # self.dfs(graph, show_topological_sort=True)
         
 
-        new_position = scale_position(POSITION_TRIANGLE, 2, 1.5)
-        graph = GraphObject(MAP_TRIANGLE_UNDIR, new_position)
-        ### Prim-basic
-        # self.mst_prim_basic(graph)
+    #     new_position = scale_position(POSITION_TRIANGLE, 2, 1.5)
+    #     graph = GraphObject(MAP_TRIANGLE_UNDIR, new_position)
+    #     ### Prim-basic
+    #     # self.prim_basic(graph)
 
-        ### Prim-queue
-        # self.mst_prim_queue(graph, source='A', hide_details=True)
+    #     ### Prim-queue
+    #     # self.prim(graph, source='A', hide_details=True)
 
-        ### Kruskal-basic
-        # self.mst_kruskal_basic(graph)
+    #     ### Kruskal-basic
+    #     # self.kruskal_basic(graph)
 
-        ### Kruskal-union-find
-        # self.mst_kruskal_union_find(graph)
+    #     ### Kruskal-union-find
+    #     # self.kruskal(graph)
 
-        new_position = scale_position(POSITION_TRIANGLE, 2, 1.5)
-        graph = GraphObject(MAP_TRIANGLE, new_position)
-        ### Dijkastra
-        # self.shortest_paths_dijkstra(graph, source='A')
 
-        ### Bellman-Ford (EN)
-        # self.add(watermark_en)
-        # title_mobject = show_title_for_demo("BELLMAN-FORD ALGO")
-        # self.add(title_mobject)
-        # self.wait()
-        ## Positive cycle
-        # new_position = scale_position(POSITION_DIJKSTRA_NEGATIVE_EN, 1.3, 1.3)
-        # graph = GraphObject(MAP_DIJKSTRA_NEGATIVE_EN, new_position)
-        ## Negative cycle
-        # new_position = scale_position(POSITION_TRIANGLE_NEGATIVE_CYCLE, 1.3, 1.3)
-        # graph = GraphObject(MAP_TRIANGLE_NEGATIVE_CYCLE, new_position)
-        self.bellman_ford(graph, 'A')
+    #     new_position = scale_position(POSITION_TRIANGLE, 2, 1.5)
+    #     graph = GraphObject(MAP_TRIANGLE, new_position)
+    #     ### Dijkastra
+    #     # self.dijkstra(graph, source='A')
+
+    #     ### Bellman-Ford (EN)
+    #     self.bellman_ford(graph, 'A')
 
 
         

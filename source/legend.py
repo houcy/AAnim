@@ -68,7 +68,7 @@ class Legend:
     def next_to(self, mobject, direction=UP, buff=LEGEND_OBJECT_BUFF):
         return self.mobjects.animate.next_to(mobject, direction, buff=buff)
 
-    def next_to_character_top_left(self, mobject, direction=LEFT, buff=LEGEND_CHARACTER_BUFF):
+    def next_to_character_top_left(self, mobject, direction=LEFT, buff=LEGEND_OBJECT_BUFF):
         return self.mobjects.animate.next_to(mobject, direction, buff=buff)
 
 class Test(Scene):

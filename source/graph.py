@@ -63,6 +63,9 @@ class GraphObject:
     def get_nodes(self):
         return list(self.value2node.values())
 
+    def get_node_random(self):
+        return self.get_nodes()[0]
+
     def fade_in(self, x_offset=0, y_offset=0, scale=1):
         self.mobject.scale(scale).shift(x_offset*RIGHT+y_offset*UP)
         self.mobject.save_state()
