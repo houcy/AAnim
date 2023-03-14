@@ -165,11 +165,18 @@ class GraphNode:
         Fill this node as PINK (light pink)
         """
         if not has_key:
-            return AnimationGroup(self.circle_mobject.animate.set_fill(fill_color).set_stroke(stroke_color, width=stroke_width), self.text_mobject.animate.set_color(text_color))
+            return AnimationGroup(
+                self.circle_mobject.animate.set_fill(fill_color).set_stroke(stroke_color, width=stroke_width), 
+                self.text_mobject.animate.set_color(text_color))
         elif self.text_mobject_is_showing:
-            return AnimationGroup(self.circle_mobject.animate.set_fill(fill_color).set_stroke(stroke_color, width=stroke_width), self.key_mobject.animate.set_color(text_color), self.text_mobject.animate.set_color(text_color))
+            return AnimationGroup(
+                self.circle_mobject.animate.set_fill(fill_color).set_stroke(stroke_color, width=stroke_width), 
+                self.key_mobject.animate.set_color(text_color), 
+                self.text_mobject.animate.set_color(text_color))
         else:
-            return AnimationGroup(self.circle_mobject.animate.set_fill(fill_color).set_stroke(stroke_color, width=stroke_width), self.key_mobject.animate.set_color(text_color))
+            return AnimationGroup(
+                self.circle_mobject.animate.set_fill(fill_color).set_stroke(stroke_color, width=stroke_width), 
+                self.key_mobject.animate.set_color(text_color))
 
     def mark_pink3(self):
         """

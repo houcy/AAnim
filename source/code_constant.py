@@ -19,13 +19,13 @@ CODE_FOR_INSERT = """INSERT(A, value) {
 }
 """
 
-CODE_FOR_DFS = """DFS(G) {
+CODE_FOR_DFS = """DFS(Graph) {
     for each vertex u
         if u.color = BLACK
             DFS_VISIT(G, u)
 }
 
-DFS_VISIT(G, u) {
+DFS_VISIT(Graph, u) {
     u.color = PINK
     for each neighbor v of u
         if v.color = BLACK
@@ -34,7 +34,7 @@ DFS_VISIT(G, u) {
 }
 """
 
-CODE_FOR_BFS = """BFS(G, s) {
+CODE_FOR_BFS = """BFS(Graph, source) {
     s.color = PINK
     Q = ∅
     ENQUEUE(Q, s)
@@ -49,7 +49,7 @@ CODE_FOR_BFS = """BFS(G, s) {
 }
 """
 
-CODE2_FOR_BFS = """BFS(G, s) {
+CODE2_FOR_BFS = """BFS(Graph, source) {
     curr_level, next_level = ∅, ∅
     ENQUEUE(curr_level, s)
     s.color = PINK
@@ -66,7 +66,7 @@ CODE2_FOR_BFS = """BFS(G, s) {
 }
 """
 
-CODE_FOR_PRIM_BASIC = """PRIM_IDEA(G) {
+CODE_FOR_PRIM_BASIC = """PRIM_IDEA(Graph) {
     Edges = ∅
     ReachSet = ∅
     UnReachSet = G.V
@@ -81,7 +81,7 @@ CODE_FOR_PRIM_BASIC = """PRIM_IDEA(G) {
 }
 """
 
-CODE_FOR_PRIM_QUEUE = """PRIM(G) {
+CODE_FOR_PRIM_QUEUE = """PRIM(Graph) {
     Edges = ∅, UnReachSet = G.V
     set all vertices v.minEdge = ∅
     set all vertices v.key = ∞
@@ -100,7 +100,7 @@ CODE_FOR_PRIM_QUEUE = """PRIM(G) {
 """
 
 
-CODE_FOR_KRUSKAL = """KRUSKAL_IDEA(G) {
+CODE_FOR_KRUSKAL = """KRUSKAL_IDEA(Graph) {
     Edges = ∅
     scan all edges by nondecreasing weight
         if an edge is safe (does not form
@@ -110,7 +110,7 @@ CODE_FOR_KRUSKAL = """KRUSKAL_IDEA(G) {
 }
 """
 
-CODE_FOR_KRUSKAL_CHINESE = """KRUSKAL(G) {
+CODE_FOR_KRUSKAL_CHINESE = """KRUSKAL(Graph) {
     Edges = ∅
     按从小到大的顺序检查每条边
         如果这条边是安全的（没有和最小生成树形成任何环）
@@ -120,7 +120,7 @@ CODE_FOR_KRUSKAL_CHINESE = """KRUSKAL(G) {
 """
 
 
-CODE_FOR_KRUSKAL_UNION_FIND = """KRUSKAL(G) {
+CODE_FOR_KRUSKAL_UNION_FIND = """KRUSKAL(Graph) {
     Edges = ∅
     for each vertex v ∈ G.V
         MAKE_SET(v)

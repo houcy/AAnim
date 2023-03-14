@@ -6,24 +6,25 @@ LINE_WIDTH = 7
 class Legend:
     def __init__(self, dict, is_horizontal=False, save_space=False):
         """
-        Dict should be from color to text, such as: {PINK1: "explored", PINK3: "finished"}
+        Dict should look like this: {("LINE", fill_color, stroke_color): "description text that you want to show"}
         """
         self.animation = None
         inside = VGroup()
         self.box = None
-        for feature, explanation in dict.items():
-            if feature[0] == "HIGHLIGHT_ROUNDED_RECTANGLE":
-                command, fill_color, stroke_color = feature
-                if command == "HIGHLIGHT_ROUNDED_RECTANGLE":
-                    rect = RoundedRectangle(corner_radius=0.06, height=2.2*SM_RADIUS, width=2.2*SM_RADIUS).set_fill(fill_color, 1).set_stroke(color=stroke_color)
-                    text = Text(str(explanation), color=LINE_COLOR, font=FONT, font_size=LEGEND_SIZE*2).scale(0.5).next_to(circle, RIGHT, buff=2)
-                    if is_horizontal or save_space:
-                        row = VGroup(rect, text).arrange_in_grid(rows=1, buff=LEGEND_BUFF_MICRO)
-                        inside += row
-                    else:
-                        inside += rect
-                        inside += text
-            elif feature[0] == "MULTICOLORS":
+        for feature, description in dict.items():
+            type = feature[0]
+            # if type == "HIGHLIGHT_ROUNDED_RECTANGLE":
+            #     command, fill_color, stroke_color = feature
+            #     if command == "HIGHLIGHT_ROUNDED_RECTANGLE":
+            #         rect = RoundedRectangle(corner_radius=0.06, height=2.2*SM_RADIUS, width=2.2*SM_RADIUS).set_fill(fill_color, 1).set_stroke(color=stroke_color)
+            #         text = Text(str(explanation), color=LINE_COLOR, font=FONT, font_size=LEGEND_SIZE*2).scale(0.5).next_to(circle, RIGHT, buff=2)
+            #         if is_horizontal or save_space:
+            #             row = VGroup(rect, text).arrange_in_grid(rows=1, buff=LEGEND_BUFF_MICRO)
+            #             inside += row
+            #         else:
+            #             inside += rect
+            #             inside += text
+            if type == "MULTICOLORS":
                 legend = VGroup()
                 if feature[1] == "CIRCLE":
                     for i, color in enumerate(MULTI_COLORS):
@@ -31,28 +32,27 @@ class Legend:
                 elif feature[1] == "LINE":
                     for i, color in enumerate(MULTI_COLORS):
                         legend += Line(start=[0, 0, 0], end=[0.21, 0, 0]).set_fill(color, 1).set_stroke(color, width=LINE_WIDTH).shift((i * 0.1) * DOWN)
-                text = Text(str(explanation), color=LINE_COLOR, font=FONT, font_size=LEGEND_SIZE).next_to(legend, RIGHT, buff=2)
+                text = Text(str(description), color=LINE_COLOR, font=FONT, font_size=LEGEND_SIZE).next_to(legend, RIGHT, buff=2)
                 if is_horizontal or save_space:
                     row = VGroup(legend, text).arrange_in_grid(rows=1, buff=LEGEND_BUFF_MICRO)
                     inside += row
                 else:
                     inside += legend
                     inside += text
-
-            elif feature[0] == "LINE":
+            elif type == "LINE":
                 _, fill_color, stroke_color = feature
                 line = Line(start=[0, 0, 0], end=[0.21, 0, 0]).set_fill(fill_color, 1).set_stroke(stroke_color, width=LINE_WIDTH)
-                text = Text(str(explanation), color=LINE_COLOR, font=FONT, font_size=LEGEND_SIZE*2).scale(0.5).next_to(line, RIGHT, buff=2)
+                text = Text(str(description), color=LINE_COLOR, font=FONT, font_size=LEGEND_SIZE*2).scale(0.5).next_to(line, RIGHT, buff=2)
                 if is_horizontal or save_space:
                     row = VGroup(line, text).arrange_in_grid(rows=1, buff=LEGEND_BUFF_MICRO)
                     inside += row
                 else:
                     inside += line
                     inside += text
-            else:
-                fill_color, stroke_color = feature
+            elif type == "CIRCLE":
+                _, fill_color, stroke_color = feature
                 circle = Circle(radius=SM_RADIUS).set_fill(fill_color, 1).set_stroke(stroke_color)
-                text = Text(str(explanation), color=LINE_COLOR, font=FONT, font_size=LEGEND_SIZE*2).scale(0.5).next_to(circle, RIGHT, buff=2)
+                text = Text(str(description), color=LINE_COLOR, font=FONT, font_size=LEGEND_SIZE*2).scale(0.5).next_to(circle, RIGHT, buff=2)
                 if is_horizontal or save_space:
                     row = VGroup(circle, text).arrange_in_grid(rows=1, buff=LEGEND_BUFF_MICRO)
                     inside += row
