@@ -1,5 +1,6 @@
 from manim import *
 from style import *
+from util import *
 from graph_node import GraphNode
 from graph_edge import GraphEdge
 from graph_edges_group import GraphEdgesGroup
@@ -233,30 +234,25 @@ class GraphObject:
         
 
 
-        
-
 class Test(Scene):
     def construct(self):
+        position = scale_position(POSITION1, 1.5, 1.5)
         self.camera.background_color = BACKGROUND
-        # graph = Graph(MAP_UNDIRECTED, POSITION1, is_directed=False)
-        # self.add(graph.mobject)
-        # self.play(FadeOut(graph.mobject))
-        # graph = Graph(MAP_DIRECTED, POSITION1, is_directed=True)
-        # self.add(graph.mobject)
-        # self.play(FadeOut(graph.mobject))
-        # graph = Graph(MAP_UNDIRECTED_WEIGHT, POSITION1, is_directed=False)
-        # self.add(graph.mobject)
-        # self.play(FadeOut(graph.mobject))
-        # graph = Graph(MAP_DIRECTED_WEIGHT, POSITION1, is_directed=True)
-        # self.add(graph.mobject)
-        # self.play(FadeOut(graph.mobject))
-        graph = Graph(MAP_CYCLE, POSITION_CYCLE, is_directed=True)
+        graph = GraphObject(MAP_UNDIRECTED, position)
         self.add(graph.mobject)
         self.play(FadeOut(graph.mobject))
-        graph = Graph(MAP_CYCLE, POSITION_CYCLE2, is_directed=True)
+        graph = GraphObject(MAP_DIRECTED, position)
         self.add(graph.mobject)
         self.play(FadeOut(graph.mobject))
-        graph = Graph(MAP_CYCLE, POSITION_CYCLE3, is_directed=True)
+        graph = GraphObject(MAP_UNDIRECTED_WEIGHT, position)
         self.add(graph.mobject)
         self.play(FadeOut(graph.mobject))
-    
+        graph = GraphObject(MAP_CYCLE, POSITION_CYCLE)
+        self.add(graph.mobject)
+        self.play(FadeOut(graph.mobject))
+        graph = GraphObject(MAP_CYCLE, POSITION_CYCLE2)
+        self.add(graph.mobject)
+        self.play(FadeOut(graph.mobject))
+        graph = GraphObject(MAP_CYCLE, POSITION_CYCLE3)
+        self.add(graph.mobject)
+        self.play(FadeOut(graph.mobject))
