@@ -2,7 +2,7 @@
 
 ## 🍓 What AAnim is
 
-A(lgorithm)Anim(ation) is a library for data structure and algorithms animation by using a Python library called Manim.
+A(lgorithm)Anim(ation) is a library for creating 3b1b-ish videos on visulizing data structure and algorithms.
 
 ## 🍓 Installing Dependencies
 
@@ -95,9 +95,9 @@ Normally a video of 100 animations would take around 6 mins to generate. It's no
 
 ## 🍓 WIP
 
-1. We are working on an online version of it to save your time on waiting.
-2. We are working on creatin a invisible box to scale the graph so that it won't overlap.
-3. We are working on a new feature to enable you to specify a layout engine among `dot`, `neato`, `twopi`, `circo`, `fdp`, `osage`, `sfdp`, which are supported by Graphviz. It's not implemented yet.
+1. We are working on an web version of AAnim.
+2. We are working on dynamically placing the graph and the code such that they won't overlap.
+3. We are working on a new feature to give you freedom to choose different layout of the graph by specifying a layout engine among `dot`, `neato`, `twopi`, `circo`, `fdp`, `osage`, `sfdp`.
 
 The above instructions were tested only on Mac OS X Intel version. Feel free to give it a try anyway and let me know if it doesn't work on your env and we can figure it out together. We thank you for choosing AAnim! If you have any suggestions or comments, feel free to contact Joy: zhuozhuo530[at]gmail.
 
