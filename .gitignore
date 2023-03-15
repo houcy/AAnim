@@ -1,7 +1,7 @@
 __pycache__
 .DS_Store
 media/
-practice/test.py
+source/test.py
 manim.cfg
-practice/output.png
-practice/output.json
+source/output.png
+source/output.json
